@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template
 from pymongo import MongoClient
-import pdb
+
+import helpers
 
 app = Flask(__name__)
 
@@ -16,7 +17,7 @@ def index():
 def submit():
     query = request.args['query']
     results = run_query(query)
-    return render_template('results.html', results=results)
+    return render_template('results.html', results=results, query=query)
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -27,13 +28,16 @@ def page_not_found(e):
 #-----------------------------------------------------------------------------
 
 def run_query(query):
-    # print "QUERY: " + query
     connection = MongoClient('localhost', 27017)
-    db = connection.DDM
-    q = db.command('text', 'test', search=query, limit=10)
-    results = q['results']
-    # print "RESULTS: " + str(results)
-    return results
+    db = connection.xgen
+    
+    q = db.command('text', 'jira', search=query, limit=10)
+    jira_results = helpers.clean_jira_results(q['results'], query)
+
+    q = db.command('text', 'partychapp', search=query, limit=10)
+    chat_results = helpers.clean_chat_results(q['results'], query)
+
+    return sorted(jira_results + chat_results, key=lambda k: k['score'])
 
 #-----------------------------------------------------------------------------
 # Launch
