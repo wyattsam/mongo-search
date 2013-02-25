@@ -3,8 +3,32 @@
 
 {% block content %}
 
-{% for result in results %}
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="btn-group btn-group-vertical">
+        <button type="button" class="btn btn-block" data-toggle="button">JIRA</button>
+        <button type="button" class="btn btn-block" data-toggle="button">Stack Overflow</button>
+        <button type="button" class="btn btn-block" data-toggle="button">10gen Wiki</button>
+        <button type="button" class="btn btn-block" data-toggle="button">10gen Chat</button>
+        <button type="button" class="btn btn-block" data-toggle="button">Internal Email</button>
+        <button type="button" class="btn btn-block" data-toggle="button">MongoDB Forums</button>
+        <button type="button" class="btn btn-block" data-toggle="button">MongoDB Docs</button>
+      </div>
+    </div>
 
-{% endfor %}
+    <div class="span10">
+      {% for result in results %}
+      <div class="result">
+        <a target="_blank" href="{{ result.url }}">
+          <h5 class="result-summary" data-source="{{ result.source }}">{{ result.summary }}</h5>
+        </a>
+        <p class="result-snippet" data-source="{{ result.source }}">{{ result.snippet }}</p>
+        <p class="muted result-url" data-source="{{ result.source }}">{{ result.url }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
 
 {% endblock %}
