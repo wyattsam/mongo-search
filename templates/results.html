@@ -2,6 +2,12 @@
 {% block title %} - Results{% endblock %}
 
 {% block content %}
+<form class="form-search" method="get" action="/submit">
+  <div class="input-append">
+    <input type="text" name="query" placeholder="Search">
+    <button type="submit" class="btn">Submit</button>
+  </div>
+</form>
 
 <div class="container-fluid">
   <div class="row-fluid">
