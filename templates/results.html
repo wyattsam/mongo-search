@@ -31,4 +31,9 @@
   </div>
 </div>
 
+<script>
+  $(document).ready(function() {
+    $('.result-summary, .result-snippet').highlight( "{{ query }}" );
+  });
+</script>
 {% endblock %}
