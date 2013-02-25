@@ -36,6 +36,9 @@ def save(conn, messages):
     coll.insert(m)
 
 if __name__ == '__main__':
+  if len(sys.argv) != 2:
+    print "usage: %s name_of_channel" % sys.argv[0]
+    sys.exit(1)
   channel = sys.argv[1]
   conn = pymongo.MongoClient(MONGO_HOST)
   messages = fetch(channel)
