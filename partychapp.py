@@ -30,9 +30,10 @@ def fetch(channel):
     return []
   return resp_data['entries']
 
-def save(conn, messages):
+def save(conn, messages, channel):
   coll = conn[MONGO_DATABASE][MONGO_COLLECTION]
   for m in messages:
+    m['channel'] = channel
     coll.insert(m)
 
 if __name__ == '__main__':
@@ -42,5 +43,5 @@ if __name__ == '__main__':
   channel = sys.argv[1]
   conn = pymongo.MongoClient(MONGO_HOST)
   messages = fetch(channel)
-  save(conn, messages)
+  save(conn, messages, channel)
   print "saved %d messages" % len(messages)
