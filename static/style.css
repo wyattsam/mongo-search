@@ -1,0 +1,38 @@
+/*----------------------*/
+/* Results.html         */
+/*----------------------*/
+
+.result-summary {
+    font-weight: normal;
+    margin-bottom: 0px;
+    text-decoration: underline;
+}
+
+.result-snippet {
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+
+.result-url {
+    margin-top: 0px;
+}
+
+a {
+    color: #12c;
+}
+
+.highlight {
+    font-weight: bold;
+}
+
+.result {
+    margin-bottom: 20px;
+}
+
+[data-source="jira"] {
+    border-left: 3px solid cyan; padding-left: 5px;
+}
+
+[data-source="chat"] {
+    border-left: 3px solid greenyellow; padding-left: 5px;
+}
