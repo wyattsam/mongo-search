@@ -4,25 +4,58 @@ import requests
 from pymongo import Connection
 from time import sleep
 
-MONGO = Connection( 'mongodb://xgen:xgen@localhost:27017/xgen' )
+MONGO = Connection('localhost:27017')
 DB = MONGO['xgen']
-ISSUE_BASE = 'https://jira.mongodb.org/rest/api/latest/issue/'
+ISSUES = DB['jira']
+API_BASE = 'https://jira.mongodb.org/rest/api/latest/'
+ISSUE_URL = API_BASE + 'issue/'
+SEARCH_URL = API_BASE + 'search/'
+PROJECT_URL = API_BASE + 'project/'
 
-def get( project, num, username, password ):
-    issue_url = ISSUE_BASE + project + '-' + str( num )
-    print issue_url
-    response = requests.get(issue_url, auth=(username, password), verify=False)
-    jira_ticket_data = response.json()
-    jira_ticket_data[ '_id' ] = jira_ticket_data[ 'key' ]
-    DB.jira.save( jira_ticket_data )
+def jira_get(url, params={}, login=True):
+    auth = credentials if login else {}
+    return requests.get(url, params=params, auth=auth, verify=False).json()
+
+
+def save_issue(issue_key):
+    print "getting " + issue_key
+    issue = jira_get(ISSUE_URL + issue_key)
+    issue['_id'] = issue['key']
+    ISSUES.save(issue)
+
+def save_issues(project):
+    jql = 'PROJECT={project} order by KEY asc'.format(project=project)
+    params = {
+        'jql': jql,
+        'startAt': 0,
+        'maxResults': 100,
+        'fields': 'KEY'
+    }
+
+    while True:
+        result = jira_get(SEARCH_URL, params=params)
+        issues = result['issues']
+
+        if issues:
+            for issue in issues:
+                save_issue(issue['key'])
+                sleep(0.25)
+        else:
+            break
+
+        params['startAt'] += len(issues)
 
 if __name__ == '__main__':
+    global credentials
+
     if len(sys.argv) < 3:
         print "usage: jira.py jira_username jira_password"
         sys.exit(0)
 
     jira_user, jira_pass = sys.argv[1:3]
-
-    for i in range( 1, 5000 ):
-        get( 'CS', i, jira_user, jira_pass )
-        sleep( 2 )
+    credentials = (jira_user, jira_pass)
+    projects = jira_get(PROJECT_URL, login=False)
+    project_keys = [project['key'] for project in projects]
+    print project_keys
+    for project_key in project_keys:
+        save_issues(project_key)
