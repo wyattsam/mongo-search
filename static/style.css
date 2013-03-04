@@ -30,9 +30,9 @@ a {
 }
 
 [data-source="jira"] {
-    border-left: 3px solid cyan; padding-left: 5px;
+    border-left: 3px solid green; padding-left: 5px;
 }
 
-[data-source="chat"] {
-    border-left: 3px solid greenyellow; padding-left: 5px;
+[data-source="so"] {
+    border-left: 3px solid orange; padding-left: 5px;
 }
