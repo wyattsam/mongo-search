@@ -6,30 +6,33 @@ from time import sleep
 
 MONGO = Connection('localhost:27017')
 DB = MONGO['xgen']
+COMBINED = DB['combined']
 ISSUES = DB['jira']
-API_BASE = 'https://jira.mongodb.org/rest/api/latest/'
-ISSUE_URL = API_BASE + 'issue/'
+API_BASE = 'https://jira.mongodb.org/rest/api/2/'
 SEARCH_URL = API_BASE + 'search/'
 PROJECT_URL = API_BASE + 'project/'
+PAGE_SIZE = 100
 
-def jira_get(url, params={}, login=True):
+def jira_get(url, params={}, login=False):
     auth = credentials if login else {}
     return requests.get(url, params=params, auth=auth, verify=False).json()
 
-
-def save_issue(issue_key):
-    print "getting " + issue_key
-    issue = jira_get(ISSUE_URL + issue_key)
-    issue['_id'] = issue['key']
-    ISSUES.save(issue)
+def save_issue(issue, project):
+    print "upserting jira issue " + issue['key']
+    key = issue['key']
+    issue['_id'] = key
+    issue['project'] = project
+    ISSUES.update({'_id': key}, issue, True)
+    issue['source'] = 'jira'
+    COMBINED.update({'_id': key}, issue, True)
 
 def save_issues(project):
     jql = 'PROJECT={project} order by KEY asc'.format(project=project)
     params = {
         'jql': jql,
         'startAt': 0,
-        'maxResults': 100,
-        'fields': 'KEY'
+        'maxResults': PAGE_SIZE,
+        'fields': 'key,summary,description,comment'
     }
 
     while True:
@@ -38,24 +41,26 @@ def save_issues(project):
 
         if issues:
             for issue in issues:
-                save_issue(issue['key'])
-                sleep(0.25)
+                save_issue(issue, project)
         else:
             break
 
         params['startAt'] += len(issues)
+        sleep(1)
 
 if __name__ == '__main__':
     global credentials
+    login = False
 
-    if len(sys.argv) < 3:
-        print "usage: jira.py jira_username jira_password"
-        sys.exit(0)
+    # user provided login credentials
+    if len(sys.argv) == 3:
+        jira_user, jira_pass = sys.argv[1:3]
+        credentials = (jira_user, jira_pass)
+        login = True        
 
-    jira_user, jira_pass = sys.argv[1:3]
-    credentials = (jira_user, jira_pass)
-    projects = jira_get(PROJECT_URL, login=False)
+    projects = jira_get(PROJECT_URL, login=login)
+    
     project_keys = [project['key'] for project in projects]
-    print project_keys
+    print "getting jira issues for the following projects: " + str(project_keys)
     for project_key in project_keys:
         save_issues(project_key)
