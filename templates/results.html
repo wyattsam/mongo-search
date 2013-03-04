@@ -4,7 +4,7 @@
 {% block content %}
 <form class="form-search" method="get" action="/submit">
   <div class="input-append">
-    <input type="text" name="query" placeholder="Search">
+    <input type="text" name="query" placeholder="Search" value="{{ query }}">
     <button type="submit" class="btn">Submit</button>
   </div>
 </form>
@@ -13,13 +13,14 @@
   <div class="row-fluid">
     <div class="span2">
       <div class="btn-group btn-group-vertical">
+        <!--
         <button type="button" class="btn btn-block" data-toggle="button">JIRA</button>
         <button type="button" class="btn btn-block" data-toggle="button">Stack Overflow</button>
         <button type="button" class="btn btn-block" data-toggle="button">10gen Wiki</button>
         <button type="button" class="btn btn-block" data-toggle="button">10gen Chat</button>
         <button type="button" class="btn btn-block" data-toggle="button">Internal Email</button>
         <button type="button" class="btn btn-block" data-toggle="button">MongoDB Forums</button>
-        <button type="button" class="btn btn-block" data-toggle="button">MongoDB Docs</button>
+        <button type="button" class="btn btn-block" data-toggle="button">MongoDB Docs</button>-->
       </div>
     </div>
 

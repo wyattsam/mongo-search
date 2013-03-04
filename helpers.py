@@ -1,34 +1,39 @@
-def clean_jira_results(raw_results, query):
-    JIRA_BASE_URL = 'http://jira.mongodb.com/browse/'
+import json
+import re
 
-    clean = []
-    for i in raw_results:
-        doc = {}
-        doc['score'] = i['score']
-        doc['summary'] = i['obj']['fields']['summary']
-        doc['url'] = JIRA_BASE_URL + i['obj']['key']
-        doc['source'] = "jira"
+JIRA_URL = "https://jira.mongodb.org/browse/"
 
-        description = i['obj']['fields']['description']
-        match_start = description.find(query)
-        if match_start != -1:
-            start, end = max(0, match_start-200), max(400, match_start+200)
-            doc['snippet'] = description[start:end] + " ..."
-        else:
-            doc['snippet'] = description[:400] + " ..."
+def massage_results(raw_results, query):
+    massaged = []
 
-        clean.append(doc)
-    return clean
+    for result in raw_results:
+        current = result['obj']
+        current['score'] = result['score']
+        source = current['source']
 
-def clean_chat_results(raw_results, query):
-    clean = []
-    for i in raw_results:
-        doc = {}
-        doc['score'] = i['score']
-        doc['summary'] = ''.join(['Chat from ', i['obj']['user'], ' in ', i['obj']['channel']])
-        doc['url'] = ''
-        doc['snippet'] = i['obj']['content']
-        doc['source'] = "chat"
+        if source == 'so':
+            massaged.append(massage_stack_overflow(current))
+        elif source == 'jira':
+            massaged.append(massage_jira(current))
 
-        clean.append(doc)
-    return clean
+    return massaged
+
+def massage_stack_overflow(post):
+    massaged = {
+        'score': post['score'],
+        'url': post['link'],
+        'summary': post['title'],
+        'snippet': re.sub('<[^<]+?>', '', post['body']),
+        'source': 'so'
+    }
+    return massaged
+
+def massage_jira(issue):
+    massaged = {
+        'score': issue['score'],
+        'url': JIRA_URL + issue['key'],
+        'summary': issue['fields']['summary'],
+        'snippet': issue['fields']['description'],
+        'source': 'jira'
+    }
+    return massaged

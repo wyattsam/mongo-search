@@ -3,7 +3,43 @@ from pymongo import MongoClient
 
 import helpers
 
+CONNECTION = MongoClient('localhost', 27017)
+ADMIN = CONNECTION['admin']
+ADMIN.command('setParameter', textSearchEnabled=True)
+DB = CONNECTION['xgen']
+COMBINED = DB['combined']
+
 app = Flask(__name__)
+
+#-----------------------------------------------------------------------------
+# Indexes
+#-----------------------------------------------------------------------------
+
+COMBINED.ensure_index([
+    # Stack Overflow
+    ('title', 'text'),
+    ('body', 'text'),
+    ('tags', 'text'),
+    ('owner.display_name', 'text'),
+    ('comments.body', 'text'),
+    ('answers.body', 'text'),
+    ('answers.comments.body', 'text'),
+
+    # JIRA
+    ('project', 'text'),
+    ('fields.summary', 'text'),
+    ('fields.description', 'text'),
+    ('fields.summary', 'text'),
+    ('fields.comment.comments.body', 'text')
+],
+    name='search_index',
+    weights= {
+        'title': 50,
+        'tags': 25,
+        'summary': 50,
+        'description': 25
+    }
+)
 
 #-----------------------------------------------------------------------------
 # Controllers
@@ -28,16 +64,10 @@ def page_not_found(e):
 #-----------------------------------------------------------------------------
 
 def run_query(query):
-    connection = MongoClient('localhost', 27017)
-    db = connection.xgen
-    
-    q = db.command('text', 'jira', search=query, limit=10)
-    jira_results = helpers.clean_jira_results(q['results'], query)
+    results = DB.command('text', 'combined', search=query, limit=10)['results']
+    massaged = helpers.massage_results(results, query)
 
-    q = db.command('text', 'partychapp', search=query, limit=10)
-    chat_results = helpers.clean_chat_results(q['results'], query)
-
-    return sorted(jira_results + chat_results, key=lambda k: k['score'])
+    return sorted(massaged, key=lambda k: k['score'])
 
 #-----------------------------------------------------------------------------
 # Launch
