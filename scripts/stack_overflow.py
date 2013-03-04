@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 import requests
-import settings
+#import settings
 from pymongo import Connection
 from time import sleep
 
@@ -22,7 +22,7 @@ def save_questions(tag):
         'order': 'asc',
         'page': 1,
         'pagesize': PAGE_SIZE,
-        'key': settings.stackapp['key']
+        #'key': settings.stackapp['key']
     }
 
     while True:
