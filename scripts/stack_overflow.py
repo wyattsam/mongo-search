@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import sys
 import requests
 import settings
 from pymongo import Connection
@@ -35,7 +36,7 @@ def save_questions(tag):
             STACK_OVERFLOW.update({'_id': key}, item, True)
             item['source'] = 'so'
             COMBINED.update({'_id': key}, item, True)
-        
+
         if not result['has_more']: break
 
         # don't remove this -- back off if you're told to backoff
