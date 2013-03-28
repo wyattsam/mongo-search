@@ -1,1 +1,1 @@
-web: gunicorn -b 127.0.0.1:4000 search:app
+web: gunicorn -w 4 -b :4000 search:app
