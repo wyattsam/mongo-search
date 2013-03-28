@@ -4,8 +4,8 @@ Jinja2==2.6
 Werkzeug==0.8.3
 colorama==0.2.5
 distribute==0.6.31
-gaffer==0.4.4
 gunicorn==0.17.2
+honcho==0.4.0
 ipython==0.13.1
 jira-python==0.12
 paramiko==1.10.0
