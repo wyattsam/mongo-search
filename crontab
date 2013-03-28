@@ -1,0 +1,3 @@
+# MIN   HOUR    DOM     MON     DOW     CMD
+0       3       *       *       *       /home/ec2-user/playground/duckduckmongo/scripts/jira.py
+0       3       *       *       *       /home/ec2-user/playground/duckduckmongo/scripts/stack_overflow.py
