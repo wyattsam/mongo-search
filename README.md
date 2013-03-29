@@ -1,7 +1,7 @@
 # Duck Duck Mongo
 
 ### Activate environment
- - `source env/bin/activate`
+ - `source env/bin/activate` or use virtualenvwrapper, envy, autoenv, whatever
 
 ### Setup
  - `pip install -r requirements.txt`
@@ -12,7 +12,7 @@
 
 ### Setup MongoDB -- Mac OS X
  - run `brew install mongodb`
- - add `setParameter=textSearchEnabled=true` to /usr/local/etc/mongod.conf`
+ - add `setParameter=textSearchEnabled=true` to /usr/local/etc/mongod.conf
  - run `launchctl stop homebrew.mxcl.mongodb`
  - run `launchctl start homebrew.mxcl.mongodb`
 
