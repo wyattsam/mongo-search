@@ -2,7 +2,7 @@
 {% block title %} - Results{% endblock %}
 
 {% block content %}
-<form class="form-search" method="get" action="/submit">
+<form class="form-search" method="get" action="/search">
     <div class="input-append">
         <input type="text" name="query" placeholder="Search" value="{{ query }}">
         <button type="submit" class="btn">Submit</button>
@@ -23,8 +23,8 @@
                 <button type="button" class="btn btn-block" data-toggle="button">MongoDB Docs</button>-->
             </div>
         </div>
-
         <div class="span10">
+            <p>{{pagination.total_count}} reuslts for query {{query}}</p>
             {% for result in results %}
             <div class="result">
                 <a target="_blank" href="{{ result.url }}">
@@ -34,6 +34,19 @@
                 <p class="muted result-url" data-source="{{ result.source }}">{{ result.url }}</p>
             </div>
             {% endfor %}
+            <div class="pagination pagination-centered">
+                <ul>
+                    {%- for page in pagination.iter_pages() %}
+                        {% if page %}
+                            {% if page != pagination.page %}
+                                <li><a href="/search?query={{query}}&page={{page}}">{{page}}</a></li>
+                            {% else %}
+                                <li class="disabled"><a href="#">{{ page }}</a></li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </div>
 </div>

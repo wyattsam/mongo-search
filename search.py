@@ -8,6 +8,7 @@ ADMIN = CONNECTION['admin']
 ADMIN.command('setParameter', textSearchEnabled=True)
 DB = CONNECTION['xgen']
 COMBINED = DB['combined']
+PAGE_SIZE = 10
 
 app = Flask(__name__)
 
@@ -49,11 +50,15 @@ COMBINED.ensure_index([
 def index():
     return render_template('index.html')
 
-@app.route("/submit", methods=['POST','GET'])
+@app.route("/search")
 def submit():
-    query = request.args['query']
-    results = run_query(query)
-    return render_template('results.html', results=results, query=query)
+    query = request.args.get('query', '')
+    page = int(request.args.get('page', 1))
+    count = run_count(query)
+    pagination = helpers.Pagination(page, PAGE_SIZE, count)
+    results = run_query(query, page)
+    return render_template('results.html', results=results,
+        query=query, pagination=pagination)
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -63,11 +68,17 @@ def page_not_found(e):
 # Helpers
 #-----------------------------------------------------------------------------
 
-def run_query(query):
-    results = DB.command('text', 'combined', search=query, limit=10)['results']
+def run_count(query):
+    return len(DB.command('text', 'combined', search=query)['results'])
+
+def run_query(query, page):
+    results = DB.command('text', 'combined', search=query)['results']
+    count = len(results)
     massaged = helpers.massage_results(results, query)
 
-    return sorted(massaged, key=lambda k: k['score'])
+    start = (page - 1) * PAGE_SIZE
+    end = page * PAGE_SIZE
+    return sorted(massaged, key=lambda k: k['score'])[start:end]
 
 #-----------------------------------------------------------------------------
 # Launch
@@ -76,3 +87,4 @@ def run_query(query):
 if __name__ == "__main__":
     app.debug = True
     app.run()
+
