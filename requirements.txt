@@ -20,3 +20,4 @@ six==1.2.0
 tlslite==0.4.1
 tornado==2.4
 wsgiref==0.1.2
+pyquery==1.2.4
