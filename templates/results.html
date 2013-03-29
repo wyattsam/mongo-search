@@ -2,45 +2,60 @@
 {% block title %} - Results{% endblock %}
 
 {% block content %}
-<form class="form-search" method="get" action="/submit">
-  <div class="input-append">
-    <input type="text" name="query" placeholder="Search" value="{{ query }}">
-    <button type="submit" class="btn">Submit</button>
-  </div>
+<form class="form-search" method="get" action="/search">
+    <div class="input-append">
+        <input type="text" name="query" placeholder="Search" value="{{ query }}">
+        <button type="submit" class="btn">Submit</button>
+    </div>
 </form>
 
 <div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span2">
-      <div class="btn-group btn-group-vertical">
-        <!--
-        <button type="button" class="btn btn-block" data-toggle="button">JIRA</button>
-        <button type="button" class="btn btn-block" data-toggle="button">Stack Overflow</button>
-        <button type="button" class="btn btn-block" data-toggle="button">10gen Wiki</button>
-        <button type="button" class="btn btn-block" data-toggle="button">10gen Chat</button>
-        <button type="button" class="btn btn-block" data-toggle="button">Internal Email</button>
-        <button type="button" class="btn btn-block" data-toggle="button">MongoDB Forums</button>
-        <button type="button" class="btn btn-block" data-toggle="button">MongoDB Docs</button>-->
-      </div>
+    <div class="row-fluid">
+        <div class="span2">
+            <div class="btn-group btn-group-vertical">
+                <!--
+                <button type="button" class="btn btn-block" data-toggle="button">JIRA</button>
+                <button type="button" class="btn btn-block" data-toggle="button">Stack Overflow</button>
+                <button type="button" class="btn btn-block" data-toggle="button">10gen Wiki</button>
+                <button type="button" class="btn btn-block" data-toggle="button">10gen Chat</button>
+                <button type="button" class="btn btn-block" data-toggle="button">Internal Email</button>
+                <button type="button" class="btn btn-block" data-toggle="button">MongoDB Forums</button>
+                <button type="button" class="btn btn-block" data-toggle="button">MongoDB Docs</button>-->
+            </div>
+        </div>
+        <div class="span10">
+            <p>{{pagination.total_count}} reuslts for query {{query}}</p>
+            {% for result in results %}
+            <div class="result">
+                <a target="_blank" href="{{ result.url }}">
+                    <h5 class="result-summary" data-source="{{ result.source }}">{{ result.summary }}</h5>
+                </a>
+                {%- if result.snippet %}
+                    <p class="result-snippet" data-source="{{ result.source }}">{{ result.snippet }}</p>
+                {% endif %}
+                <p class="muted result-url" data-source="{{ result.source }}">{{ result.url }}</p>
+            </div>
+            {% endfor %}
+            <div class="pagination pagination-centered">
+                <ul>
+                    {%- for page in pagination.iter_pages() %}
+                        {% if page %}
+                            {% if page != pagination.page %}
+                                <li><a href="/search?query={{query}}&page={{page}}">{{page}}</a></li>
+                            {% else %}
+                                <li class="disabled"><a href="#">{{ page }}</a></li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
-
-    <div class="span10">
-      {% for result in results %}
-      <div class="result">
-        <a target="_blank" href="{{ result.url }}">
-          <h5 class="result-summary" data-source="{{ result.source }}">{{ result.summary }}</h5>
-        </a>
-        <p class="result-snippet" data-source="{{ result.source }}">{{ result.snippet }}</p>
-        <p class="muted result-url" data-source="{{ result.source }}">{{ result.url }}</p>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
 </div>
 
 <script>
-  $(document).ready(function() {
-    $('.result-summary, .result-snippet').highlight( "{{ query }}" );
-  });
+    $(document).ready(function() {
+        $('.result-summary, .result-snippet').highlight( "{{ query }}" );
+    });
 </script>
 {% endblock %}
