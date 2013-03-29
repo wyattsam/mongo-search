@@ -30,15 +30,15 @@ COMBINED.ensure_index([
     ('project', 'text'),
     ('fields.summary', 'text'),
     ('fields.description', 'text'),
-    ('fields.summary', 'text'),
     ('fields.comment.comments.body', 'text')
 ],
     name='search_index',
     weights= {
-        'title': 50,
+        'title': 150,
         'tags': 25,
-        'summary': 50,
-        'description': 25
+        'fields.summary': 150,
+        'fields.description': 5,
+        'project': 250
     }
 )
 
@@ -78,7 +78,7 @@ def run_query(query, page):
 
     start = (page - 1) * PAGE_SIZE
     end = page * PAGE_SIZE
-    return sorted(massaged, key=lambda k: k['score'])[start:end]
+    return sorted(massaged, key=lambda k: -k['score'])[start:end]
 
 #-----------------------------------------------------------------------------
 # Launch
