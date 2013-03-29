@@ -30,7 +30,9 @@
                 <a target="_blank" href="{{ result.url }}">
                     <h5 class="result-summary" data-source="{{ result.source }}">{{ result.summary }}</h5>
                 </a>
-                <p class="result-snippet" data-source="{{ result.source }}">{{ result.snippet }}</p>
+                {%- if result.snippet %}
+                    <p class="result-snippet" data-source="{{ result.source }}">{{ result.snippet }}</p>
+                {% endif %}
                 <p class="muted result-url" data-source="{{ result.source }}">{{ result.url }}</p>
             </div>
             {% endfor %}
