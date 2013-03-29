@@ -56,10 +56,10 @@ if __name__ == '__main__':
     if len(sys.argv) == 3:
         jira_user, jira_pass = sys.argv[1:3]
         credentials = (jira_user, jira_pass)
-        login = True        
+        login = True
 
     projects = jira_get(PROJECT_URL, login=login)
-    
+
     project_keys = [project['key'] for project in projects]
     print "getting jira issues for the following projects: " + str(project_keys)
     for project_key in project_keys:
