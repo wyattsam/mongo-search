@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from pyquery import PyQuery as pq
 import requests
 import re
