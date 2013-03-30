@@ -51,13 +51,14 @@ def get_thread_messages(thread_id):
         message_parts = pq(div).children()
         message = ""
         for message_p in message_parts:
-            content = pq(message_p).text().strip()
-            if content.startswith('- Show quoted text -') or content.startswith('- Hide quoted text -'):
+            content = pq(message_p).text()
+            if content.strip().startswith('- Show quoted text -') \
+                or content.strip().startswith('- Hide quoted text -'):
                 break
             else:
                 if content.startswith('> '):
                     content = content[2:]
-                message += " " + content
+                message += content
         messages.append(message)
     return messages
 
