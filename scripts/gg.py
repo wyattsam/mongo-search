@@ -52,6 +52,7 @@ def get_thread_messages(thread_id):
         message = ""
         for message_p in message_parts:
             content = pq(message_p).text()
+            content.replace(u'\xa0', u' ')
             if content.strip().startswith('- Show quoted text -') \
                 or content.strip().startswith('- Hide quoted text -'):
                 break
