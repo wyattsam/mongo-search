@@ -48,10 +48,21 @@ def get_thread_messages(thread_id):
     message_divs = t.find('div#inbdy')
     messages = []
     for div in message_divs:
-        content = pq(div).text()
-        if content.strip():
-            messages.append(content)
+        message_parts = pq(div).children()
+        message = ""
+        for message_p in message_parts:
+            content = pq(message_p).text().strip()
+            if content.startswith('- Show quoted text -') or content.startswith('- Hide quoted text -'):
+                break
+            else:
+                if content.startswith('> '):
+                    content = content[2:]
+                print "got content", content
+                message += " " + content
+        messages.append(message)
     return messages
+
+#print get_thread_messages('4772f0e22b3832af')
 
 def scrape():
   conn = pymongo.MongoClient(MONGO_HOST)
