@@ -57,12 +57,9 @@ def get_thread_messages(thread_id):
             else:
                 if content.startswith('> '):
                     content = content[2:]
-                print "got content", content
                 message += " " + content
         messages.append(message)
     return messages
-
-#print get_thread_messages('4772f0e22b3832af')
 
 def scrape():
   conn = pymongo.MongoClient(MONGO_HOST)
