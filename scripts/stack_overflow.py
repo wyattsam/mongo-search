@@ -27,7 +27,7 @@ def save_questions(tag):
 
     while True:
         result = requests.get(SEARCH_URL, params=params).json()
-        items = result['items']
+        items = result.get('items', [])
 
         for item in items:
             key = 'SO-' + str(item['question_id'])
@@ -37,7 +37,7 @@ def save_questions(tag):
             item['source'] = 'so'
             COMBINED.update({'_id': key}, item, True)
 
-        if not result['has_more']: break
+        if not result.get('has_more'): break
 
         # don't remove this -- back off if you're told to backoff
         if result.has_key('backoff'):
