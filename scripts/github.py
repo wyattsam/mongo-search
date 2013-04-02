@@ -28,7 +28,7 @@ def save_repo_commits(repo):
                 'name': repo['name'],
                 'url': repo['url']
             }
-            print "upserting commit for " + repo['full_name'] + ":" + commit['sha']
+            #print "upserting commit for " + repo['full_name'] + ":" + commit['sha']
             COMMITS.update(
                 {'repo.full_name': repo['full_name'], 'sha': commit['sha']},
                 commit, True
@@ -43,6 +43,7 @@ def save_repo_commits(repo):
             next_link = response.links['next']['url']
             response = requests.get(next_link, params=COMMIT_PARAMS)
         else:
+            print "done"
             break
 
 

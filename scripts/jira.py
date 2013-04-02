@@ -18,7 +18,7 @@ def jira_get(url, params={}, login=False):
     return requests.get(url, params=params, auth=auth, verify=False).json()
 
 def save_issue(issue, project):
-    print "upserting jira issue " + issue['key']
+    #print "upserting jira issue " + issue['key']
     key = issue['key']
     issue['_id'] = key
     issue['project'] = project
@@ -43,6 +43,7 @@ def save_issues(project):
             for issue in issues:
                 save_issue(issue, project)
         else:
+            print "done"
             break
 
         params['startAt'] += len(issues)

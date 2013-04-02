@@ -32,12 +32,14 @@ def save_questions(tag):
         for item in items:
             key = 'SO-' + str(item['question_id'])
             item['_id'] = key
-            print "upserting stack overflow question " + key
+            #print "upserting stack overflow question " + key
             STACK_OVERFLOW.update({'_id': key}, item, True)
             item['source'] = 'so'
             COMBINED.update({'_id': key}, item, True)
 
-        if not result.get('has_more'): break
+        if not result.get('has_more'):
+            print "done"
+            break
 
         # don't remove this -- back off if you're told to backoff
         if result.has_key('backoff'):
