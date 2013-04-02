@@ -43,7 +43,6 @@ def save_issues(project):
             for issue in issues:
                 save_issue(issue, project)
         else:
-            print "done"
             break
 
         params['startAt'] += len(issues)
@@ -64,4 +63,5 @@ if __name__ == '__main__':
     project_keys = [project['key'] for project in projects]
     print "getting jira issues for the following projects: " + str(project_keys)
     for project_key in project_keys:
+        print "[PROJECT] " + project_key
         save_issues(project_key)

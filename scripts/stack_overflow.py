@@ -14,6 +14,7 @@ SEARCH_URL = API_BASE + 'search'
 PAGE_SIZE = 100
 
 def save_questions(tag):
+    print "[TAG] " + tag
     params = {
         'site': 'stackoverflow',
         'tagged': tag,
@@ -37,9 +38,7 @@ def save_questions(tag):
             item['source'] = 'so'
             COMBINED.update({'_id': key}, item, True)
 
-        if not result.get('has_more'):
-            print "done"
-            break
+        if not result.get('has_more'): break
 
         # don't remove this -- back off if you're told to backoff
         if result.has_key('backoff'):

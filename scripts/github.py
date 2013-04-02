@@ -43,15 +43,16 @@ def save_repo_commits(repo):
             next_link = response.links['next']['url']
             response = requests.get(next_link, params=COMMIT_PARAMS)
         else:
-            print "done"
             break
 
 
 def save_organizations(organizations):
     for organization in organizations:
+        print "[ORG] " + organization
         repos = requests.get(ORGS_URL + organization + '/repos',
             params=OAUTH_PARAMS).json()
         for repo in repos:
+            print "[REPO] " + repo['name']
             save_repo_commits(repo)
 
 if __name__ == '__main__':
