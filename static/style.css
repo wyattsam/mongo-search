@@ -1,5 +1,19 @@
 /*----------------------*/
-/* Results.html         */
+/* index.html         */
+/*----------------------*/
+
+.center {
+    float: none;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.search-box {
+    margin: 100px 0px 300px;
+}
+
+/*----------------------*/
+/* results.html         */
 /*----------------------*/
 
 .result-summary {
