@@ -14,6 +14,7 @@ SEARCH_URL = API_BASE + 'search'
 PAGE_SIZE = 100
 
 def save_questions(tag):
+    print "[TAG] " + tag
     params = {
         'site': 'stackoverflow',
         'tagged': tag,
@@ -27,17 +28,17 @@ def save_questions(tag):
 
     while True:
         result = requests.get(SEARCH_URL, params=params).json()
-        items = result['items']
+        items = result.get('items', [])
 
         for item in items:
             key = 'SO-' + str(item['question_id'])
             item['_id'] = key
-            print "upserting stack overflow question " + key
+            #print "upserting stack overflow question " + key
             STACK_OVERFLOW.update({'_id': key}, item, True)
             item['source'] = 'so'
             COMBINED.update({'_id': key}, item, True)
 
-        if not result['has_more']: break
+        if not result.get('has_more'): break
 
         # don't remove this -- back off if you're told to backoff
         if result.has_key('backoff'):

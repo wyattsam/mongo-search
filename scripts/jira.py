@@ -18,7 +18,7 @@ def jira_get(url, params={}, login=False):
     return requests.get(url, params=params, auth=auth, verify=False).json()
 
 def save_issue(issue, project):
-    print "upserting jira issue " + issue['key']
+    #print "upserting jira issue " + issue['key']
     key = issue['key']
     issue['_id'] = key
     issue['project'] = project
@@ -63,4 +63,5 @@ if __name__ == '__main__':
     project_keys = [project['key'] for project in projects]
     print "getting jira issues for the following projects: " + str(project_keys)
     for project_key in project_keys:
+        print "[PROJECT] " + project_key
         save_issues(project_key)
