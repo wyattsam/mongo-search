@@ -1,0 +1,12 @@
+{% macro source_selector(shortname, fullname, source_counts, sources_searched) -%}
+    <li>
+        <label class="checkbox">
+            <div class="source_icon {{shortname}}_icon">&nbsp;</div>
+            <input type="checkbox" value="{{shortname}}" name="source" form="search" {{"checked" if not sources_searched or shortname in sources_searched}}/>
+            {{fullname}}
+            {% if not sources_searched or shortname in sources_searched %}
+                <span class="source_count {{"nonzero" if source_counts[shortname] > 0}}">({{source_counts[shortname]}})</span>
+            {% endif %}
+        </label>
+    </li>
+{% endmacro %}

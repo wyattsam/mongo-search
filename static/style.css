@@ -16,6 +16,15 @@
 /* results.html         */
 /*----------------------*/
 
+
+.bounds{
+    font-weight:bold;
+}
+
+.source-search{
+    font-weight:bold;
+}
+
 .result-summary {
     font-weight: normal;
     margin-bottom: 0px;
@@ -49,4 +58,46 @@ a {
 
 [data-source="so"] {
     border-left: 3px solid orange; padding-left: 5px;
+}
+
+/* Left sidebar on results.html */
+#source-list li{
+    margin-bottom:4px;
+}
+
+label.checkbox{
+    line-height:20px;
+}
+
+.source_icon{
+    background-size:18px 18px;
+    background-repeat:no-repeat;
+    width:20px;
+    height:20px;
+    display:inline-block;
+    padding-right:2px;
+}
+
+.google_icon{
+    background-image:url('/static/img/google.png');
+}
+
+.github_icon{
+    background-image:url('/static/img/github.png');
+}
+
+.so_icon{
+    background-image:url('/static/img/stackoverflow.png');
+}
+
+.jira_icon{
+    background-image:url('/static/img/icon_jira.png');
+}
+
+.chat_icon{
+    background-image:url('/static/img/chat.png');
+}
+
+.nonzero{
+    font-weight:bold;
 }

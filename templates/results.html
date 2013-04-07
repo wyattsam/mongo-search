@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block title %} - Results{% endblock %}
 
+ Results gi
 {% block content %}
-<form class="form-search" method="get" action="/search">
+<form class="form-search" method="get" action="/search" id="search">
     <div class="input-append">
         <input type="text" name="query" placeholder="Search" value="{{ query }}">
         <button type="submit" class="btn">Submit</button>
@@ -13,18 +14,33 @@
     <div class="row-fluid">
         <div class="span2">
             <div class="btn-group btn-group-vertical">
-                <!--
-                <button type="button" class="btn btn-block" data-toggle="button">JIRA</button>
-                <button type="button" class="btn btn-block" data-toggle="button">Stack Overflow</button>
-                <button type="button" class="btn btn-block" data-toggle="button">10gen Wiki</button>
-                <button type="button" class="btn btn-block" data-toggle="button">10gen Chat</button>
-                <button type="button" class="btn btn-block" data-toggle="button">Internal Email</button>
-                <button type="button" class="btn btn-block" data-toggle="button">MongoDB Forums</button>
-                <button type="button" class="btn btn-block" data-toggle="button">MongoDB Docs</button>-->
+                <ul id="source-list">
+                    {% from "_template_helpers.html" import source_selector %}
+                    {{ source_selector("jira", "JIRA", source_counts, sources_searched) }}
+                    {{ source_selector("google", "Google Groups", source_counts, sources_searched) }}
+                    {{ source_selector("so", "StackOverflow", source_counts, sources_searched) }}
+                    {{ source_selector("github", "GitHub", source_counts, sources_searched) }}
+                    {{ source_selector("chat", "Chat", source_counts, sources_searched) }}
+                    <!-- to add: -->
+                    <!-- 10gen wiki -->
+                    <!-- 10gen chat -->
+                    <!-- MongoDB docs-->
+                    <!-- etc -->
+                </ul>
             </div>
         </div>
-        <div class="span10">
-            <p>{{pagination.total_count}} reuslts for query {{query}}</p>
+        <div class="offset1 span9">
+            <p>Results <span class="bounds">{{pagination.lower_bound}}-{{pagination.upper_bound}}</span> of <span class="bounds">{{pagination.total_count}}</span> results for <strong>&quot;{{query}}&quot;</strong>
+            {% set sources_count = SOURCES|length %}
+            {% set sources_used_count = sources_searched|length %}
+            {% if sources_used_count < sources_count %}
+                in 
+                {% for source in sources_searched %}
+                <span class="source-search">{{SOURCES.get(source)}}</span>
+                {%- if not loop.last %},{% endif %}
+                {% endfor %}
+            {% endif %}
+            </p>
             {% for result in results %}
             <div class="result">
                 <a target="_blank" href="{{ result.url }}">
@@ -41,7 +57,7 @@
                     {%- for page in pagination.iter_pages() %}
                         {% if page %}
                             {% if page != pagination.page %}
-                                <li><a href="/search?query={{query}}&page={{page}}">{{page}}</a></li>
+                                <li><a href="{{url_for_other_page(page)}}">{{page}}</a></li>
                             {% else %}
                                 <li class="disabled"><a href="#">{{ page }}</a></li>
                             {% endif %}

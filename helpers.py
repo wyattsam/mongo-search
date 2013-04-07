@@ -1,8 +1,13 @@
+from collections import Counter
 import json
 import re
 from math import ceil
 
 JIRA_URL = "https://jira.mongodb.org/browse/"
+
+def get_counts_by_source(raw_results):
+    source_counts = Counter((doc['obj']['source'] for doc in raw_results))
+    return source_counts 
 
 def massage_results(raw_results, query):
     massaged = []
@@ -45,6 +50,14 @@ class Pagination(object):
         self.page = page
         self.per_page = per_page
         self.total_count = total_count
+
+    @property
+    def lower_bound(self):
+        return (self.page - 1) * self.per_page + 1
+
+    @property
+    def upper_bound(self):
+        return min((self.page-1) * self.per_page + self.per_page, self.total_count)
 
     @property
     def pages(self):
