@@ -3,7 +3,7 @@ from search import SOURCES
 from pyparsing import Literal, CaselessKeyword, Word, \
     Suppress, ZeroOrMore, Optional, Each
 
-class DuckDuckMongoQuery(object):
+class MongoQuery(object):
 
     def reset(self):
         self.project_filter = set()
@@ -53,6 +53,6 @@ class DuckDuckMongoQuery(object):
         print "in projects: " + ','.join(self.project_filter)
         print "using sources: " + ','.join(self.source_filter)
 
-#ddmq = DuckDuckMongoQuery()
-#ddmq.parse(testString)
+#mq = MongoQuery()
+#mq.parse(testString)
 #ddmq.debug()

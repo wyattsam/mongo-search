@@ -64,8 +64,8 @@ def submit():
     page = int(request.args.get('page', 1))
     sources = request.args.getlist('source')
 
-    from query_parse import DuckDuckMongoQuery
-    query_parser = DuckDuckMongoQuery()
+    from query_parse import MongoQuery
+    query_parser = MongoQuery()
     query_parser.parse(query)
 
     # if no sources are selected, disregard it and turn them all on.
