@@ -34,14 +34,20 @@
 .result-snippet {
     margin-bottom: 0px;
     margin-top: 0px;
+    font-size: .9em;
 }
 
 .result-url {
     margin-top: 0px;
+    font-size: .9em
 }
 
 a {
     color: #12c;
+}
+
+.pagination {
+    margin-top: 30px;
 }
 
 .highlight {
@@ -49,7 +55,7 @@ a {
 }
 
 .result {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 [data-source="jira"] {
