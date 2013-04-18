@@ -33,10 +33,11 @@ COMBINED.ensure_index([
     ('answers.comments.body', 'text'),
 
     # JIRA
+    ('_id', 'text'),
     ('project', 'text'),
     ('fields.summary', 'text'),
     ('fields.description', 'text'),
-    ('fields.comment.comments.body', 'text')
+    ('fields.comment.comments.body', 'text'),
 ],
     name='search_index',
     weights= {
@@ -44,7 +45,8 @@ COMBINED.ensure_index([
         'tags': 25,
         'fields.summary': 150,
         'fields.description': 5,
-        'project': 250
+        'project': 250,
+        '_id' : 300
     }
 )
 
