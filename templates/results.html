@@ -46,10 +46,16 @@
                     {% endfor %}
                 {% endif %}
             </p>
+
             {% for result in results %}
             <div class="result">
                 <a target="_blank" href="{{ result.url }}">
-                    <h5 class="result-summary" data-source="{{ result.source }}">{{ result.summary }}</h5>
+                    <div class="result-summary" data-source="{{ result.source }}">
+                        {% if result.source == 'jira' %}
+                            <strong>{{ result.key }}</strong>
+                        {% endif %}
+                        {{ result.summary }}
+                    </div>
                 </a>
                 {%- if result.snippet %}
                     <p class="result-snippet" data-source="{{ result.source }}">{{ result.snippet|truncate(350) }}</p>
@@ -57,6 +63,7 @@
                 <p class="muted result-url" data-source="{{ result.source }}">{{ result.url }}</p>
             </div>
             {% endfor %}
+
             <div class="pagination pagination-centered">
                 <ul>
                     {%- for page in pagination.iter_pages() %}

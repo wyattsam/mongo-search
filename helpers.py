@@ -26,6 +26,7 @@ def massage_results(raw_results, query):
 
 def massage_stack_overflow(post):
     massaged = {
+        'key': post['key'],
         'score': post['score'],
         'url': post['link'],
         'summary': post['title'],
@@ -36,6 +37,7 @@ def massage_stack_overflow(post):
 
 def massage_jira(issue):
     massaged = {
+        'key': issue['key'],
         'score': issue['score'],
         'url': JIRA_URL + issue['key'],
         'summary': issue['fields']['summary'],
