@@ -76,13 +76,13 @@ def submit():
         query_parser.source_filter.add(source)
 
     docfilter = query_parser.build_filter()
-    
+
     results, source_counts = run_query(query_parser.full_text_query, page, docfilter)
     pagination = helpers.Pagination(page, PAGE_SIZE, sum(source_counts.values()))
     return render_template('results.html', results=results,
         source_counts=source_counts,
         sources_searched=set(sources).union(query_parser.source_filter),
-        query=query_parser.full_text_query, 
+        query=query_parser.full_text_query,
         pagination=pagination)
 
 @app.errorhandler(404)
