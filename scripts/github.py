@@ -24,6 +24,7 @@ def save_repo_commits(repo):
 
         for commit in commits:
             commit['repo'] = {
+                '_id': repo['full_name'] + '-' + commit['sha'],
                 'full_name': repo['full_name'],
                 'name': repo['name'],
                 'url': repo['url']
