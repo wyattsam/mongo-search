@@ -84,6 +84,7 @@
 <script>
     $(document).ready(function() {
         $('.result-summary, .result-snippet').highlight( "{{ query }}" );
+        $('input:checkbox').click( function(){ $('#search').submit(); } );
     });
 </script>
 {% endblock %}
