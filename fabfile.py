@@ -18,4 +18,4 @@ def deploy():
     code_dir = '/home/ec2-user/playground/duckduckmongo'
     with cd(code_dir):
         run("git pull")
-        run("sudo restart duckduckmongo")
+        run("sudo restart search")
