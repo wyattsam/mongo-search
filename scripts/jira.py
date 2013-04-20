@@ -22,9 +22,9 @@ def save_issue(issue, project):
     key = issue['key']
     issue['_id'] = key
     issue['project'] = project
-    ISSUES.update({'_id': key}, issue, True)
+    ISSUES.save(issue)
     issue['source'] = 'jira'
-    COMBINED.update({'_id': key}, issue, True)
+    COMBINED.save(issue)
 
 def save_issues(project):
     jql = 'PROJECT={project} order by KEY asc'.format(project=project)

@@ -34,9 +34,9 @@ def save_questions(tag):
             key = 'SO-' + str(item['question_id'])
             item['_id'] = key
             #print "upserting stack overflow question " + key
-            STACK_OVERFLOW.update({'_id': key}, item, True)
+            STACK_OVERFLOW.save(item)
             item['source'] = 'so'
-            COMBINED.update({'_id': key}, item, True)
+            COMBINED.save(item)
 
         if not result.get('has_more'): break
 

@@ -30,15 +30,9 @@ def save_repo_commits(repo):
                 'url': repo['url']
             }
             #print "upserting commit for " + repo['full_name'] + ":" + commit['sha']
-            COMMITS.update(
-                {'repo.full_name': repo['full_name'], 'sha': commit['sha']},
-                commit, True
-            )
+            COMMITS.save(commit)
             commit['source'] = 'github'
-            COMBINED.update(
-                {'repo.full_name': repo['full_name'], 'sha': commit['sha']},
-                commit, True
-            )
+            COMBINED.save(commit)
 
         if response.links.get('next'):
             next_link = response.links['next']['url']
