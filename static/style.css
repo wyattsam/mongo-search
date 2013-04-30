@@ -85,23 +85,23 @@ label.checkbox{
 }
 
 .google_icon{
-    background-image:url('/static/img/google.png');
+    background-image:url('/static/img/icon-google.png');
 }
 
 .github_icon{
-    background-image:url('/static/img/github.png');
+    background-image:url('/static/img/icon-github.png');
 }
 
 .so_icon{
-    background-image:url('/static/img/stackoverflow.png');
+    background-image:url('/static/img/icon-stack-overflow.png');
 }
 
 .jira_icon{
-    background-image:url('/static/img/icon_jira.png');
+    background-image:url('/static/img/icon-jira.png');
 }
 
 .chat_icon{
-    background-image:url('/static/img/chat.png');
+    background-image:url('/static/img/icon-chat.png');
 }
 
 .nonzero{
