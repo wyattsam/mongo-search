@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import requests
+import re
 from pymongo import Connection
 from time import sleep
 
@@ -14,6 +15,12 @@ CLIENT_ID = '10346e4112a4437615df'
 CLIENT_SECRET = 'd8bf753eb3ad7b1aadbe91edb8507c2b05d57476'
 OAUTH_PARAMS = {'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET}
 COMMIT_PARAMS = dict(OAUTH_PARAMS, per_page=PER_PAGE)
+JIRA_KEY_PATTERN = re.compile('(\w+\-\d+)')
+
+JIRA_PROJECTS = set(['AZURE', 'BACKUP', 'BUILDBOT', 'CDRIVER',
+                     'CSHARP', 'CI', 'SERVER', 'DOCS', 'ERLANG',
+                     'HADOOP', 'HASKELL', 'JAVA', 'MMS', 'MOTOR',
+                     'NODE', 'PERL', 'PHP', 'PYTHON', 'RUBY', 'SCALA'])
 
 def save_repo_commits(repo):
     commits_url = repo['url'] + '/commits'
@@ -29,6 +36,19 @@ def save_repo_commits(repo):
                 'name': repo['name'],
                 'url': repo['url']
             }
+
+            message = commit['commit']['message']
+            tickets = []
+            for ticketkey in JIRA_KEY_PATTERN.findall(message):
+                if any(ticketkey.lower().startswith(project.lower() + "-") for project in JIRA_PROJECTS):
+                    tickets.append(ticketkey.upper())
+
+            if tickets:
+                if len(tickets) == 1:
+                    commit['tickets'] = tickets[0]
+                else:
+                    commit['tickets'] = tickets
+
             #print "upserting commit for " + repo['full_name'] + ":" + commit['sha']
             COMMITS.save(commit)
             commit['source'] = 'github'
