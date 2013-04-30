@@ -107,3 +107,13 @@ label.checkbox{
 .nonzero{
     font-weight:bold;
 }
+
+
+.gh-commit-message{
+    font-weight:bold;
+}
+
+.gh-avatar{
+    width:32px;
+    height:32px;
+}
