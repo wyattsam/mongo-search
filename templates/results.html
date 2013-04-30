@@ -48,20 +48,18 @@
             </p>
 
             {% for result in results %}
-            <div class="result">
-                <a target="_blank" href="{{ result.url }}">
-                    <div class="result-summary" data-source="{{ result.source }}">
-                        {% if result.source == 'jira' %}
-                            <strong>{{ result.id }}</strong>
-                        {% endif %}
-                        {{ result.summary }}
-                    </div>
-                </a>
-                {%- if result.snippet %}
-                    <p class="result-snippet" data-source="{{ result.source }}">{{ result.snippet|truncate(350) }}</p>
+                {#{result}#}
+                {% if result.source == 'jira' %}
+                    {% include "results/jira_result.html" %}
+                {% elif result.source == 'github' %}
+                    {% include "results/github_result.html" %}
+                {% elif result.source == 'so' %}
+                    {% include "results/stackoverflow_result.html" %}
+                {% elif result.source == 'googlegroups' %}
+                    {% include "results/googlegroups_result.html" %}
+                {% elif result.source == 'chat' %}
+                    {% include "results/chat_result.html" %}
                 {% endif %}
-                <p class="muted result-url" data-source="{{ result.source }}">{{ result.url }}</p>
-            </div>
             {% endfor %}
 
             <div class="pagination pagination-centered">
