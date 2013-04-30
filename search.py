@@ -8,6 +8,7 @@ ADMIN = CONNECTION['admin']
 ADMIN.command('setParameter', textSearchEnabled=True)
 DB = CONNECTION['xgen']
 COMBINED = DB['combined']
+GITHUB = DB['github']
 PAGE_SIZE = 10
 
 SOURCES =  {"so":"StackOverflow",
@@ -38,6 +39,9 @@ COMBINED.ensure_index([
     ('fields.summary', 'text'),
     ('fields.description', 'text'),
     ('fields.comment.comments.body', 'text'),
+
+    # GitHub
+    ('commit.message', 'text')
 ],
     name='search_index',
     weights= {
@@ -45,10 +49,13 @@ COMBINED.ensure_index([
         'tags': 25,
         'fields.summary': 150,
         'fields.description': 5,
+        'commit.message': 5,
         'project': 250,
         '_id' : 300
     }
 )
+
+GITHUB.ensure_index('tickets')
 
 #-----------------------------------------------------------------------------
 # Controllers
