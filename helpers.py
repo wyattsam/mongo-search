@@ -21,7 +21,24 @@ def massage_results(raw_results, query):
             massaged.append(massage_stack_overflow(current))
         elif source == 'jira':
             massaged.append(massage_jira(current))
+        elif source == 'github':
+            massaged.append(massage_github(current))
 
+    return massaged
+
+def massage_github(commit):
+    committer = commit['committer'] or {}
+    massaged = {
+        'id': commit['_id'],
+        'score': commit['score'],
+        'source': 'github',
+        "committer" : commit['commit']['committer']['name'],
+        "committer_avatar" : committer.get('avatar_url', ''),
+        "date_committed" : commit['commit']['committer']['date'],
+        "commit_msg" : commit['commit']['message'],
+        "url" : commit['html_url'],
+        "repo_name" : commit['repo']['full_name']
+    }
     return massaged
 
 def massage_stack_overflow(post):
@@ -38,6 +55,8 @@ def massage_stack_overflow(post):
 def massage_jira(issue):
     massaged = {
         'id': issue['_id'],
+        'fields' : issue['fields'],
+        'status': issue.get('fields',{}).get('status',None),
         'score': issue['score'],
         'url': JIRA_URL + issue['key'],
         'summary': issue['fields']['summary'],
