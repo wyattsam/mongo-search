@@ -22,6 +22,7 @@ def save_issue(issue, project):
     key = issue['key']
     issue['_id'] = key
     issue['project'] = project
+    issue['fields']['status'] = issue['fields']['status']['name']
     ISSUES.save(issue)
     issue['source'] = 'jira'
     COMBINED.save(issue)
@@ -32,7 +33,7 @@ def save_issues(project):
         'jql': jql,
         'startAt': 0,
         'maxResults': PAGE_SIZE,
-        'fields': 'key,summary,description,comment'
+        'fields': 'key,summary,description,comment,status'
     }
 
     while True:
