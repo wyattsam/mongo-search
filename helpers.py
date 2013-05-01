@@ -28,6 +28,13 @@ def massage_results(raw_results, query):
 
 def massage_github(commit):
     committer = commit['committer'] or {}
+    commit_msg_header = commit['commit']['message']
+    commit_msg_body = None
+    newline_pos = commit_msg_header.find('\n')
+    if newline_pos >= 0:
+        commit_msg_body = commit_msg_header[newline_pos:].strip()
+        commit_msg_header = commit_msg_header[0:newline_pos].strip()
+    
     massaged = {
         'id': commit['_id'],
         'score': commit['score'],
@@ -35,7 +42,8 @@ def massage_github(commit):
         "committer" : commit['commit']['committer']['name'],
         "committer_avatar" : committer.get('avatar_url', ''),
         "date_committed" : commit['commit']['committer']['date'],
-        "commit_msg" : commit['commit']['message'],
+        "commit_msg" : commit_msg_header,
+        "commit_msg_body" : commit_msg_body,
         "url" : commit['html_url'],
         "repo_name" : commit['repo']['full_name']
     }
