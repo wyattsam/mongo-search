@@ -66,6 +66,10 @@ a {
     border-left: 3px solid orange; padding-left: 5px;
 }
 
+[data-source="github"] {
+    border-left: 3px solid black; padding-left: 5px;
+}
+
 /* Left sidebar on results.html */
 #source-list li{
     margin-bottom:4px;

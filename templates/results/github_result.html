@@ -4,14 +4,12 @@
     <div class="gh-commit-container" data-source="{{ result.source }}">
         <img class="gh-avatar" src="{{result.committer_avatar}}"></img>
         <span class="gh-commit-message">{{ result.commit_msg }}</span>
+        {% if result.commit_msg_body %}
+            <div class="gh-commit-body">{{ result.commit_msg_body }}</div>
+        {% endif %}
+        <p>
+        <span class="muted">by</span>&nbsp;<span class="gh-username">{{result.committer}}</span>&nbsp;<span class="muted">on repo:</span>&nbsp;<span>{{result.repo_name}}</span><br/>
+            <a target="_blank" href="{{ result.url }}">{{result.url}} </a>
+        </p>
     </div>
-    {%- if result.snippet %}
-        <p class="result-snippet" data-source="{{ result.source }}">{{ result.snippet|truncate(350) }}</p>
-    {% endif %}
-    <p>
-        <span class="muted">by</span>&nbsp;<span class="gh-username">{{result.committer}}</span>&nbsp;<span class="muted">on repo:</span>&nbsp;<span>{{result.repo_name}}</span>
-    </p>
-    <p>
-        <a target="_blank" href="{{ result.url }}">{{result.url}} </a>
-    </p>
 {% endblock %}
