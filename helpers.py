@@ -101,6 +101,6 @@ class Pagination(object):
         return self.page < self.pages
 
     def iter_pages(self):
-        for num in xrange(1, self.pages + 1):
+        for num in xrange(self.page, min(self.pages + 1, self.page + 10)):
            yield num
 

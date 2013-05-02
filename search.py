@@ -10,12 +10,39 @@ DB = CONNECTION['xgen']
 COMBINED = DB['combined']
 GITHUB = DB['github']
 PAGE_SIZE = 10
+SEARCH_LIMIT = 100000
 
 SOURCES =  {"so":"StackOverflow",
             "jira": "JIRA",
             "google":"Google Groups",
             "github":"GitHub",
             "chat":"10gen Chat"}
+
+RESULT_PROJECTION = {
+    # Common
+    'source': 1,
+    'status': 1,
+    'url': 1,
+    'summary': 1,
+    'snippet': 1,
+
+    # GitHub
+    'commit.committer.name': 1,
+    'commit.committer.avatar_url': 1,
+    'commit.committer.date': 1,
+    'commit.message': 1,
+    'commit.html_url': 1,
+    'commit.repo.full_name': 1,
+
+    # Jira
+    'fields': 1,
+    'key': 1,
+
+    # Stack Overflow
+    'link': 1,
+    'title': 1,
+    'body': 1
+}
 
 app = Flask(__name__)
 
@@ -104,8 +131,12 @@ def run_count(query):
     return len(DB.command('text', 'combined', search=query)['results'])
 
 def run_query(query, page, docfilter):
-    results = DB.command('text', 'combined', search=query,
-        filter=docfilter)['results']
+    results = DB.command('text', 'combined',
+        search=query,
+        filter=docfilter,
+        limit=SEARCH_LIMIT,
+        project=RESULT_PROJECTION
+    )['results']
 
     count = len(results)
     source_counts = helpers.get_counts_by_source(results)

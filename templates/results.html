@@ -64,15 +64,19 @@
 
             <div class="pagination pagination-centered">
                 <ul>
+                    {% if pagination.has_prev %}
+                        <li><a href="{{url_for_other_page(pagination.page -1)}}">«</a></li>
+                    {% endif %}
                     {%- for page in pagination.iter_pages() %}
-                        {% if page %}
-                            {% if page != pagination.page %}
-                                <li><a href="{{url_for_other_page(page)}}">{{page}}</a></li>
-                            {% else %}
-                                <li class="disabled"><a href="#">{{ page }}</a></li>
-                            {% endif %}
+                        {% if page != pagination.page %}
+                            <li><a href="{{url_for_other_page(page)}}">{{page}}</a></li>
+                        {% else %}
+                            <li class="disabled"><a href="#">{{ page }}</a></li>
                         {% endif %}
                     {% endfor %}
+                    {% if pagination.has_next %}
+                        <li><a href="{{url_for_other_page(pagination.page + 1)}}">»</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
