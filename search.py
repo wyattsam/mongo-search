@@ -12,11 +12,13 @@ GITHUB = DB['github']
 PAGE_SIZE = 10
 SEARCH_LIMIT = 100000
 
-SOURCES =  {"so":"StackOverflow",
-            "jira": "JIRA",
-            "google":"Google Groups",
-            "github":"GitHub",
-            "chat":"10gen Chat"}
+SOURCES = {
+    'so':     'StackOverflow',
+    'jira':   'JIRA',
+    'google': 'Google Groups',
+    'github': 'GitHub',
+    'chat':   '10gen Chat'
+}
 
 RESULT_PROJECTION = {
     # Common
