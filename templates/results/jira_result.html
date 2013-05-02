@@ -1,13 +1,9 @@
 {% extends "results/baseresult.html" %}
 
 {% block content %}
-    {% if result.fields.status in ('Closed', 'Resolved') %}
-        <strike><strong>{{result.id}}</strong></strike>
-    {% else %}
-        <strong>{{ result.id }}</strong>
-    {% endif %}
     <a target="_blank" href="{{ result.url }}">
         <div class="result-summary" data-source="{{ result.source }}">
+            <strong>{{ result.id }}</strong>
             {{ result.summary }}
         </div>
     </a>
