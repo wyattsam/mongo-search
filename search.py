@@ -127,9 +127,6 @@ def page_not_found(e):
 # Helpers
 #-----------------------------------------------------------------------------
 
-def run_count(query):
-    return len(DB.command('text', 'combined', search=query)['results'])
-
 def run_query(query, page, docfilter):
     results = DB.command('text', 'combined',
         search=query,
@@ -138,7 +135,6 @@ def run_query(query, page, docfilter):
         project=RESULT_PROJECTION
     )['results']
 
-    count = len(results)
     source_counts = helpers.get_counts_by_source(results)
     massaged = helpers.massage_results(results, query)
 
