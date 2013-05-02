@@ -112,7 +112,9 @@ def submit():
     docfilter = query_parser.build_filter()
 
     results, source_counts = run_query(query_parser.full_text_query, page, docfilter)
-    pagination = helpers.Pagination(page, PAGE_SIZE, sum(source_counts.values()))
+    total_count = sum(source_counts.values())
+    pagination = helpers.Pagination(page, PAGE_SIZE, total_count)
+
     return render_template('results.html', results=results,
         source_counts=source_counts,
         sources_searched=set(sources).union(query_parser.source_filter),
