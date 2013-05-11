@@ -34,7 +34,7 @@ def massage_github(commit):
     if newline_pos >= 0:
         commit_msg_body = commit_msg_header[newline_pos:].strip()
         commit_msg_header = commit_msg_header[0:newline_pos].strip()
-    
+
     massaged = {
         'id': commit['_id'],
         'score': commit['score'],
