@@ -38,8 +38,10 @@ def save_issues(project):
 
     while True:
         result = jira_get(SEARCH_URL, params=params)
-        issues = result['issues']
+        if not 'issues' in result:
+            break
 
+        issues = result['issues']
         if issues:
             for issue in issues:
                 save_issue(issue, project)
