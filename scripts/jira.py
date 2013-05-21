@@ -13,9 +13,10 @@ SEARCH_URL = API_BASE + 'search/'
 PROJECT_URL = API_BASE + 'project/'
 PAGE_SIZE = 100
 
-def jira_get(url, params={}, login=False):
-    auth = credentials if login else {}
-    return requests.get(url, params=params, auth=auth, verify=False).json()
+def jira_get(url, params={}, credentials=None):
+    auth = credentials if credentials else {} 
+    response = requests.get(url, params=params, auth=auth, verify=False)
+    return response.json()
 
 def save_issue(issue, project):
     #print "upserting jira issue " + issue['key']
@@ -27,7 +28,7 @@ def save_issue(issue, project):
     issue['source'] = 'jira'
     COMBINED.save(issue)
 
-def save_issues(project):
+def save_issues(project, credentials=None):
     jql = 'PROJECT={project} order by KEY asc'.format(project=project)
     params = {
         'jql': jql,
@@ -37,8 +38,8 @@ def save_issues(project):
     }
 
     while True:
-        result = jira_get(SEARCH_URL, params=params)
-        if not 'issues' in result:
+        result = jira_get(SEARCH_URL, params=params, credentials=credentials)
+        if 'issues' not in result:
             break
 
         issues = result['issues']
@@ -52,19 +53,15 @@ def save_issues(project):
         sleep(1)
 
 if __name__ == '__main__':
-    global credentials
-    login = False
-
     # user provided login credentials
+    credentials = None
     if len(sys.argv) == 3:
         jira_user, jira_pass = sys.argv[1:3]
         credentials = (jira_user, jira_pass)
-        login = True
 
-    projects = jira_get(PROJECT_URL, login=login)
-
+    projects = jira_get(PROJECT_URL, credentials=credentials)
     project_keys = [project['key'] for project in projects]
     print "getting jira issues for the following projects: " + str(project_keys)
     for project_key in project_keys:
-        print "[PROJECT] " + project_key
-        save_issues(project_key)
+        save_issues(project_key, credentials)
+
