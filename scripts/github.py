@@ -18,7 +18,7 @@ COMMIT_PARAMS = dict(OAUTH_PARAMS, per_page=PER_PAGE)
 JIRA_KEY_PATTERN = re.compile('(\w+\-\d+)')
 
 JIRA_PROJECTS = set(['AZURE', 'BACKUP', 'BUILDBOT', 'CDRIVER',
-                     'CSHARP', 'CI', 'SERVER', 'DOCS', 'ERLANG',
+                     'CSHARP', 'CI', 'CS', 'SERVER', 'DOCS', 'ERLANG',
                      'HADOOP', 'HASKELL', 'JAVA', 'MMS', 'MOTOR',
                      'NODE', 'PERL', 'PHP', 'PYTHON', 'RUBY', 'SCALA'])
 

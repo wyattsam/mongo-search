@@ -10,7 +10,7 @@ DB = CONNECTION['xgen']
 COMBINED = DB['combined']
 GITHUB = DB['github']
 PAGE_SIZE = 10
-SEARCH_LIMIT = 100000
+COUNT_LIMIT = 1000000
 
 SOURCES = {
     'so':     'StackOverflow',
@@ -18,6 +18,11 @@ SOURCES = {
     'google': 'Google Groups',
     'github': 'GitHub',
     'chat':   '10gen Chat'
+}
+
+COUNT_PROJECTION = {
+    '_id': 0,
+    'source': 1
 }
 
 RESULT_PROJECTION = {
@@ -33,21 +38,21 @@ RESULT_PROJECTION = {
     'html_url': 1,
     'repo': 1,
     'commit.committer': 1,
-    'commit.committer.name': 1,
-    'commit.committer.avatar_url': 1,
-    'commit.committer.date': 1,
     'commit.message': 1,
     'commit.html_url': 1,
     'commit.repo.full_name': 1,
 
     # Jira
-    'fields': 1,
-    'key': 1,
+    'project': 1,
+    'fields.summary': 1,
+    'fields.description': 1,
+    'fieldd.comment.comments.body': 1,
 
     # Stack Overflow
     'link': 1,
     'title': 1,
-    'body': 1
+    'body': 1,
+    'tags': 1
 }
 
 app = Flask(__name__)
@@ -74,7 +79,8 @@ COMBINED.ensure_index([
     ('fields.comment.comments.body', 'text'),
 
     # GitHub
-    ('commit.message', 'text')
+    ('commit.message', 'text'),
+    ('source', 1)
 ],
     name='search_index',
     weights= {
@@ -116,15 +122,22 @@ def submit():
         query_parser.source_filter.add(source)
 
     docfilter = query_parser.build_filter()
+    parsed_query = query_parser.full_text_query
 
-    results, source_counts = run_query(query_parser.full_text_query, page, docfilter)
+    #run the counts seperately using covered query
+    covered_results = run_count_query(parsed_query, docfilter)
+    source_counts = helpers.get_counts_by_source(covered_results)
+
+    page_limit = page * PAGE_SIZE
+
+    results = run_query(parsed_query, page, docfilter, page_limit)
     total_count = sum(source_counts.values())
     pagination = helpers.Pagination(page, PAGE_SIZE, total_count)
 
     return render_template('results.html', results=results,
         source_counts=source_counts,
         sources_searched=set(sources).union(query_parser.source_filter),
-        query=query_parser.full_text_query,
+        query=parsed_query,
         pagination=pagination)
 
 @app.errorhandler(404)
@@ -135,20 +148,27 @@ def page_not_found(e):
 # Helpers
 #-----------------------------------------------------------------------------
 
-def run_query(query, page, docfilter):
+def run_count_query(query, docfilter):
+    return DB.command('text', 'combined',
+        search=query,
+        filter=docfilter,
+        project=COUNT_PROJECTION,
+        limit=COUNT_LIMIT
+    )['results']
+
+def run_query(query, page, docfilter, limit):
     results = DB.command('text', 'combined',
         search=query,
         filter=docfilter,
-        limit=SEARCH_LIMIT,
+        limit=limit,
         project=RESULT_PROJECTION
     )['results']
 
-    source_counts = helpers.get_counts_by_source(results)
     massaged = helpers.massage_results(results, query)
 
     start = (page - 1) * PAGE_SIZE
     end = page * PAGE_SIZE
-    return sorted(massaged, key=lambda k: -k['score'])[start:end], source_counts
+    return sorted(massaged, key=lambda k: -k['score'])[start:end]
 
 def url_for_other_page(page):
     args = request.args.copy()
