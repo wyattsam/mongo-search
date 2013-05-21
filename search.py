@@ -29,6 +29,10 @@ RESULT_PROJECTION = {
     'snippet': 1,
 
     # GitHub
+    'committer': 1,
+    'html_url': 1,
+    'repo': 1,
+    'commit.committer': 1,
     'commit.committer.name': 1,
     'commit.committer.avatar_url': 1,
     'commit.committer.date': 1,
