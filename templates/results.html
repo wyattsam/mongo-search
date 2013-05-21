@@ -35,7 +35,7 @@
                     <span class="bounds">{{pagination.lower_bound}}-{{pagination.upper_bound}}</span> of
                     <span class="bounds">{{pagination.total_count}}</span>
                 {% endif %}
-                results for <strong>&quot;{{query}}&quot;</strong>
+                results for <strong>{{query}}</strong>
                 {% set sources_count = SOURCES|length %}
                 {% set sources_used_count = sources_searched|length %}
                 {% if sources_used_count < sources_count %}

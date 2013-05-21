@@ -79,6 +79,8 @@ COMBINED.ensure_index([
 
     # GitHub
     ('commit.message', 'text'),
+
+    # Appended field for covered count query
     ('source', 1)
 ],
     name='search_index',
