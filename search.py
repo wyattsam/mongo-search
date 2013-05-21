@@ -46,7 +46,6 @@ RESULT_PROJECTION = {
     'project': 1,
     'fields.summary': 1,
     'fields.description': 1,
-    'fieldd.comment.comments.body': 1,
 
     # Stack Overflow
     'link': 1,
