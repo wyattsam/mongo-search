@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 import requests
 import re
-from pymongo import Connection
+from pymongo import MongoClient
 from time import sleep
 
-MONGO = Connection('localhost:27017')
+MONGO = MongoClient('localhost:27017')
 DB = MONGO['xgen']
 COMBINED = DB['combined']
 COMMITS = DB['github']
@@ -31,11 +31,11 @@ def save_repo_commits(repo):
 
         for commit in commits:
             commit['repo'] = {
-                '_id': repo['full_name'] + '-' + commit['sha'],
                 'full_name': repo['full_name'],
                 'name': repo['name'],
                 'url': repo['url']
             }
+            commit['_id'] = repo['full_name'] + '-' + commit['sha']
 
             message = commit['commit']['message']
             tickets = []
