@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 import helpers
 
-CONNECTION = MongoClient('localhost', 27017)
+CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
 ADMIN = CONNECTION['admin']
 ADMIN.command('setParameter', textSearchEnabled=True)
 DB = CONNECTION['xgen']
