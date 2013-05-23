@@ -126,6 +126,8 @@ def submit():
     parsed_query = query_parser.full_text_query
 
     #run the counts seperately using covered query
+    if not parsed_query:
+        parsed_query = ' '
     covered_results = run_count_query(parsed_query, docfilter)
     source_counts = helpers.get_counts_by_source(covered_results)
 
