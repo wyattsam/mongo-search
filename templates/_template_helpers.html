@@ -9,7 +9,7 @@
             </div>
             <div class="subsource_list">
                 {% if shortname == 'github' %}
-                    {% for repo, count in counts['repo'].iteritems() %}
+                    {% for repo, count in counts['repo']|dictsort(true) %}
                         <div class="subsource">
                             <a href="/search?query={{query}}&source=github&repo={{repo}}" class="subsource_name">
                                 {{repo}}
@@ -19,7 +19,7 @@
                     {% endfor %}
                 {% endif %}
                 {% if shortname == 'jira' %}
-                    {% for project, count in counts['project'].iteritems() %}
+                    {% for project, count in counts['project']|dictsort(true) %}
                         <div class="subsource">
                             <a href="/search?query={{query}}&source=jira&project={{project}}" class="subsource_name">
                                 {{project}}
