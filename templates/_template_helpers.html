@@ -1,9 +1,15 @@
-{% macro source_selector(shortname, fullname, counts, sources_searched, query) -%}
+{% macro source_selector(shortname, fullname, counts, sources_searched, query, sub_source) -%}
     <li>
         <div class="source">
             <div class="source_header">
                 <span class="source_icon {{shortname}}_icon">&nbsp;</span>
-                    <a href="/search?query={{query}}&source={{shortname}}">{{fullname}}</a>
+                    <a href="/search?query={{query}}&source={{shortname}}">
+                        {% if shortname in sources_searched %}
+                            <strong>{{fullname}}</strong>
+                        {% else %}
+                            {{fullname}}
+                        {% endif %}
+                    </a>
                 </span>
                 <span class="source_count {{"nonzero" if counts['source'][shortname] > 0}}">({{counts['source'][shortname]}})</span>
             </div>
@@ -12,7 +18,11 @@
                     {% for repo, count in counts['repo']|dictsort(true) %}
                         <div class="subsource">
                             <a href="/search?query={{query}}&source=github&repo={{repo}}" class="subsource_name">
-                                {{repo}}
+                                {% if repo == sub_source %}
+                                    <strong>{{repo}}</strong>
+                                {% else %}
+                                    {{repo}}
+                                {% endif %}
                             </a>
                             <span class="subsource_count">({{count}})</span>
                         </div>
@@ -22,7 +32,11 @@
                     {% for project, count in counts['project']|dictsort(true) %}
                         <div class="subsource">
                             <a href="/search?query={{query}}&source=jira&project={{project}}" class="subsource_name">
-                                {{project}}
+                                {% if project == sub_source %}
+                                    <strong>{{project}}</strong>
+                                {% else %}
+                                    {{project}}
+                                {% endif %}
                             </a>
                             <span class="subsource_count">({{count}})</span>
                         </div>

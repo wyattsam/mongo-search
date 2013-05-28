@@ -13,11 +13,11 @@
         <div class="span2">
             <ul class="unstyled" id="source-list">
                 {% from "_template_helpers.html" import source_selector %}
-                {{ source_selector("jira", "JIRA", counts, sources_searched, query) }}
-                {{ source_selector("google", "Google Groups", counts, sources_searched, query) }}
-                {{ source_selector("so", "StackOverflow", counts, sources_searched, query) }}
-                {{ source_selector("github", "GitHub", counts, sources_searched, query) }}
-                {{ source_selector("chat", "Chat", counts, sources_searched, query) }}
+                {{ source_selector("jira", "JIRA", counts, sources_searched, query, sub_source) }}
+                {{ source_selector("google", "Google Groups", counts, sources_searched, query, sub_source) }}
+                {{ source_selector("so", "StackOverflow", counts, sources_searched, query, sub_source) }}
+                {{ source_selector("github", "GitHub", counts, sources_searched, query, sub_source) }}
+                {{ source_selector("chat", "Chat", counts, sources_searched, query, sub_source) }}
                 <!-- to add: -->
                 <!-- 10gen wiki -->
                 <!-- 10gen chat -->
