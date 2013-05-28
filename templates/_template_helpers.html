@@ -4,7 +4,7 @@
             <div class="source_header">
                 <span class="source_icon {{shortname}}_icon">&nbsp;</span>
                     <a href="/search?query={{query}}&source={{shortname}}">
-                        {% if shortname in sources_searched %}
+                        {% if shortname in sources_searched and sources_searched|length == 1 %}
                             <strong>{{fullname}}</strong>
                         {% else %}
                             {{fullname}}
