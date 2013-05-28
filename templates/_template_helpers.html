@@ -1,12 +1,34 @@
-{% macro source_selector(shortname, fullname, source_counts, sources_searched) -%}
+{% macro source_selector(shortname, fullname, counts, sources_searched, query) -%}
     <li>
-        <label class="checkbox">
-            <div class="source_icon {{shortname}}_icon">&nbsp;</div>
-            <input type="checkbox" value="{{shortname}}" name="source" form="search" {{"checked" if not sources_searched or shortname in sources_searched}}/>
-            {{fullname}}
-            {% if not sources_searched or shortname in sources_searched %}
-                <span class="source_count {{"nonzero" if source_counts[shortname] > 0}}">({{source_counts[shortname]}})</span>
-            {% endif %}
+        <div class="source">
+            <div class="source_header">
+                <span class="source_icon {{shortname}}_icon">&nbsp;</span>
+                    <a href="/search?query={{query}}&source={{shortname}}">{{fullname}}</a>
+                </span>
+                <span class="source_count {{"nonzero" if counts['source'][shortname] > 0}}">({{counts['source'][shortname]}})</span>
+            </div>
+            <div class="subsource_list">
+                {% if shortname == 'github' %}
+                    {% for repo, count in counts['repo'].iteritems() %}
+                        <div class="subsource">
+                            <a href="/search?query={{query}}&source=github&repo={{repo}}" class="subsource_name">
+                                {{repo}}
+                            </a>
+                            <span class="subsource_count">({{count}})</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                {% if shortname == 'jira' %}
+                    {% for project, count in counts['project'].iteritems() %}
+                        <div class="subsource">
+                            <a href="/search?query={{query}}&source=jira&project={{project}}" class="subsource_name">
+                                {{project}}
+                            </a>
+                            <span class="subsource_count">({{count}})</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
         </label>
     </li>
 {% endmacro %}

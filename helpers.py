@@ -5,9 +5,28 @@ from math import ceil
 
 JIRA_URL = "https://jira.mongodb.org/browse/"
 
-def get_counts_by_source(raw_results):
-    source_counts = Counter((doc['obj']['source'] for doc in raw_results))
-    return source_counts 
+def get_counts(raw_results):
+    counts = {
+        'total': 0,
+        'source': Counter(),
+        'repo': Counter(),
+        'project': Counter(),
+        'tag': Counter()
+    }
+
+    for doc in raw_results:
+        obj = doc['obj']
+
+        counts['total'] += 1
+        counts['source'][obj['source']] += 1
+
+        if obj['source'] == 'github':
+            counts['repo'][obj['repo']['name']] += 1
+
+        if obj['source'] == 'jira':
+            counts['project'][obj['project']] += 1
+
+    return counts
 
 def massage_results(raw_results, query):
     massaged = []

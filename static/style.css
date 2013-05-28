@@ -71,21 +71,45 @@ a {
 }
 
 /* Left sidebar on results.html */
+#source-list{
+    width: 225px;
+}
+
+#source-list a{
+    color: #333333;
+    text-decoration: none;
+}
+
 #source-list li{
+    line-height: 24px;
     margin-bottom:4px;
 }
 
-label.checkbox{
-    line-height:20px;
+.source{
+    margin-bottom: 15px;
+}
+
+.subsource_list{
+    margin-top: 5px;
+}
+
+.subsource{
+    font-size: .8em;
+    margin-left: 40px;
+    line-height: 1.6em;
+}
+
+.source .subsource_count{
+    font-weight: bold;
 }
 
 .source_icon{
-    background-size:18px 18px;
+    background-size:24px 24px;
     background-repeat:no-repeat;
-    width:20px;
-    height:20px;
+    width:24px;
+    height:24px;
     display:inline-block;
-    padding-right:2px;
+    padding-right: 5px;
 }
 
 .google_icon{
@@ -109,9 +133,8 @@ label.checkbox{
 }
 
 .nonzero{
-    font-weight:bold;
+    font-weight: bold;
 }
-
 
 .gh-commit-message{
     font-weight:bold;

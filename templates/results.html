@@ -11,21 +11,19 @@
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span2">
-            <div class="btn-group btn-group-vertical">
-                <ul id="source-list">
-                    {% from "_template_helpers.html" import source_selector %}
-                    {{ source_selector("jira", "JIRA", source_counts, sources_searched) }}
-                    {{ source_selector("google", "Google Groups", source_counts, sources_searched) }}
-                    {{ source_selector("so", "StackOverflow", source_counts, sources_searched) }}
-                    {{ source_selector("github", "GitHub", source_counts, sources_searched) }}
-                    {{ source_selector("chat", "Chat", source_counts, sources_searched) }}
-                    <!-- to add: -->
-                    <!-- 10gen wiki -->
-                    <!-- 10gen chat -->
-                    <!-- MongoDB docs-->
-                    <!-- etc -->
-                </ul>
-            </div>
+            <ul class="unstyled" id="source-list">
+                {% from "_template_helpers.html" import source_selector %}
+                {{ source_selector("jira", "JIRA", counts, sources_searched, query) }}
+                {{ source_selector("google", "Google Groups", counts, sources_searched, query) }}
+                {{ source_selector("so", "StackOverflow", counts, sources_searched, query) }}
+                {{ source_selector("github", "GitHub", counts, sources_searched, query) }}
+                {{ source_selector("chat", "Chat", counts, sources_searched, query) }}
+                <!-- to add: -->
+                <!-- 10gen wiki -->
+                <!-- 10gen chat -->
+                <!-- MongoDB docs-->
+                <!-- etc -->
+            </ul>
         </div>
         <div class="offset1 span9">
             <p>Results:
@@ -44,6 +42,9 @@
                         <span class="source-search">{{SOURCES.get(source)}}</span>
                         {%- if not loop.last %},{% endif %}
                     {% endfor %}
+                    {% if sub_source %}
+                        ({{ sub_source }})
+                    {% endif %}
                 {% endif %}
             </p>
 

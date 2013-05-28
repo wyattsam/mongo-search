@@ -22,7 +22,10 @@ SOURCES = {
 
 COUNT_PROJECTION = {
     '_id': 0,
-    'source': 1
+    'source': 1,
+    'repo.name': 1,
+    'project': 1,
+    'tags': 1
 }
 
 RESULT_PROJECTION = {
@@ -108,6 +111,10 @@ def index():
 @app.route("/search")
 def submit():
     query = request.args.get('query', '')
+    source = request.args.get('source', '')
+    project = request.args.get('project', '')
+    repo = request.args.get('repo', '')
+
     page = int(request.args.get('page', 1))
     sources = request.args.getlist('source')
 
@@ -122,24 +129,31 @@ def submit():
     for source in sources:
         query_parser.source_filter.add(source)
 
+    if repo:
+        query_parser.repo_filter.add(repo)
+    if project:
+        query_parser.project_filter.add(project)
+
     docfilter = query_parser.build_filter()
     parsed_query = query_parser.full_text_query
 
     #run the counts seperately using covered query
     if not parsed_query:
         parsed_query = ' '
-    covered_results = run_count_query(parsed_query, docfilter)
-    source_counts = helpers.get_counts_by_source(covered_results)
+
+    covered_results = run_count_query(parsed_query)
+    counts = helpers.get_counts(covered_results)
+    counts['filter_total'] = len(run_count_query(parsed_query, docfilter))
 
     page_limit = page * PAGE_SIZE
 
     results = run_query(parsed_query, page, docfilter, page_limit)
-    total_count = sum(source_counts.values())
-    pagination = helpers.Pagination(page, PAGE_SIZE, total_count)
+    pagination = helpers.Pagination(page, PAGE_SIZE, counts['filter_total'])
 
     return render_template('results.html', results=results,
-        source_counts=source_counts,
+        counts=counts,
         sources_searched=set(sources).union(query_parser.source_filter),
+        sub_source=(repo or project),
         query=parsed_query,
         pagination=pagination)
 
@@ -151,7 +165,7 @@ def page_not_found(e):
 # Helpers
 #-----------------------------------------------------------------------------
 
-def run_count_query(query, docfilter):
+def run_count_query(query, docfilter=None):
     return DB.command('text', 'combined',
         search=query,
         filter=docfilter,
