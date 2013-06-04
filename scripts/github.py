@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 import requests
 import re
+import sys
 from pymongo import MongoClient
 from time import sleep
 
 MONGO = MongoClient('localhost:27017')
 DB = MONGO['xgen']
+
+if len(sys.argv) > 1:
+    DB.authenticate(sys.argv[1], sys.argv[2])
+
 COMBINED = DB['combined']
 COMMITS = DB['github']
 API_BASE = 'https://api.github.com/'

@@ -7,6 +7,10 @@ from time import sleep
 
 MONGO = Connection('localhost:27017')
 DB = MONGO['xgen']
+
+if len(sys.argv) > 1:
+    DB.authenticate(sys.argv[1], sys.argv[2])
+
 COMBINED = DB['combined']
 STACK_OVERFLOW = DB['stack_overflow']
 API_BASE = 'https://api.stackexchange.com/2.1/'
