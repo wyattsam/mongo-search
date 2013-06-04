@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
 import requests
-#import settings
 from pymongo import Connection
 from time import sleep
 
