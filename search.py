@@ -4,9 +4,12 @@ from pymongo import MongoClient
 import helpers
 
 CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
-ADMIN = CONNECTION['admin']
-ADMIN.command('setParameter', textSearchEnabled=True)
+
+# Setup database
 DB = CONNECTION['xgen']
+DB.authenticate('search', 'g00gl3sux')
+
+# Setup collections
 COMBINED = DB['combined']
 GITHUB = DB['github']
 PAGE_SIZE = 10
