@@ -7,8 +7,8 @@ from time import sleep
 MONGO = Connection('localhost:27017')
 DB = MONGO['xgen']
 
-if len(sys.argv) > 1:
-    DB.authenticate(sys.argv[1], sys.argv[2])
+if len(sys.argv) == 5:
+    DB.authenticate(sys.argv[3], sys.argv[4])
 
 COMBINED = DB['combined']
 ISSUES = DB['jira']
