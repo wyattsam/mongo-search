@@ -35,6 +35,9 @@ def save_repo_commits(repo):
         commits = response.json()
 
         for commit in commits:
+            # the repo probably has no commits
+            if 'message' in commit: break
+
             commit['repo'] = {
                 'full_name': repo['full_name'],
                 'name': repo['name'],
