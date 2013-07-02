@@ -19,7 +19,8 @@ SOURCES = {
     'jira':   'JIRA',
     'google': 'Google Groups',
     'github': 'GitHub',
-    'chat':   '10gen Chat'
+    'chat':   '10gen Chat',
+    'docs':   'Docs',
 }
 
 COUNT_PROJECTION = {

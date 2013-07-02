@@ -42,6 +42,8 @@ def massage_results(raw_results, query):
             massaged.append(massage_jira(current))
         elif source == 'github':
             massaged.append(massage_github(current))
+        elif source == 'docs':
+            massaged.append(massage_docs(current))
 
     return massaged
 
@@ -67,6 +69,9 @@ def massage_github(commit):
         "repo_name" : commit['repo']['full_name']
     }
     return massaged
+
+def massage_docs(doc):
+    return doc
 
 def massage_stack_overflow(post):
     massaged = {

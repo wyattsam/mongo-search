@@ -1,0 +1,11 @@
+{% extends "results/baseresult.html" %}
+
+{% block content %}
+    <div class="docs-container" data-source="TODO">
+        <a target="_blank" href="{{ result.url }}">{{ result.title }}</a>
+        <div class="result-snippet">{{ result.body|truncate(350) }}</div>
+        <p class="result-url">
+            <span class="muted">{{result.url}}</span>
+        </p>
+    </div>
+{% endblock %}

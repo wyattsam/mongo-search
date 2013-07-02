@@ -137,6 +137,10 @@ a {
     background-image:url('/static/img/icon-chat.png');
 }
 
+.docs_icon{
+    background-image:url('/static/img/icon-docs.png');
+}
+
 .nonzero{
     font-weight: bold;
 }
