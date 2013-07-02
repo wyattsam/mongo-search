@@ -16,6 +16,7 @@ API_BASE = 'https://jira.mongodb.org/rest/api/2/'
 SEARCH_URL = API_BASE + 'search/'
 PROJECT_URL = API_BASE + 'project/'
 PAGE_SIZE = 100
+SKIP_PROJECTS = ['FREE']
 
 def jira_get(url, params={}, credentials=None):
     auth = credentials if credentials else {} 
@@ -67,6 +68,10 @@ if __name__ == '__main__':
     project_keys = [project['key'] for project in projects]
     print "getting jira issues for the following projects: " + str(project_keys)
     for project_key in project_keys:
-        print "[PROJECT] " + project_key
-        save_issues(project_key, credentials)
+        if project_key in SKIP_PROJECTS:
+            print "[SKIP] " + project_key
+            continue
+        else:
+            print "[PROJECT] " + project_key
+            save_issues(project_key, credentials)
 
