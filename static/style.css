@@ -70,6 +70,10 @@ a {
     border-left: 3px solid black; padding-left: 5px;
 }
 
+[data-source="docs"] {
+    border-left: 3px solid #6C513A; padding-left: 5px;
+}
+
 /* Left sidebar on results.html */
 #source-list{
     width: 225px;
