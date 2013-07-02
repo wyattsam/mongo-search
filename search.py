@@ -99,7 +99,7 @@ def submit():
     docfilter = query_parser.build_filter()
     parsed_query = query_parser.full_text_query
 
-    #run the counts seperately using covered query
+    #run the counts separately using covered query
     if not parsed_query:
         parsed_query = ' '
 
