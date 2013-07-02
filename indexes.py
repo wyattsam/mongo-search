@@ -1,11 +1,25 @@
+from pymongo import MongoClient
+
 #-----------------------------------------------------------------------------
 # Indexes
 #-----------------------------------------------------------------------------
+
+CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
+
+# Setup database
+DB = CONNECTION['xgen']
+DB.authenticate('search', 'g00gl3sux')
+
+# Setup collections
+COMBINED = DB['combined']
+GITHUB = DB['github']
 
 COMBINED.ensure_index([
     # Stack Overflow
     ('title', 'text'),
     ('body', 'text'),
+
+    # Stack Overflow
     ('tags', 'text'),
     ('owner.display_name', 'text'),
     ('comments.body', 'text'),
