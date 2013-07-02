@@ -1,15 +1,21 @@
 {% extends "results/baseresult.html" %}
 
 {% block content %}
-    <div class="gh-commit-container" data-source="{{ result.source }}">
-        <a target="_blank" href="{{ result.url }}">{{ result.commit_msg }}</a>
-        {% if result.commit_msg_body %}
-            <div class="result-snippet">{{ result.commit_msg_body|truncate(350) }}</div>
-        {% endif %}
-        <p class="result-url">
-            <span class="muted">committer:</span>&nbsp;<span class="gh-username">{{result.committer}}</span>&nbsp;<span class="muted">repo:</span>&nbsp;<span>{{result.repo_name}}</span>
-            <br/>
-            <span class="muted">{{result.url}}</span>
+<div data-source="{{ result.source }}">
+    <a target="_blank" href="{{ result.url }}">
+        <div class="result-summary">
+            {{ result.commit_msg }}
+        </div>
+    </a>
+    {% if result.commit_msg_body %}
+        <div class="result-snippet">
+            {{ result.commit_msg_body|truncate(350) }}
+        </div>
+    {% endif %}
+    <p class="result-url">
+        <span class="muted">committer:</span>&nbsp;<span class="gh-username">{{result.committer}}</span>&nbsp;<span class="muted">repo:</span>&nbsp;<span>{{result.repo_name}}</span>
+        <br/>
+        <span class="muted">{{result.url}}</span>
         </p>
-    </div>
+</div>
 {% endblock %}
