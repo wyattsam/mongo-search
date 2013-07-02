@@ -24,7 +24,12 @@ def save_doc_pages():
             # Blank line in file.
             continue
 
-        file_json = requests.get(file_url).json()
+        try:
+            file_json = requests.get(file_url).json()
+        except ValueError:
+            print "Failed to parse json in %s" % file_url
+            continue
+
         if 'text' not in file_json:
             print("Skipping %s" % file_url)
         else:
