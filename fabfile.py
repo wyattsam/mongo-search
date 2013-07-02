@@ -18,5 +18,5 @@ def deploy():
     code_dir = '/home/ec2-user/playground/duckduckmongo'
     with cd(code_dir):
         run("git pull")
-        run("crontab crontab")
+        #run("crontab crontab")
         run("sudo restart search")
