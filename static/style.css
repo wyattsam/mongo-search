@@ -99,6 +99,11 @@ a {
     line-height: 1.6em;
 }
 
+.selected{
+    background-color:#DDD;
+    font-weight:bold;
+}
+
 .source .subsource_count{
     font-weight: bold;
 }

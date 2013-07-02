@@ -16,13 +16,9 @@
             <div class="subsource_list">
                 {% if shortname == 'github' %}
                     {% for repo, count in counts['repo']|dictsort(true) %}
-                        <div class="subsource">
+                        <div class="subsource{{ ' selected' if repo==sub_source  else ''}}" >
                             <a href="/search?query={{query}}&source=github&repo={{repo}}" class="subsource_name">
-                                {% if repo == sub_source %}
-                                    <strong>{{repo}}</strong>
-                                {% else %}
-                                    {{repo}}
-                                {% endif %}
+                                  {{repo}}
                             </a>
                             <span class="subsource_count">({{count}})</span>
                         </div>
@@ -30,13 +26,9 @@
                 {% endif %}
                 {% if shortname == 'jira' %}
                     {% for project, count in counts['project']|dictsort(true) %}
-                        <div class="subsource">
+                    <div class="subsource{{ ' selected' if project==sub_source  else ''}}" >
                             <a href="/search?query={{query}}&source=jira&project={{project}}" class="subsource_name">
-                                {% if project == sub_source %}
-                                    <strong>{{project}}</strong>
-                                {% else %}
-                                    {{project}}
-                                {% endif %}
+                                 {{project}}
                             </a>
                             <span class="subsource_count">({{count}})</span>
                         </div>
