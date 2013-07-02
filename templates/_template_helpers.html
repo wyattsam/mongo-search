@@ -34,6 +34,16 @@
                         </div>
                     {% endfor %}
                 {% endif %}
+                {% if shortname == 'docs' %}
+                {% for manual, count in counts['docs']|dictsort(true) %}
+                    <div class="subsource{{ ' selected' if manual==sub_source  else ''}}" >
+                            <a href="/search?query={{query}}&source=docs&manual={{manual}}" class="subsource_name">
+                                 {{manual}}
+                            </a>
+                            <span class="subsource_count">({{count}})</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
             </div>
         </label>
     </li>

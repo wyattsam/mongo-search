@@ -11,7 +11,8 @@ def get_counts(raw_results):
         'source': Counter(),
         'repo': Counter(),
         'project': Counter(),
-        'tag': Counter()
+        'tag': Counter(),
+        'docs': Counter()
     }
 
     for doc in raw_results:
@@ -25,6 +26,9 @@ def get_counts(raw_results):
 
         if obj['source'] == 'jira':
             counts['project'][obj['project']] += 1
+
+        if obj['source'] == 'docs':
+            counts['docs'][obj['subsource']] += 1
 
     return counts
 

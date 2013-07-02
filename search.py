@@ -28,7 +28,8 @@ COUNT_PROJECTION = {
     'source': 1,
     'repo.name': 1,
     'project': 1,
-    'tags': 1
+    'tags': 1,
+    'subsource': 1
 }
 
 RESULT_PROJECTION = {
@@ -76,6 +77,7 @@ def submit():
     source = request.args.get('source', '')
     project = request.args.get('project', '')
     repo = request.args.get('repo', '')
+    manual = request.args.get('manual', '')
 
     page = int(request.args.get('page', 1))
     sources = request.args.getlist('source')
@@ -95,6 +97,8 @@ def submit():
         query_parser.repo_filter.add(repo)
     if project:
         query_parser.project_filter.add(project)
+    if manual:
+        query_parser.project_filter.add(manual)
 
     docfilter = query_parser.build_filter()
     parsed_query = query_parser.full_text_query
@@ -115,7 +119,7 @@ def submit():
     return render_template('results.html', results=results,
         counts=counts,
         sources_searched=set(sources).union(query_parser.source_filter),
-        sub_source=(repo or project),
+        sub_source=(repo or project or manual),
         query=parsed_query,
         pagination=pagination)
 

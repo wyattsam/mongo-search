@@ -22,6 +22,10 @@ class MongoQuery(object):
             Suppress(":") + Word(pyparsing.alphanums) + \
             ZeroOrMore(Suppress(",") + Word(pyparsing.alphanums))
 
+        manual_selector = CaselessKeyword("manual") + \
+            Suppress(":") + Word(pyparsing.alphanums) + \
+            ZeroOrMore(Suppress(",") + Word(pyparsing.alphanums))
+
         source_selector = CaselessKeyword("source") + \
             Suppress(":") + Word(pyparsing.alphanums) + \
             ZeroOrMore(Suppress(",") + Word(pyparsing.alphanums))
@@ -59,6 +63,8 @@ class MongoQuery(object):
             filter_doc['project'] = {"$in":list(self.project_filter)}
         if 'github' in self.source_filter and len(self.repo_filter):
             filter_doc['repo.name'] = {"$in":list(self.repo_filter)}
+        if 'docs' in self.source_filter and len(self.repo_filter):
+            filter_doc['subsource'] = {"$in":list(self.repo_filter)}
         return filter_doc
 
     def debug(self):
