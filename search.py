@@ -97,7 +97,7 @@ def submit():
     if project:
         query_parser.project_filter.add(project)
     if manual:
-        query_parser.project_filter.add(manual)
+        query_parser.manual_filter.add(manual)
 
     docfilter = query_parser.build_filter()
     parsed_query = query_parser.full_text_query
