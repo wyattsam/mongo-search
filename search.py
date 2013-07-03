@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, url_for
 from pymongo import MongoClient
+from datetime import datetime
 import helpers
 
 CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
@@ -10,6 +11,7 @@ DB.authenticate('search', 'g00gl3sux')
 
 # Setup collections
 COMBINED = DB['combined']
+SEARCHES = DB['searches']
 PAGE_SIZE = 10
 COUNT_LIMIT = 1000000
 
@@ -89,8 +91,8 @@ def submit():
     if len(set(sources).union(query_parser.source_filter)) == 0:
         sources = SOURCES.keys()
 
-    for source in sources:
-        query_parser.source_filter.add(source)
+    for multisource in sources:
+        query_parser.source_filter.add(multisource)
 
     if repo:
         query_parser.repo_filter.add(repo)
@@ -101,6 +103,17 @@ def submit():
 
     docfilter = query_parser.build_filter()
     parsed_query = query_parser.full_text_query
+
+    search = {
+        'time': datetime.now(),
+        'query': query
+    }
+
+    if source:
+        search['source'] = source
+    if project or repo or manual:
+        search['subsource'] = project or repo or manual
+    SEARCHES.insert(search)
 
     #run the counts separately using covered query
     if not parsed_query:
