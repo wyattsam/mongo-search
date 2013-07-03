@@ -2,6 +2,7 @@
 import requests
 import re
 import sys
+from datetime import datetime
 from pymongo import MongoClient
 from time import sleep
 
@@ -11,6 +12,7 @@ DB = MONGO['xgen']
 if len(sys.argv) > 1:
     DB.authenticate(sys.argv[1], sys.argv[2])
 
+SCRAPES = DB['scrapes']
 COMBINED = DB['combined']
 COMMITS = DB['github']
 API_BASE = 'https://api.github.com/'
@@ -79,5 +81,17 @@ def save_organizations(organizations):
             save_repo_commits(repo)
 
 if __name__ == '__main__':
-    save_organizations(['mongodb'])
+    scrape = SCRAPES.insert({
+        'source': 'github',
+        'start': datetime.now(),
+        'state': 'running'
+    })
 
+    try:
+        save_organizations(['mongodb'])
+        SCRAPES.update({'_id': scrape},
+            { '$set': { 'state': 'complete', 'end': datetime.now()} })
+
+    except Exception as error:
+        SCRAPES.update({'_id': scrape},
+            { '$set': { 'state': 'failed', 'error': error} })

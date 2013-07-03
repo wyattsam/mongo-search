@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import requests
+from datetime import datetime
 from pymongo import Connection
 from time import sleep
 
@@ -10,6 +11,7 @@ DB = MONGO['xgen']
 if len(sys.argv) == 5:
     DB.authenticate(sys.argv[3], sys.argv[4])
 
+SCRAPES = DB['scrapes']
 COMBINED = DB['combined']
 ISSUES = DB['jira']
 API_BASE = 'https://jira.mongodb.org/rest/api/2/'
@@ -58,20 +60,33 @@ def save_issues(project, credentials=None):
         sleep(1)
 
 if __name__ == '__main__':
+    scrape = SCRAPES.insert({
+        'source': 'jira',
+        'start': datetime.now(),
+        'state': 'running'
+    })
+
     # user provided login credentials
     credentials = None
     if len(sys.argv) >= 3:
         jira_user, jira_pass = sys.argv[1:3]
         credentials = (jira_user, jira_pass)
 
-    projects = jira_get(PROJECT_URL, credentials=credentials)
-    project_keys = [project['key'] for project in projects]
-    print "getting jira issues for the following projects: " + str(project_keys)
-    for project_key in project_keys:
-        if project_key in SKIP_PROJECTS:
-            print "[SKIP] " + project_key
-            continue
-        else:
-            print "[PROJECT] " + project_key
-            save_issues(project_key, credentials)
+    try:
+        projects = jira_get(PROJECT_URL, credentials=credentials)
+        project_keys = [project['key'] for project in projects]
 
+        for project_key in project_keys:
+            if project_key in SKIP_PROJECTS:
+                print "[SKIP] " + project_key
+                continue
+            else:
+                print "[PROJECT] " + project_key
+                save_issues(project_key, credentials)
+
+        SCRAPES.update({'_id': scrape},
+            { '$set': { 'state': 'complete', 'end': datetime.now()} })
+
+    except Exception as error:
+        SCRAPES.update({'_id': scrape},
+            { '$set': { 'state': 'failed', 'error': error} })

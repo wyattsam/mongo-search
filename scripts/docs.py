@@ -3,6 +3,7 @@
 
 import requests
 import sys
+from datetime import datetime
 from pymongo import MongoClient
 
 MONGO = MongoClient('localhost:27017')
@@ -11,6 +12,7 @@ DB = MONGO['xgen']
 if len(sys.argv) > 1:
     DB.authenticate(sys.argv[1], sys.argv[2])
 
+SCRAPES = DB['scrapes']
 COMBINED = DB['combined']
 DOCS = DB['docs']
 
@@ -47,5 +49,18 @@ def save_doc_pages():
         COMBINED.save(doc)
 
 if __name__ == '__main__':
-    save_doc_pages()
+    scrape = SCRAPES.insert({
+        'source': 'docs',
+        'start': datetime.now(),
+        'state': 'running'
+    })
+
+    try:
+        save_doc_pages()
+        SCRAPES.update({'_id': scrape},
+            { '$set': { 'state': 'complete', 'end': datetime.now()} })
+
+    except Exception as error:
+        SCRAPES.update({'_id': scrape},
+            { '$set': { 'state': 'failed', 'error': error} })
 

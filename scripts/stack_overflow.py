@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import requests
+from datetime import datetime
 from pymongo import Connection
 from time import sleep
 
@@ -10,6 +11,7 @@ DB = MONGO['xgen']
 if len(sys.argv) > 1:
     DB.authenticate(sys.argv[1], sys.argv[2])
 
+SCRAPES = DB['scrapes']
 COMBINED = DB['combined']
 STACK_OVERFLOW = DB['stack_overflow']
 API_BASE = 'https://api.stackexchange.com/2.1/'
@@ -50,4 +52,17 @@ def save_questions(tag):
         params['page'] += 1
 
 if __name__ == '__main__':
-    save_questions('mongodb')
+    scrape = SCRAPES.insert({
+        'source': 'so',
+        'start': datetime.now(),
+        'state': 'running'
+    })
+
+    try:
+        save_questions('mongodb')
+        SCRAPES.update({'_id': scrape},
+            { '$set': { 'state': 'complete', 'end': datetime.now()} })
+
+    except Exception as error:
+        SCRAPES.update({'_id': scrape},
+            { '$set': { 'state': 'failed', 'error': error} })
