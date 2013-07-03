@@ -60,7 +60,7 @@ def save_issues(project, credentials=None):
 if __name__ == '__main__':
     # user provided login credentials
     credentials = None
-    if len(sys.argv) == 3:
+    if len(sys.argv) >= 3:
         jira_user, jira_pass = sys.argv[1:3]
         credentials = (jira_user, jira_pass)
 
