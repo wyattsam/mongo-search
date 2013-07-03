@@ -10,7 +10,6 @@ DB.authenticate('search', 'g00gl3sux')
 
 # Setup collections
 COMBINED = DB['combined']
-GITHUB = DB['github']
 PAGE_SIZE = 10
 COUNT_LIMIT = 1000000
 
