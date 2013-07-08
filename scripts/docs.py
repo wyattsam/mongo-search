@@ -54,16 +54,16 @@ if __name__ == '__main__':
 
     try:
         save_doc_pages(source_name='mongodb',
-                       id_tag='docs-manual-', 
+                       id_tag='docs-manual-',
                        file_list_url='http://docs.mongodb.org/manual/json/.file_list')
         save_doc_pages(source_name='ecosystem',
-                       id_tag='docs-ecosystem-', 
+                       id_tag='docs-ecosystem-',
                        file_list_url='http://docs.mongodb.org/ecosystem/json/.file_list')
       # save_doc_pages(source_name='MMS',
-      #                id_tag='mms-saas-', 
+      #                id_tag='mms-saas-',
       #                file_list_url='http://mms.10gen.com/help/json/.file_list')
       # save_doc_pages(source_name='MMS On-Prem',
-      #                id_tag='mms-hosted-', 
+      #                id_tag='mms-hosted-',
       #                file_list_url='http://mms.10gen.com/help-hosted/current/json/.file_list')
 
         SCRAPES.update({'_id': scrape},

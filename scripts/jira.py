@@ -21,7 +21,7 @@ PAGE_SIZE = 100
 SKIP_PROJECTS = ['FREE']
 
 def jira_get(url, params={}, credentials=None):
-    auth = credentials if credentials else {} 
+    auth = credentials if credentials else {}
     response = requests.get(url, params=params, auth=auth, verify=False)
     return response.json()
 
