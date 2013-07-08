@@ -67,7 +67,7 @@ if __name__ == '__main__':
       #                file_list_url='http://mms.10gen.com/help-hosted/current/json/.file_list')
 
         SCRAPES.update({'_id': scrape},
-            { '$set': { 'state': 'complete', 'end': datetime.now()} })
+            { '$set': { 'state': 'complete', 'end': datetime.utcnow()} })
     except Exception as error:
         SCRAPES.update({'_id': scrape},
             { '$set': { 'state': 'failed', 'error': error} })

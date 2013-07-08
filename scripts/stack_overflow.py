@@ -54,7 +54,7 @@ def save_questions(tag):
 if __name__ == '__main__':
     scrape = SCRAPES.insert({
         'source': 'so',
-        'start': datetime.now(),
+        'start': datetime.utcnow(),
         'state': 'running'
     })
 

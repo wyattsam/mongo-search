@@ -62,7 +62,7 @@ def save_issues(project, credentials=None):
 if __name__ == '__main__':
     scrape = SCRAPES.insert({
         'source': 'jira',
-        'start': datetime.now(),
+        'start': datetime.utcnow(),
         'state': 'running'
     })
 

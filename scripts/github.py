@@ -83,7 +83,7 @@ def save_organizations(organizations):
 if __name__ == '__main__':
     scrape = SCRAPES.insert({
         'source': 'github',
-        'start': datetime.now(),
+        'start': datetime.utcnow(),
         'state': 'running'
     })
 
