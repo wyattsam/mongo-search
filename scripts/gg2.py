@@ -51,9 +51,9 @@ def save_message(msgnum):
         thread_id = groups[0]
         message_id = groups[1]
 
+        group = None
         subject = sub_re.sub('', message['Subject'])
         group_match = group_re.match(subject)
-
         if group_match is not None:
             group, subject = group_match.groups()
 
@@ -61,7 +61,7 @@ def save_message(msgnum):
             '_id': 'gg-%s' % message_id,
             'date': date,
             'subject': subject,
-            'group': group or None,
+            'group': group,
             'sender': message['X-Original-Sender'],
             'from': message['From'],
             'thread_id': int(thread_id),
@@ -107,7 +107,7 @@ if __name__ == '__main__':
 
     except Exception as error:
         SCRAPES.update({'_id': scrape},
-            {'$set': {'state': 'failed', 'error': error}})
+            {'$set': {'state': 'failed', 'error': str(error)}})
 
 MAIL.close()
 MAIL.logout()
