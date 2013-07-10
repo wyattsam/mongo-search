@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, url_for
+from flask import Flask, request, render_template, url_for, json
 from pymongo import MongoClient
 from datetime import datetime
 import helpers
@@ -12,6 +12,7 @@ DB.authenticate('search', 'g00gl3sux')
 # Setup collections
 COMBINED = DB['combined']
 SEARCHES = DB['searches']
+PHANTOM = DB['phantom']
 PAGE_SIZE = 10
 COUNT_LIMIT = 1000000
 
@@ -72,6 +73,16 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
+@app.route("/phantom", methods=["POST", "OPTIONS"])
+@helpers.crossdomain(origin="*", attach_to_all=True, automatic_options=True,
+    headers=["Content-length","Content-type","Connection"])
+def phantom():
+    topics = json.loads(request.data)
+    for topic in topics:
+        PHANTOM.insert(topic)
+
+    return "wow"
+
 @app.route("/search")
 def submit():
     query = request.args.get('query', '')
@@ -79,7 +90,6 @@ def submit():
     project = request.args.get('project', '')
     repo = request.args.get('repo', '')
     manual = request.args.get('manual', '')
-
     page = int(request.args.get('page', 1))
     sources = request.args.getlist('source')
 

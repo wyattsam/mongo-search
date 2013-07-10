@@ -37,7 +37,6 @@ sub_re = re.compile(r'([\[\(] *)?(\bRE|FWD?) *([-:;)\]][ :;\])-]*|$)|\]+ *$',
                     re.IGNORECASE | re.MULTILINE)
 group_re = re.compile(r'^\[(.*)\]\s+(.*)')
 
-
 def save_message(msgnum):
     status, data = MAIL.uid('fetch', msgnum, '(RFC822 X-GM-MSGID X-GM-THRID)')
     if status == 'OK':
@@ -64,8 +63,9 @@ def save_message(msgnum):
             'group': group,
             'sender': message['X-Original-Sender'],
             'from': message['From'],
-            'thread_id': int(thread_id),
-            'message_id': int(message_id)
+            'gm_thread_id': int(thread_id),
+            'gm_message_id': int(message_id),
+            'gg_message_id': message['Message-Id']
         }
 
         for part in message.walk():
@@ -109,5 +109,5 @@ if __name__ == '__main__':
         SCRAPES.update({'_id': scrape},
             {'$set': {'state': 'failed', 'error': str(error)}})
 
-MAIL.close()
 MAIL.logout()
+MAIL.close()
