@@ -1,3 +1,5 @@
+#!/usr/bin/env phantomjs
+
 var baseUrl = 'https://groups.google.com/forum/';
 var forumUrl = baseUrl + '#!forum/';
 var groupUrl = forumUrl + 'mongodb-user';
