@@ -1,74 +1,45 @@
-#!/usr/bin/env python
-"""Scrape the MongoDB manual."""
-
 import requests
-import sys
-from datetime import datetime
-from pymongo import MongoClient
+from scrapers import JSONScraper
 
-MONGO = MongoClient('localhost:27017')
-DB = MONGO['xgen']
 
-if len(sys.argv) > 1:
-    DB.authenticate(sys.argv[1], sys.argv[2])
+class DocumentationScraper(JSONScraper):
 
-SCRAPES = DB['scrapes']
-COMBINED = DB['combined']
-DOCS = DB['docs']
+    NAME = 'docs'
+    API_BASE = 'http://docs.mongodb.org/'
 
-def save_doc_pages(source_name, id_tag, file_list_url):
-    file_list = requests.get(file_list_url)
-    for file_url in file_list.text.split('\n'):
-        if not file_url:
-            # Blank line in file.
-            continue
+    def get_urls(self, kind):
+        file_urls_url = self.API_BASE + kind + '/json/.file_list'
+        file_urls = requests.get(file_urls_url).text.split('\n')
+        return file_urls
 
-        try:
-            file_json = requests.get(file_url).json()
-        except ValueError:
-            print "Failed to parse json in %s" % file_url
-            continue
-
-        if 'text' not in file_json:
-            print("Skipping %s" % file_url)
-        else:
-            print(file_url)
+    def scrape_file(self, kind, file_url):
+        file_json = self.get_json(file_url)
+        if 'text' in file_json:
+            page_name = file_json['current_page_name']
+            _id = "-".join([self.NAME, kind, page_name])
             doc = {
-                '_id':  id_tag + file_json['current_page_name'],
+                '_id': _id,
                 'title': file_json['title'],
                 'body': file_json['text'],
                 'url':  file_json['url'],
-                'subsource': source_name,
+                'subsource': kind,
             }
+            return doc
+        else:
+            return
 
-        DOCS.save(doc)
-        doc['source'] = 'docs'
-        COMBINED.save(doc)
+    def scrape_kind(self, kind):
+        file_urls = self.get_urls(kind)
+        for file_url in file_urls:
+            try:
+                yield self.scrape_file(kind, file_url)
+            except ValueError:
+                print "Failed to parse json in %s" % file_url
+                continue
 
-if __name__ == '__main__':
-    scrape = SCRAPES.insert({
-        'source': 'docs',
-        'start': datetime.now(),
-        'state': 'running'
-    })
-
-    try:
-        save_doc_pages(source_name='mongodb',
-                       id_tag='docs-manual-',
-                       file_list_url='http://docs.mongodb.org/manual/json/.file_list')
-        save_doc_pages(source_name='ecosystem',
-                       id_tag='docs-ecosystem-',
-                       file_list_url='http://docs.mongodb.org/ecosystem/json/.file_list')
-      # save_doc_pages(source_name='MMS',
-      #                id_tag='mms-saas-',
-      #                file_list_url='http://mms.10gen.com/help/json/.file_list')
-      # save_doc_pages(source_name='MMS On-Prem',
-      #                id_tag='mms-hosted-',
-      #                file_list_url='http://mms.10gen.com/help-hosted/current/json/.file_list')
-
-        SCRAPES.update({'_id': scrape},
-            { '$set': { 'state': 'complete', 'end': datetime.utcnow()} })
-    except Exception as error:
-        SCRAPES.update({'_id': scrape},
-            { '$set': { 'state': 'failed', 'error': error} })
-
+    def scrape(self):
+        kinds = ['manual', 'ecosystem']
+        for kind in kinds:
+            print '[DOC] ' + kind
+            for doc in self.scrape_kind(kind):
+                yield doc
