@@ -3,7 +3,6 @@ from scrapers import JSONScraper
 
 
 class DocumentationScraper(JSONScraper):
-
     NAME = 'docs'
     API_BASE = 'http://docs.mongodb.org/'
 
