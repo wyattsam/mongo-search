@@ -30,7 +30,7 @@ class ScrapeRunner(object):
         scrape = {'_id': self.scrape_id}
         update = {'$set': {
             'state': 'error',
-            'error': error
+            'error': str(error)
         }}
         self.scrapes.update(scrape, update)
         self.scrape_id = None
