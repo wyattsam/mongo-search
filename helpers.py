@@ -85,7 +85,7 @@ def massage_results(raw_results, query):
         current['score'] = result['score']
         source = current['source']
 
-        if source == 'so':
+        if source == 'stack_overflow':
             massaged.append(massage_stack_overflow(current))
         elif source == 'jira':
             massaged.append(massage_jira(current))
@@ -129,7 +129,7 @@ def massage_stack_overflow(post):
         'url': post['link'],
         'summary': post['title'],
         'snippet': re.sub('<[^<]+?>', '', post['body']),
-        'source': 'so'
+        'source': 'stack_overflow'
     }
     return massaged
 

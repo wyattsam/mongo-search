@@ -17,12 +17,12 @@ PAGE_SIZE = 10
 COUNT_LIMIT = 1000000
 
 SOURCES = {
-    'so':     'StackOverflow',
-    'jira':   'JIRA',
-    'google': 'Google Groups',
-    'github': 'GitHub',
-    'chat':   '10gen Chat',
-    'docs':   'Docs',
+    'stack_overflow': 'StackOverflow',
+    'jira':           'JIRA',
+    'google':         'Google Groups',
+    'github':         'GitHub',
+    'chat':           '10gen Chat',
+    'docs':           'Docs'
 }
 
 COUNT_PROJECTION = {
