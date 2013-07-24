@@ -115,7 +115,7 @@ def submit():
     parsed_query = query_parser.full_text_query
 
     search = {
-        'time': datetime.now(),
+        'time': datetime.utcnow(),
         'query': query
     }
 
