@@ -1,4 +1,6 @@
 import requests
+import sys
+import traceback
 from datetime import datetime
 from pymongo import MongoClient
 
@@ -6,12 +8,13 @@ from pymongo import MongoClient
 class ScrapeRunner(object):
 
     def login(self):
-        self.db.authenticate(*self.credentials)
+        user, password = self.credentials.values()
+        self.db.authenticate(user, password)
 
-    def __init__(self, credentials):
+    def __init__(self, credentials, database):
         # mongo
         self.client = MongoClient('localhost:27017')
-        self.db = self.client.xgen
+        self.db = self.client[database]
         self.combined = self.db.combined
         self.scrapes = self.db.scrapes
         self.credentials = credentials
@@ -28,9 +31,11 @@ class ScrapeRunner(object):
 
     def _scrape_error(self, error):
         scrape = {'_id': self.scrape_id}
+        exc_type, exc_value, exc_trace = sys.exc_info()
         update = {'$set': {
             'state': 'error',
-            'error': str(error)
+            'error': str(error),
+            'trace': traceback.format_exception(exc_type, exc_value, exc_trace)
         }}
         self.scrapes.update(scrape, update)
         self.scrape_id = None

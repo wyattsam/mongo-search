@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys
+import settings
 from scripts.scrapers import ScrapeRunner
 from scripts.jira import JiraScraper
 from scripts.github import GitHubScraper
@@ -7,24 +8,19 @@ from scripts.stack_overflow import StackOverflowScraper
 from scripts.docs import DocumentationScraper
 from scripts.google_groups import GoogleGroupsScraper
 
-user = 'scraper'
-password = 'scr4p3r'
-
 scraper_name = sys.argv[1]
-credentials = tuple(sys.argv[2:4])
-
-runner = ScrapeRunner([user, password])
+runner = ScrapeRunner(**settings.MONGO)
 
 scraper = None
 if scraper_name == 'jira':
-    scraper = JiraScraper(credentials)
+    scraper = JiraScraper(**settings.JIRA)
 elif scraper_name == 'github':
-    scraper = GitHubScraper()
+    scraper = GitHubScraper(**settings.GITHUB)
 elif scraper_name == 'stack_overflow':
-    scraper = StackOverflowScraper()
+    scraper = StackOverflowScraper(**settings.STACK_OVERFLOW)
 elif scraper_name == 'docs':
-    scraper = DocumentationScraper()
+    scraper = DocumentationScraper(**settings.DOCS)
 elif scraper_name == 'google_groups':
-    scraper = GoogleGroupsScraper(credentials)
+    scraper = GoogleGroupsScraper(**settings.GMAIL)
 
 runner.run(scraper)

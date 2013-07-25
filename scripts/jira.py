@@ -7,10 +7,12 @@ class JiraScraper(JSONScraper):
     SEARCH_URL = API_BASE + 'search/'
     PROJECT_URL = API_BASE + 'project/'
     PAGE_SIZE = 100
-    SKIP_PROJECTS = ['FREE']
 
-    def __init__(self, credentials=None):
-        self.credentials = credentials
+    def __init__(self, credentials=None, skip=[]):
+        user = credentials['user']
+        password = credentials['password']
+        self.credentials = tuple([user, password])
+        self.skip = skip
 
     def get_projects(self):
         projects = self.get_json(url=self.PROJECT_URL, auth=self.credentials)
@@ -18,7 +20,7 @@ class JiraScraper(JSONScraper):
         return project_keys
 
     def search_issues(self, jql):
-        return self.get_json(self.SEARCH_URL, jql, self.credentials)
+        return self.get_json(self.SEARCH_URL, jql, auth=self.credentials)
 
     def scrape_issue(self, issue, project):
         issue['_id'] = issue['key']
@@ -49,7 +51,7 @@ class JiraScraper(JSONScraper):
             sleep(1)
 
     def scrape_project(self, project):
-        if project not in self.SKIP_PROJECTS:
+        if project not in self.skip:
             print "[PROJECT] " + project
             for issue in self.scrape_issues(project):
                 yield issue

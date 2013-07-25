@@ -6,6 +6,9 @@ class DocumentationScraper(JSONScraper):
     NAME = 'docs'
     API_BASE = 'http://docs.mongodb.org/'
 
+    def __init__(self, kinds):
+        self.kinds = kinds
+
     def get_urls(self, kind):
         file_urls_url = self.API_BASE + kind + '/json/.file_list'
         file_urls = requests.get(file_urls_url).text.split('\n')
@@ -30,6 +33,8 @@ class DocumentationScraper(JSONScraper):
     def scrape_kind(self, kind):
         file_urls = self.get_urls(kind)
         for file_url in file_urls:
+            if not file_url:
+                return
             try:
                 yield self.scrape_file(kind, file_url)
             except ValueError:
@@ -37,8 +42,7 @@ class DocumentationScraper(JSONScraper):
                 continue
 
     def scrape(self):
-        kinds = ['manual', 'ecosystem']
-        for kind in kinds:
+        for kind in self.kinds:
             print '[DOC] ' + kind
             for doc in self.scrape_kind(kind):
                 yield doc

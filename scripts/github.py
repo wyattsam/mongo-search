@@ -7,14 +7,17 @@ class GitHubScraper(JSONScraper):
     API_BASE = 'https://api.github.com/'
     ORGS_URL = API_BASE + 'orgs/'
     PER_PAGE = 100
-    CLIENT_ID = '10346e4112a4437615df'
-    CLIENT_SECRET = 'd8bf753eb3ad7b1aadbe91edb8507c2b05d57476'
-    OAUTH_PARAMS = {'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET}
-    COMMIT_PARAMS = dict(OAUTH_PARAMS, per_page=PER_PAGE)
+
+    def __init__(self, credentials=None, organizations=[]):
+        self.credentials = credentials
+        self.organizations = organizations
+
+    def commit_params(self):
+        return dict(self.credentials, per_page=self.PER_PAGE)
 
     def get_repos(self, organization):
         url = self.ORGS_URL + organization + '/repos'
-        repos = self.get_json(url, self.OAUTH_PARAMS)
+        repos = self.get_json(url, self.credentials)
         return repos
 
     def scrape_commit(self, repo, commit):
@@ -24,15 +27,18 @@ class GitHubScraper(JSONScraper):
             'url': repo['url']
         }
         commit['_id'] = repo['full_name'] + '-' + commit['sha']
-
         return commit
 
     def scrape_commits(self, repo):
         commits_url = repo['url'] + '/commits'
-        response = requests.get(commits_url, params=self.COMMIT_PARAMS)
+        response = requests.get(commits_url, params=self.commit_params())
 
         while True:
-            commits = response.json()
+            try:
+                commits = response.json()
+            except ValueError:
+                raise ValueError(response)
+
             for commit in commits:
                 if 'message' in commit:
                     # the repo probably has no commits
@@ -41,7 +47,7 @@ class GitHubScraper(JSONScraper):
 
             if 'next' in response.links:
                 next_link = response.links['next']['url']
-                response = requests.get(next_link, params=self.COMMIT_PARAMS)
+                response = requests.get(next_link, params=self.commit_params())
             else:
                 break
 
@@ -51,7 +57,8 @@ class GitHubScraper(JSONScraper):
             yield commit
 
     def scrape(self):
-        repos = self.get_repos('mongodb')
-        for repo in repos:
-            for commit in self.scrape_repo(repo):
-                yield commit
+        for organization in self.organizations:
+            repos = self.get_repos(organization)
+            for repo in repos:
+                for commit in self.scrape_repo(repo):
+                    yield commit

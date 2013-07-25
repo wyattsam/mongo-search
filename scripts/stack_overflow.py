@@ -8,6 +8,10 @@ class StackOverflowScraper(JSONScraper):
     SEARCH_URL = API_BASE + 'search'
     PAGE_SIZE = 100
 
+    def __init__(self, tags, credentials=None):
+        self.tags = tags
+        self.credentials = credentials
+
     def scrape_question(self, question):
         key = 'SO-' + str(question['question_id'])
         question['_id'] = key
@@ -25,6 +29,10 @@ class StackOverflowScraper(JSONScraper):
             'pagesize': self.PAGE_SIZE,
         }
 
+        if self.credentials:
+            params['access_token'] = self.credentials['access_token']
+            params['key'] = self.credentials['key']
+
         while True:
             result = self.get_json(self.SEARCH_URL, params=params)
             items = result.get('items', [])
@@ -32,17 +40,18 @@ class StackOverflowScraper(JSONScraper):
             for item in items:
                 yield self.scrape_question(item)
 
-            if 'has_more' not in result:
+            if not result['has_more']:
                 break
 
             # don't remove this -- back off if you're told to backoff
             if 'backoff' in result:
-                sleep(result['backoff'])
+                backoff = result['backoff']
+                print '[BACKOFF] backing off for %s seconds' % backoff
+                sleep(backoff)
 
             params['page'] += 1
 
     def scrape(self):
-        tags = ['mongodb']
-        for tag in tags:
+        for tag in self.tags:
             for question in self.scrape_tag(tag):
                 yield question

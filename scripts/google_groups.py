@@ -10,18 +10,19 @@ from scrapers import Scraper
 
 class GoogleGroupsScraper(Scraper):
     NAME = 'google_groups'
-    LABELS = ['freesupport']
     HEADER_RE = re.compile(".*\(X-GM-THRID (\d+) X-GM-MSGID (\d+)")
     SUBJECT_RE = re.compile(r'([\[\(] *)?(\bRE|FWD?) *([-:;)\]][ :;\])-]*|$)|\]+ *$',
                             re.IGNORECASE | re.MULTILINE)
     GROUP_RE = re.compile(r'^\[(.*)\]\s+(.*)')
     MESSAGE_PARTS = '(RFC822 X-GM-MSGID X-GM-THRID)'
 
-    def __init__(self, credentials=None, label='freesupport'):
+    def __init__(self, labels, credentials):
         self.credentials = credentials
+        self.labels = labels
 
     def login(self):
-        user, password = self.credentials
+        user = self.credentials['user']
+        password = self.credentials['password']
         self.gmail = imap.IMAP4_SSL('imap.gmail.com', 993)
         self.gmail.login(user, password)
 
@@ -51,7 +52,7 @@ class GoogleGroupsScraper(Scraper):
 
     def scrape(self):
         self.login()
-        for label in self.LABELS:
+        for label in self.labels:
             for message in self.scrape_label(label):
                 yield message
 
@@ -82,6 +83,7 @@ class GoogleGroupsScraper(Scraper):
     def extract_body(self, message):
         for part in message.walk():
             if part.get_content_type() == 'text/plain':
+                body = None
                 text = part.get_payload()
                 try:
                     body = erp.parse_reply(text)

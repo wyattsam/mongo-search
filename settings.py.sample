@@ -1,0 +1,45 @@
+MONGO = {
+    'credentials': {
+        'user': '',
+        'password': ''
+    },
+    'database': 'xgen'
+}
+
+GMAIL = {
+    'credentials': {
+        'user': '',
+        'password': ''
+    },
+    'labels': ['freesupport']
+}
+
+JIRA = {
+    'credentials': {
+        'user': '',
+        'password': ''
+    },
+    'skip': ['FREE']
+}
+
+GITHUB = {
+    'credentials': {
+        'client_id': '',
+        'client_secret': ''
+    },
+    'organizations': ['mongodb']
+}
+
+STACK_OVERFLOW = {
+    'credentials': {
+        'client_id': '',
+        'client_secret': '',
+        'key': '',
+        'access_token': ''
+    },
+    'tags': ['mongodb']
+}
+
+DOCS = {
+    'kinds': ['manual', 'ecosystem']
+}
