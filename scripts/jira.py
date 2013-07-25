@@ -44,6 +44,8 @@ class JiraScraper(JSONScraper):
                         yield self.scrape_issue(issue, project)
                 else:
                     break
+            else:
+                break
 
             params['startAt'] += len(issues)
             sleep(1)
@@ -56,6 +58,7 @@ class JiraScraper(JSONScraper):
 
     def scrape(self):
         projects = self.get_projects()
+        print '[JIRA] %s' % projects
         for project in projects:
             for issue in self.scrape_project(project):
                 yield issue
