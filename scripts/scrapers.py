@@ -8,7 +8,8 @@ from pymongo import MongoClient
 class ScrapeRunner(object):
 
     def login(self):
-        user, password = self.credentials.values()
+        user = self.credentials['user']
+        password = self.credentials['password']
         if user and password:
             self.db.authenticate(user, password)
 
