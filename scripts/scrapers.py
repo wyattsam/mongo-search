@@ -9,9 +9,10 @@ class ScrapeRunner(object):
 
     def login(self):
         user, password = self.credentials.values()
-        self.db.authenticate(user, password)
+        if user and password:
+            self.db.authenticate(user, password)
 
-    def __init__(self, credentials, database):
+    def __init__(self, database, credentials=None):
         # mongo
         self.client = MongoClient('localhost:27017')
         self.db = self.client[database]
@@ -19,7 +20,8 @@ class ScrapeRunner(object):
         self.scrapes = self.db.scrapes
         self.credentials = credentials
         self.scrape_id = None
-        self.login()
+        if credentials:
+            self.login()
 
     def _start_scrape(self, name):
         start = {
@@ -76,6 +78,14 @@ class Scraper(object):
 
 class JSONScraper(Scraper):
 
-    def get_json(self, url, params={}, auth={}):
+    def get_json(self, url, params={}, auth=None):
+        if auth:
+            user = auth['user']
+            password = auth['password']
+            if user and password:
+                auth = tuple([user, password])
+            else:
+                auth = None
+
         response = requests.get(url, params=params, auth=auth, verify=False)
         return response.json()

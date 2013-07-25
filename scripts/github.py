@@ -8,12 +8,16 @@ class GitHubScraper(JSONScraper):
     ORGS_URL = API_BASE + 'orgs/'
     PER_PAGE = 100
 
-    def __init__(self, credentials=None, organizations=[]):
+    def __init__(self, organizations=[], credentials=None):
         self.credentials = credentials
         self.organizations = organizations
 
     def commit_params(self):
-        return dict(self.credentials, per_page=self.PER_PAGE)
+        params = { 'per_page': self.PER_PAGE }
+        if self.credentials:
+            return dict(self.credentials, **params)
+        else:
+            return params
 
     def get_repos(self, organization):
         url = self.ORGS_URL + organization + '/repos'

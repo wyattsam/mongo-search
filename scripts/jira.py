@@ -9,10 +9,8 @@ class JiraScraper(JSONScraper):
     PAGE_SIZE = 100
 
     def __init__(self, credentials=None, skip=[]):
-        user = credentials['user']
-        password = credentials['password']
-        self.credentials = tuple([user, password])
         self.skip = skip
+        self.credentials = credentials
 
     def get_projects(self):
         projects = self.get_json(url=self.PROJECT_URL, auth=self.credentials)

@@ -34,13 +34,21 @@ class StackOverflowScraper(JSONScraper):
             params['key'] = self.credentials['key']
 
         while True:
+            print '[%s] page %s' % (tag, params['page'])
             result = self.get_json(self.SEARCH_URL, params=params)
             items = result.get('items', [])
 
-            for item in items:
-                yield self.scrape_question(item)
+            if items:
+                for item in items:
+                    yield self.scrape_question(item)
+                
+                if not result['has_more']:
+                    break
 
-            if not result['has_more']:
+                params['page'] += 1
+
+            else:
+                print '[ERROR] %s' % result
                 break
 
             # don't remove this -- back off if you're told to backoff
@@ -49,7 +57,6 @@ class StackOverflowScraper(JSONScraper):
                 print '[BACKOFF] backing off for %s seconds' % backoff
                 sleep(backoff)
 
-            params['page'] += 1
 
     def scrape(self):
         for tag in self.tags:
