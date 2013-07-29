@@ -100,6 +100,7 @@ class GoogleGroupsScraper(Scraper):
         group, subject = self.extract_group(subject)
         date = self.extract_date(message['Date'])
         body = self.extract_body(message)
+        gg_id = message['Message-Id'].strip('<>')
 
         msgdoc = {
             '_id': 'gg-%s' % message_id,
@@ -110,7 +111,7 @@ class GoogleGroupsScraper(Scraper):
             'from': message['From'],
             'thread_id': int(thread_id),
             'message_id': int(message_id),
-            'google_groups_id': message['Message-Id'],
+            'google_groups_id': gg_id,
             'body': body
         }
 
