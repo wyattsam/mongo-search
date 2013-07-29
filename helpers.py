@@ -99,8 +99,8 @@ def massage_jira(issue):
         'status': issue.get('fields',{}).get('status',None),
         'score': issue['score'],
         'url': JIRA_URL + issue['_id'],
-        'summary': issue['fields']['summary'],
-        'snippet': issue['fields']['description'],
+        'summary': issue['fields'].get('summary', ''),
+        'snippet': issue['fields'].get('description', ''),
         'source': 'jira'
     }
     return massaged

@@ -53,7 +53,7 @@ class MongoQuery(object):
 
     def parse(self, query):
         tokens = self.query_parser.parseString(query)
-        self.full_text_query = tokens[-1]
+        self.full_text_query = tokens[-1] or ''
 
     def build_filter(self):
         filter_doc = {}

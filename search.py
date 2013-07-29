@@ -76,67 +76,27 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
+
 @app.route("/search")
 def submit():
-    query = request.args.get('query', '')
-    source = request.args.get('source', '')
-    project = request.args.get('project', '')
-    repo = request.args.get('repo', '')
-    manual = request.args.get('manual', '')
-    page = int(request.args.get('page', 1))
-    sources = request.args.getlist('source')
-
-    from query_parse import MongoQuery
-    query_parser = MongoQuery()
-    query_parser.parse(query)
-
-    # if no sources are selected, disregard it and turn them all on.
-    if len(set(sources).union(query_parser.source_filter)) == 0:
-        sources = SOURCES.keys()
-
-    for multisource in sources:
-        query_parser.source_filter.add(multisource)
-
-    if repo:
-        query_parser.repo_filter.add(repo)
-    if project:
-        query_parser.project_filter.add(project)
-    if manual:
-        query_parser.manual_filter.add(manual)
-
-    docfilter = query_parser.build_filter()
-    parsed_query = query_parser.full_text_query
-
-    search = {
-        'time': datetime.utcnow(),
-        'query': query
-    }
-
-    if source:
-        search['source'] = source
-    if project or repo or manual:
-        search['subsource'] = project or repo or manual
-    SEARCHES.insert(search)
+    args = request.args
+    query, source_filter, page = parse_args(args)
 
     #run the counts separately using covered query
-    if not parsed_query:
-        parsed_query = ' '
-
-    covered_results = run_count_query(parsed_query)
-    counts = helpers.get_counts(covered_results)
-    counts['filter_total'] = len(run_count_query(parsed_query, docfilter))
+    counts = covered_count(query, source_filter)
 
     page_limit = page * PAGE_SIZE
 
-    results = run_query(parsed_query, page, docfilter, page_limit)
+    results = run_query(query, page, source_filter, page_limit)
     pagination = helpers.Pagination(page, PAGE_SIZE, counts['filter_total'])
 
     return render_template('results.html', results=results,
         counts=counts,
-        sources_searched=set(sources).union(query_parser.source_filter),
-        sub_source=(repo or project or manual),
-        query=parsed_query,
+        sources_searched=source_filter,
+        sub_source=None,
+        query=query,
         pagination=pagination)
+
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -145,6 +105,65 @@ def page_not_found(e):
 #-----------------------------------------------------------------------------
 # Helpers
 #-----------------------------------------------------------------------------
+
+def covered_count(query, source_filter):
+    covered_results = run_count_query(query)
+    counts = helpers.get_counts(covered_results)
+    counts['filter_total'] = len(run_count_query(query, source_filter))
+
+    return counts
+
+def log_search(query, source, subsource):
+    search = {
+        'time': datetime.utcnow(),
+        'query': parsed_query
+    }
+
+    if source:
+        search['source'] = source
+    if project or repo or manual:
+        search['subsource'] = project or repo or manual
+
+    SEARCHES.insert(search)
+
+def parse_args(args):
+    query = args.get('query', '')
+    page = int(args.get('page', 1))
+
+    from query_parse import MongoQuery
+    query_parser = MongoQuery()
+    query_parser.parse(query)
+
+    parse_source(query_parser, args)
+    parse_subsource(query_parser, args)
+
+    parsed_query = query_parser.full_text_query
+    source_filter = query_parser.build_filter()
+
+    return parsed_query, source_filter, page
+
+def parse_source(parser, args):
+    sources = args.getlist('source')
+
+    # if no sources are selected, disregard it and turn them all on.
+    if len(set(sources).union(parser.source_filter)) == 0:
+        sources = SOURCES.keys()
+
+    # add all the sources to the parser
+    for multisource in sources:
+        parser.source_filter.add(multisource)
+
+def parse_subsource(parser, args):
+    manual = args.get('manual', '')
+    project = args.get('project', '')
+    repo = args.get('repo', '')
+
+    if repo:
+        parser.repo_filter.add(repo)
+    if project:
+        parser.project_filter.add(project)
+    if manual:
+        parser.manual_filter.add(manual)
 
 def run_count_query(query, docfilter=None):
     return DB.command('text', 'combined',
