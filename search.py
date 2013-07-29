@@ -76,16 +76,6 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route("/phantom", methods=["POST", "OPTIONS"])
-@helpers.crossdomain(origin="*", attach_to_all=True, automatic_options=True,
-    headers=["Content-length","Content-type","Connection"])
-def phantom():
-    topics = json.loads(request.data)
-    for topic in topics:
-        PHANTOM.insert(topic)
-
-    return "wow"
-
 @app.route("/search")
 def submit():
     query = request.args.get('query', '')
