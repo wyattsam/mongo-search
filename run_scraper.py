@@ -7,6 +7,7 @@ from scripts.github import GitHubScraper
 from scripts.stack_overflow import StackOverflowScraper
 from scripts.docs import DocumentationScraper
 from scripts.google_groups import GoogleGroupsScraper
+from scripts.profiles import ProfilesScraper
 
 scraper_name = sys.argv[1]
 runner = ScrapeRunner(**settings.MONGO)
@@ -22,5 +23,7 @@ elif scraper_name == 'docs':
     scraper = DocumentationScraper(**settings.DOCS)
 elif scraper_name == 'google_groups':
     scraper = GoogleGroupsScraper(**settings.GMAIL)
+elif scraper_name == 'profiles':
+    scraper = ProfilesScraper(**settings.PROFILES)
 
 runner.run(scraper)
