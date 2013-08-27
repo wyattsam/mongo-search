@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, url_for, json
+from flask import Flask, request, render_template, url_for, redirect
 from pymongo import MongoClient
 from datetime import datetime
 import helpers
@@ -81,6 +81,9 @@ def index():
 def submit():
     args = request.args
     query, source_filter, page = parse_args(args)
+
+    if not query:
+        return redirect('/')
 
     #run the counts separately using covered query
     counts = covered_count(query, source_filter)
