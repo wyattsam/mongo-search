@@ -92,8 +92,8 @@ def submit():
 
     return render_template('results.html', results=results,
         counts=counts,
-        sources_searched=source_filter,
-        sub_source=None,
+        sources_searched=request.args.getlist('source'),
+        sub_source=hack_sub_source(source_filter) or 'MongoDB Universe',
         query=query,
         pagination=pagination)
 
@@ -105,6 +105,15 @@ def page_not_found(e):
 #-----------------------------------------------------------------------------
 # Helpers
 #-----------------------------------------------------------------------------
+
+def hack_sub_source(source_filter):
+    subsource = (source_filter.get('project') or
+        source_filter.get('repo.name') or
+        source_filter.get('subsource'))
+    if subsource:
+        subsource = subsource['$in'][0]
+    return subsource
+
 
 def covered_count(query, source_filter):
     covered_results = run_count_query(query)
