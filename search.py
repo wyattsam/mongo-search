@@ -80,6 +80,8 @@ def index():
 @app.route("/search")
 def submit():
     args = request.args
+    log_search(args)
+
     query, source_filter, page = parse_args(args)
 
     if not query:
@@ -125,21 +127,34 @@ def covered_count(query, source_filter):
 
     return counts
 
-def log_search(query, source, subsource):
+def log_search(args):
     search = {
         'time': datetime.utcnow(),
-        'query': parsed_query
+        'query': args.get('query', None),
+        'page': int(args.get('page', 1))
     }
 
+    source = args.getlist('source')
+
     if source:
-        search['source'] = source
-    if project or repo or manual:
-        search['subsource'] = project or repo or manual
+        search['source'] = source[0]
+
+        if search['source'] == 'jira':
+            subsource = args.get('project', None)
+        elif search['source'] == 'github':
+            subsource = args.get('repo', None)
+        elif search['source'] == 'docs':
+            subsource = args.get('manual', None)
+        else:
+            subsource = None
+
+        if subsource:
+            search['subsource'] = subsource
 
     SEARCHES.insert(search)
 
 def parse_args(args):
-    query = args.get('query', '')
+    query = args.get('query', None)
     page = int(args.get('page', 1))
 
     from query_parse import MongoQuery
