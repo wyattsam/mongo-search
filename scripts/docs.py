@@ -1,7 +1,6 @@
 import requests
 from scrapers import JSONScraper
 
-
 class DocumentationScraper(JSONScraper):
     NAME = 'docs'
     API_BASE = 'http://docs.mongodb.org/'
@@ -46,3 +45,7 @@ class DocumentationScraper(JSONScraper):
             print '[DOC] ' + kind
             for doc in self.scrape_kind(kind):
                 yield doc
+
+class MmsDocumentationScraper(DocumentationScraper):
+    NAME = 'mms'
+    API_BASE = 'http://mms.mongodb.com/'
