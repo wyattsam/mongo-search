@@ -43,3 +43,7 @@ STACK_OVERFLOW = {
 DOCS = {
     'kinds': ['manual', 'ecosystem']
 }
+
+MMS_DOCS = {
+    'kinds': ['help', 'help-hosted/current']
+}
