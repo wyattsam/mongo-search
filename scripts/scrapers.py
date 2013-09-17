@@ -89,4 +89,4 @@ class JSONScraper(Scraper):
                 auth = None
 
         response = requests.get(url, params=params, auth=auth, verify=False)
-        return response.json()
+        return response.json(strict=False)
