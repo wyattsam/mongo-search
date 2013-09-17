@@ -1,6 +1,11 @@
 Fabric==1.7.0
+Flask==0.10.1
+Jinja2==2.7.1
+MarkupSafe==0.18
+Werkzeug==0.9.4
 distribute==0.6.34
 email-reply-parser==0.1.9
+itsdangerous==0.23
 paramiko==1.11.0
 pycrypto==2.6
 pymongo==2.6.2
