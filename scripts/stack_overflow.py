@@ -41,7 +41,7 @@ class StackOverflowScraper(JSONScraper):
             if items:
                 for item in items:
                     yield self.scrape_question(item)
-                
+
                 if not result['has_more']:
                     break
 
