@@ -2,12 +2,20 @@ from flask import Flask, request, render_template, url_for, redirect
 from pymongo import MongoClient
 from datetime import datetime
 import helpers
+import settings
 
 CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
 
 # Setup database
 DB = CONNECTION['xgen']
-DB.authenticate('search', 'g00gl3sux')
+
+CREDENTIALS = settings.SEARCH['credentials']
+USER = CREDENTIALS['user']
+PASSWORD = CREDENTIALS['password']
+
+# Login if credentials provided
+if USER and PASSWORD:
+    DB.authenticate(USER, PASSWORD)
 
 # Setup collections
 COMBINED = DB['combined']
