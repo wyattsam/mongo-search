@@ -229,30 +229,27 @@ def url_for_other_page(page):
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 app.jinja_env.globals['SOURCES'] = SOURCES
 
+
 #-----------------------------------------------------------------------------
 # Launch
 #-----------------------------------------------------------------------------
 
 if __name__ == "__main__":
     app.debug = True
+
+    if not app.debug:
+        ADMINS = ['tyler@10gen.com']
+
+        import logging
+        from logging.handlers import SMTPHandler
+        from logging.handlers import RotatingFileHandler
+        mail_handler = SMTPHandler('127.0.0.1',
+                                   'search@10gen.com',
+                                   ADMINS, '10gen Search Error')
+        file_handler = RotatingFileHandler('./log/flask.log')
+        mail_handler.setLevel(logging.ERROR)
+        file_handler.setLevel(logging.WARNING)
+        app.logger.addHandler(file_handler)
+        app.logger.addHandler(mail_handler)
+
     app.run()
-
-#-----------------------------------------------------------------------------
-# Logging
-#-----------------------------------------------------------------------------
-
-ADMINS = ['tyler@10gen.com']
-
-if not app.debug:
-    import logging
-    from logging.handlers import SMTPHandler
-    from logging.handlers import RotatingFileHandler
-    mail_handler = SMTPHandler('127.0.0.1',
-                               'search@10gen.com',
-                               ADMINS, '10gen Search Error')
-    file_handler = RotatingFileHandler('./log/flask.log')
-    mail_handler.setLevel(logging.ERROR)
-    file_handler.setLevel(logging.WARNING)
-    app.logger.addHandler(file_handler)
-    app.logger.addHandler(mail_handler)
-
