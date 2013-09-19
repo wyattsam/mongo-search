@@ -99,7 +99,6 @@ def submit():
     log_search(args)
 
     mq, page = parse_args(args)
-    print mq.filter
 
     if not mq.query:
         return redirect('/')
