@@ -33,6 +33,15 @@ SOURCES = {
     'docs':           'Docs'
 }
 
+SUBSOURCE_FIELD = {
+    'stack_overflow': None,
+    'jira': 'project',
+    'google': None,
+    'github': 'repo',
+    'chat': None,
+    'docs': 'manual'
+}
+
 COUNT_PROJECTION = {
     '_id': 0,
     'source': 1,
@@ -141,19 +150,10 @@ def log_search(args):
         'page': int(args.get('page', 1))
     }
 
-    source = args.getlist('source')
+    source = args.get('source')
 
     if source:
-        search['source'] = source[0]
-
-        if search['source'] == 'jira':
-            subsource = args.get('project', None)
-        elif search['source'] == 'github':
-            subsource = args.get('repo', None)
-        elif search['source'] == 'docs':
-            subsource = args.get('manual', None)
-        else:
-            subsource = None
+        subsource = SUBSOURCE_FIELD[source]
 
         if subsource:
             search['subsource'] = subsource
