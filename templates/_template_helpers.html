@@ -17,8 +17,8 @@
                 {% set ss = SUBSOURCES[shortname] %}
                 {% if counts[ss['name']] %}
                     {% for sub, count in counts[ss['name']].items() %}
-                        <div class="subsource{{ ' selected' if repo==sub_source  else ''}}" >
-                            <a href="/search?query={{query}}&source={{source}}&{{ss['name']}}={{sub}}" class="subsource_name">
+                        <div class="subsource{{ ' selected' if sub==sub_source  else ''}}" >
+                            <a href="/search?query={{query}}&source={{shortname}}&{{ss['name']}}={{sub}}" class="subsource_name">
                                   {{sub}}
                             </a>
                             <span class="subsource_count">({{count}})</span>
