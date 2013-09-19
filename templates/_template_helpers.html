@@ -1,10 +1,10 @@
-{% macro source_selector(shortname, fullname, counts, sources_searched, query, sub_source) -%}
+{% macro source_selector(shortname, fullname, counts, source, query, sub_source) -%}
     <li>
         <div class="source">
             <div class="source_header">
                 <span class="source_icon {{shortname}}_icon">&nbsp;</span>
                     <a href="/search?query={{query}}&source={{shortname}}">
-                        {% if shortname in sources_searched and sources_searched|length == 1 %}
+                        {% if shortname == source %}
                             <strong>{{fullname}}</strong>
                         {% else %}
                             {{fullname}}
@@ -14,31 +14,12 @@
                 <span class="source_count {{"nonzero" if counts['source'][shortname] > 0}}">({{counts['source'][shortname]}})</span>
             </div>
             <div class="subsource_list">
-                {% if shortname == 'github' %}
-                    {% for repo, count in counts['repo']|dictsort(true) %}
+                {% set ss = SUBSOURCES[shortname] %}
+                {% if counts[ss['name']] %}
+                    {% for sub, count in counts[ss['name']].items() %}
                         <div class="subsource{{ ' selected' if repo==sub_source  else ''}}" >
-                            <a href="/search?query={{query}}&source=github&repo={{repo}}" class="subsource_name">
-                                  {{repo}}
-                            </a>
-                            <span class="subsource_count">({{count}})</span>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-                {% if shortname == 'jira' %}
-                    {% for project, count in counts['project']|dictsort(true) %}
-                    <div class="subsource{{ ' selected' if project==sub_source  else ''}}" >
-                            <a href="/search?query={{query}}&source=jira&project={{project}}" class="subsource_name">
-                                 {{project}}
-                            </a>
-                            <span class="subsource_count">({{count}})</span>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-                {% if shortname == 'docs' %}
-                {% for manual, count in counts['docs']|dictsort(true) %}
-                    <div class="subsource{{ ' selected' if manual==sub_source  else ''}}" >
-                            <a href="/search?query={{query}}&source=docs&manual={{manual}}" class="subsource_name">
-                                 {{manual}}
+                            <a href="/search?query={{query}}&source={{source}}&{{ss['name']}}={{sub}}" class="subsource_name">
+                                  {{sub}}
                             </a>
                             <span class="subsource_count">({{count}})</span>
                         </div>

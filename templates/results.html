@@ -13,12 +13,12 @@
         <div class="span2">
             <ul class="unstyled" id="source-list">
                 {% from "_template_helpers.html" import source_selector %}
-                {{ source_selector("jira", "JIRA", counts, sources_searched, query, sub_source) }}
-                {{ source_selector("google", "Google Groups", counts, sources_searched, query, sub_source) }}
-                {{ source_selector("stack_overflow", "StackOverflow", counts, sources_searched, query, sub_source) }}
-                {{ source_selector("github", "GitHub", counts, sources_searched, query, sub_source) }}
-                {{ source_selector("chat", "Chat", counts, sources_searched, query, sub_source) }}
-                {{ source_selector("docs", "Docs", counts, sources_searched, query, sub_source) }}
+                {{ source_selector("jira", "JIRA", counts, source, query, sub_source) }}
+                {{ source_selector("google", "Google Groups", counts, source, query, sub_source) }}
+                {{ source_selector("stack_overflow", "Stack Overflow", counts, source, query, sub_source) }}
+                {{ source_selector("github", "GitHub", counts, source, query, sub_source) }}
+                {{ source_selector("chat", "Chat", counts, source, query, sub_source) }}
+                {{ source_selector("docs", "Docs", counts, source, query, sub_source) }}
                 <!-- to add: -->
                 <!-- 10gen wiki -->
                 <!-- 10gen chat -->
@@ -34,14 +34,8 @@
                     <span class="bounds">{{pagination.total_count}}</span>
                 {% endif %}
                 results for <strong>{{query}}</strong>
-                {% set sources_count = SOURCES|length %}
-                {% set sources_used_count = sources_searched|length %}
-                {% if sources_used_count < sources_count %}
-                    in
-                    {% for source in sources_searched %}
-                        <span class="source-search">{{SOURCES.get(source)}}</span>
-                        {%- if not loop.last %},{% endif %}
-                    {% endfor %}
+                {% if source %}
+                    in <span class="source-search">{{SOURCES[source]}}</span>
                     {% if sub_source %}
                         ({{ sub_source }})
                     {% endif %}

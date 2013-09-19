@@ -25,7 +25,7 @@ PAGE_SIZE = 10
 COUNT_LIMIT = 1000000
 
 SOURCES = {
-    'stack_overflow': 'StackOverflow',
+    'stack_overflow': 'Stack Overflow',
     'jira':           'JIRA',
     'google':         'Google Groups',
     'github':         'GitHub',
@@ -33,13 +33,13 @@ SOURCES = {
     'docs':           'Docs'
 }
 
-SUBSOURCE_FIELD = {
+SUBSOURCES = {
     'stack_overflow': None,
-    'jira': 'project',
+    'jira': {'name': 'project', 'field': 'project'},
     'google': None,
-    'github': 'repo',
+    'github': {'name': 'repo', 'field': 'repo.name'},
     'chat': None,
-    'docs': 'manual'
+    'docs': {'name': 'manual', 'field': 'manual'}
 }
 
 COUNT_PROJECTION = {
@@ -98,24 +98,25 @@ def submit():
     args = request.args
     log_search(args)
 
-    query, source_filter, page = parse_args(args)
+    mq, page = parse_args(args)
+    print mq.filter
 
-    if not query:
+    if not mq.query:
         return redirect('/')
 
     #run the counts separately using covered query
-    counts = covered_count(query, source_filter)
+    counts = covered_count(mq.query, mq.filter)
 
     page_limit = page * PAGE_SIZE
 
-    results = run_query(query, page, source_filter, page_limit)
+    results = run_query(mq.query, page, mq.filter, page_limit)
     pagination = helpers.Pagination(page, PAGE_SIZE, counts['filter_total'])
 
     return render_template('results.html', results=results,
         counts=counts,
-        sources_searched=request.args.getlist('source'),
-        sub_source=hack_sub_source(source_filter) or 'MongoDB Universe',
-        query=query,
+        source=mq.source,
+        sub_source=mq.sub_source,
+        query=mq.query,
         pagination=pagination)
 
 
@@ -127,13 +128,10 @@ def page_not_found(e):
 # Helpers
 #-----------------------------------------------------------------------------
 
-def hack_sub_source(source_filter):
-    subsource = (source_filter.get('project') or
-        source_filter.get('repo.name') or
-        source_filter.get('subsource'))
-    if subsource:
-        subsource = subsource['$in'][0]
-    return subsource
+def parse_args(args):
+    page = int(args.get('page', 1))
+    from query_parse import MongoQuery
+    return MongoQuery(args), page
 
 
 def covered_count(query, source_filter):
@@ -153,51 +151,13 @@ def log_search(args):
     source = args.get('source')
 
     if source:
-        subsource = SUBSOURCE_FIELD[source]
+        search['source'] = source
+        subsource = SUBSOURCES[source]
 
-        if subsource:
-            search['subsource'] = subsource
+        if subsource and args.get(subsource['name']):
+            search['subsource'] = args[subsource['name']]
 
     SEARCHES.insert(search)
-
-def parse_args(args):
-    query = args.get('query', None)
-    page = int(args.get('page', 1))
-
-    from query_parse import MongoQuery
-    query_parser = MongoQuery()
-    query_parser.parse(query)
-
-    parse_source(query_parser, args)
-    parse_subsource(query_parser, args)
-
-    parsed_query = query_parser.full_text_query
-    source_filter = query_parser.build_filter()
-
-    return parsed_query, source_filter, page
-
-def parse_source(parser, args):
-    sources = args.getlist('source')
-
-    # if no sources are selected, disregard it and turn them all on.
-    if len(set(sources).union(parser.source_filter)) == 0:
-        sources = SOURCES.keys()
-
-    # add all the sources to the parser
-    for multisource in sources:
-        parser.source_filter.add(multisource)
-
-def parse_subsource(parser, args):
-    manual = args.get('manual', '')
-    project = args.get('project', '')
-    repo = args.get('repo', '')
-
-    if repo:
-        parser.repo_filter.add(repo)
-    if project:
-        parser.project_filter.add(project)
-    if manual:
-        parser.manual_filter.add(manual)
 
 def run_count_query(query, docfilter=None):
     return DB.command('text', 'combined',
@@ -228,6 +188,7 @@ def url_for_other_page(page):
 
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 app.jinja_env.globals['SOURCES'] = SOURCES
+app.jinja_env.globals['SUBSOURCES'] = SUBSOURCES
 
 
 #-----------------------------------------------------------------------------
