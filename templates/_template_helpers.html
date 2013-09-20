@@ -1,14 +1,10 @@
 {% macro source_selector(shortname, fullname, counts, source, query, sub_source) -%}
     <li>
         <div class="source">
-            <div class="source_header">
+            <div class="source_header {% if shortname == source %} selected {% endif %}>">
                 <span class="source_icon {{shortname}}_icon">&nbsp;</span>
                     <a href="/search?query={{query}}&source={{shortname}}">
-                        {% if shortname == source %}
-                            <strong>{{fullname}}</strong>
-                        {% else %}
-                            {{fullname}}
-                        {% endif %}
+                        {{fullname}}
                     </a>
                 </span>
                 <span class="source_count {{"nonzero" if counts['source'][shortname] > 0}}">({{counts['source'][shortname]}})</span>
