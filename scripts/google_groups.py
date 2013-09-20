@@ -15,6 +15,7 @@ class GoogleGroupsScraper(Scraper):
                             re.IGNORECASE | re.MULTILINE)
     GROUP_RE = re.compile(r'^\[(.*)\]\s+(.*)')
     MESSAGE_PARTS = '(RFC822 X-GM-MSGID X-GM-THRID)'
+    FETCH_SIZE = 100
 
     def __init__(self, labels, credentials):
         self.credentials = credentials
@@ -47,8 +48,11 @@ class GoogleGroupsScraper(Scraper):
     def scrape_label(self, label):
         print '[label] %s' % label
         self.select(label)
-        for message_id in self.get_message_ids():
-            yield self.scrape_message(message_id)
+        message_ids = self.get_message_ids()
+        for num in xrange(0, len(message_ids), self.FETCH_SIZE):
+            messages = self.scrape_messages(message_ids[num:num+self.FETCH_SIZE])
+            for message in messages:
+                yield message
 
     def scrape(self):
         self.login()
@@ -91,11 +95,16 @@ class GoogleGroupsScraper(Scraper):
                     body = text
         return body
 
-    def scrape_message(self, message_id):
-        data = self.uid('fetch', message_id, self.MESSAGE_PARTS)
-        headers = data[0][0]
+    def scrape_messages(self, message_ids):
+        asking_range = str(message_ids[0]) + ':' + str(message_ids[-1])
+        print "Fetching messages in range [%s]" % asking_range
+        data = self.uid('fetch', asking_range, self.MESSAGE_PARTS)
+        for headers, message in data[::2]:
+            yield self.scrape_message(headers, message)
+
+    def scrape_message(self, headers, message):
         thread_id, message_id = self.extract_header(headers)
-        message = email.message_from_string(data[0][1])
+        message = email.message_from_string(message)
         subject = self.clean_subject(message['Subject'])
         group, subject = self.extract_group(subject)
         date = self.extract_date(message['Date'])
