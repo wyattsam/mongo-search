@@ -51,6 +51,9 @@ COMBINED.ensure_index([
     ('full_name', 'text'),
     ('crowd_id', 'text'),
 
+    # Google Groups
+    ('subject', 'text'),
+
     # Appended field for covered count query
     ('source', 1)
 ],
@@ -58,13 +61,14 @@ COMBINED.ensure_index([
     weights= {
         'title': 150,
         'tags': 25,
-        'fields.summary': 150,
-        'fields.description': 5,
-        'commit.message': 5,
+        'fields.summary': 50,
+        'fields.description': 10,
+        'commit.message': 10,
         'project': 250,
         '_id' : 300,
         'full_name': 500,
-        'crowd_id': 500
+        'crowd_id': 500,
+        'subject': 100
     }
 )
 

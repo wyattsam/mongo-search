@@ -56,7 +56,21 @@ def massage_results(raw_results, query):
             massaged.append(massage_docs(current))
         elif source == 'profiles':
             massaged.append(massage_profile(current))
+        elif source == 'google_groups':
+            massaged.append(massage_google(current))
 
+    return massaged
+
+def massage_google(post):
+    massaged = {
+        'score': post['score'],
+        'source': 'google',
+        'subject': post['subject'],
+        'body': post['body'],
+        'group': post['group'],
+        'from': post['from'],
+        'sender': post['sender']
+    }
     return massaged
 
 def massage_github(commit):

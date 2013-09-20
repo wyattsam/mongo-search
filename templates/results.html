@@ -14,7 +14,7 @@
             <ul class="unstyled" id="source-list">
                 {% from "_template_helpers.html" import source_selector %}
                 {{ source_selector("jira", "JIRA", counts, source, query, sub_source) }}
-                {{ source_selector("google", "Google Groups", counts, source, query, sub_source) }}
+                {{ source_selector("google_groups", "Google Groups", counts, source, query, sub_source) }}
                 {{ source_selector("stack_overflow", "Stack Overflow", counts, source, query, sub_source) }}
                 {{ source_selector("github", "GitHub", counts, source, query, sub_source) }}
                 {{ source_selector("profiles", "Profiles", counts, source, query, sub_source) }}
@@ -50,8 +50,8 @@
                     {% include "results/github_result.html" %}
                 {% elif result.source == 'stack_overflow' %}
                     {% include "results/stackoverflow_result.html" %}
-                {% elif result.source == 'googlegroups' %}
-                    {% include "results/googlegroups_result.html" %}
+                {% elif result.source == 'google' %}
+                    {% include "results/google_result.html" %}
                 {% elif result.source == 'chat' %}
                     {% include "results/chat_result.html" %}
                 {% elif result.source == 'docs' %}

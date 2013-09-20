@@ -84,6 +84,10 @@ a {
     border-left: 3px solid #6C513A; padding-left: 5px;
 }
 
+[data-source="google"] {
+    border-left: 3px solid #0000AA; padding-left: 5px;
+}
+
 [data-source="profiles"] {
     border-left: 3px solid #f06d54; padding-left: 5px;
 }
@@ -135,7 +139,7 @@ a {
     padding-right: 5px;
 }
 
-.google_icon{
+.google_groups_icon{
     background-image:url('/static/img/icon-google.png');
 }
 

@@ -1,0 +1,17 @@
+{% extends "results/baseresult.html" %}
+
+{% block result %}
+<div data-source="{{ result.source }}">
+    <div class="result-summary">
+        <a target="_blank" href="http://groups.google.com">
+            <strong>{{ result.subject }}</strong>
+        </a>
+    </div>
+    <div class="result-snippet">
+    	<p>{{ result.body|truncate(350) }}</p>
+    </div>
+    <p class="result-url">
+        <span class="muted">Group:</span>&nbsp;{{result.group}}&nbsp;&nbsp;&nbsp;<span class="muted">Sender:</span>&nbsp;<span>{{result.from}}</span>
+    </p>
+</div>
+{% endblock %}

@@ -20,14 +20,15 @@ if USER and PASSWORD:
 # Setup collections
 COMBINED = DB['combined']
 SEARCHES = DB['searches']
-PHANTOM = DB['phantom']
+
+# App Settings
 PAGE_SIZE = 10
 COUNT_LIMIT = 1000000
 
 SOURCES = {
     'stack_overflow': 'Stack Overflow',
     'jira':           'JIRA',
-    'google':         'Google Groups',
+    'google_groups':  'Google Groups',
     'github':         'GitHub',
     'chat':           '10gen Chat',
     'docs':           'Docs',
@@ -35,13 +36,13 @@ SOURCES = {
 }
 
 SUBSOURCES = {
-    'stack_overflow': None,
-    'jira': {'name': 'project', 'field': 'project'},
-    'google': None,
-    'github': {'name': 'repo', 'field': 'repo.name'},
-    'chat': None,
-    'docs': {'name': 'manual', 'field': 'manual'},
-    'profiles': None
+    'stack_overflow':   None,
+    'jira':             {'name': 'project', 'field': 'project'},
+    'google_groups':    None,
+    'github':           {'name': 'repo', 'field': 'repo.name'},
+    'chat':             None,
+    'docs':             {'name': 'manual', 'field': 'manual'},
+    'profiles':         None
 }
 
 COUNT_PROJECTION = {
@@ -87,7 +88,13 @@ RESULT_PROJECTION = {
     'last_name': 1,
     'uri': 1,
     'primary_email': 1,
-    'bio': 1
+    'bio': 1,
+
+    # Google Groups
+    'subject': 1,
+    'from': 1,
+    'sender': 1,
+    'group': 1
 }
 
 #-----------------------------------------------------------------------------
