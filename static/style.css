@@ -31,16 +31,20 @@
     text-decoration: underline;
 }
 
+[data-source="profiles"] .result-snippet {
+    min-height: 50px;
+}
+
 .result-snippet {
     margin-bottom: 0px;
     margin-top: 0px;
     font-size: .9em;
-    min-height: 65px;
 }
 
 .result-snippet img {
     float: right;
     margin-left: 15px;
+    margin-top: -10px;
 }
 
 .result-url {
