@@ -35,12 +35,12 @@
     margin-bottom: 0px;
     margin-top: 0px;
     font-size: .9em;
-    min-height: 50px;
+    min-height: 65px;
 }
 
 .result-snippet img {
     float: right;
-    margin-left: 10px;
+    margin-left: 15px;
 }
 
 .result-url {
