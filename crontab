@@ -3,6 +3,6 @@ MAILTO="tyler@10gen.com"
 0       7       *       *       *       cd ~/playground/duckduckmongo; source env/bin/activate; ./run_scraper.py jira 
 0       7       *       *       *       cd ~/playground/duckduckmongo; source env/bin/activate; ./run_scraper.py stack_overflow
 0       7       *       *       *       cd ~/playground/duckduckmongo; source env/bin/activate; ./run_scraper.py github
-0		7		*		*		*		cd ~/playground/duckduckmongo; source env/bin/activate; ./run_scraper.py docs
-0		7		*		*		*		cd ~/playground/duckduckmongo; source env/bin/activate;	./run_scraper.py profiles
-0		7		*		*		*		cd ~/playground/duckduckmongo; source env/bin/activate; ./run_scraper.py google_groups
+0       7       *       *       *       cd ~/playground/duckduckmongo; source env/bin/activate; ./run_scraper.py docs
+0       7       *       *       *       cd ~/playground/duckduckmongo; source env/bin/activate;	./run_scraper.py profiles
+0       7       *       *       *       cd ~/playground/duckduckmongo; source env/bin/activate; ./run_scraper.py google_groups
