@@ -17,7 +17,7 @@ class ProfilesScraper(JSONScraper):
     def scrape(self):
         params = {'expand': 'team'}
         result = self.get_json(self.EMPLOYEE_URL, params=params,
-                               auth=self.credentials, digest=True)
+            auth=self.credentials, digest=True)
 
         for employee in result['employees']:
             yield self.scrape_employee(employee)
