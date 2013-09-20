@@ -81,9 +81,9 @@ class GoogleGroupsScraper(Scraper):
         return date
 
     def extract_body(self, message):
+        body = None
         for part in message.walk():
             if part.get_content_type() == 'text/plain':
-                body = None
                 text = part.get_payload()
                 try:
                     body = erp.parse_reply(text)
