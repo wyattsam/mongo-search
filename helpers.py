@@ -1,4 +1,5 @@
 import re
+import md5
 from collections import Counter
 from math import ceil
 
@@ -7,6 +8,7 @@ from datetime import timedelta
 from flask import make_response, request, current_app
 from functools import update_wrapper
 
+CORP_URL = 'https://corp.mongodb.com/'
 JIRA_URL = "https://jira.mongodb.org/browse/"
 
 def get_counts(raw_results):
@@ -52,6 +54,8 @@ def massage_results(raw_results, query):
             massaged.append(massage_github(current))
         elif source == 'docs':
             massaged.append(massage_docs(current))
+        elif source == 'profiles':
+            massaged.append(massage_profile(current))
 
     return massaged
 
@@ -75,6 +79,20 @@ def massage_github(commit):
         "commit_msg_body" : commit_msg_body,
         "url" : commit['html_url'],
         "repo_name" : commit['repo']['full_name']
+    }
+    return massaged
+
+def massage_profile(profile):
+    massaged = {
+        'id': profile['crowd_id'],
+        'first_name': profile['first_name'],
+        'last_name': profile['last_name'],
+        'url': CORP_URL + 'employees/' + profile['crowd_id'],
+        'score': profile['score'],
+        'source': 'profiles',
+        'email': profile['primary_email'],
+        'md5': md5.new(profile['primary_email'].strip().lower()).hexdigest(),
+        'snippet': profile['bio']
     }
     return massaged
 

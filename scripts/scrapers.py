@@ -3,6 +3,7 @@ import sys
 import traceback
 from datetime import datetime
 from pymongo import MongoClient
+from requests.auth import HTTPDigestAuth
 
 
 class ScrapeRunner(object):
@@ -79,14 +80,23 @@ class Scraper(object):
 
 class JSONScraper(Scraper):
 
-    def get_json(self, url, params={}, auth=None):
+    def get_json(self, url, params={}, auth=None, digest=False):
+        headers = {'accept': 'application/json'}
+
         if auth:
             user = auth['user']
             password = auth['password']
+
             if user and password:
-                auth = tuple([user, password])
+                if digest:
+                    auth = HTTPDigestAuth(user, password)
+                else:
+                    auth = tuple([user, password])
+
             else:
                 auth = None
 
-        response = requests.get(url, params=params, auth=auth, verify=False)
+        response = requests.get(url, params=params, auth=auth, verify=False,
+            headers=headers)
+
         return response.json(strict=False)

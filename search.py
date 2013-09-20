@@ -30,7 +30,8 @@ SOURCES = {
     'google':         'Google Groups',
     'github':         'GitHub',
     'chat':           '10gen Chat',
-    'docs':           'Docs'
+    'docs':           'Docs',
+    'profiles':       'Profiles'
 }
 
 SUBSOURCES = {
@@ -39,7 +40,8 @@ SUBSOURCES = {
     'google': None,
     'github': {'name': 'repo', 'field': 'repo.name'},
     'chat': None,
-    'docs': {'name': 'manual', 'field': 'manual'}
+    'docs': {'name': 'manual', 'field': 'manual'},
+    'profiles': None
 }
 
 COUNT_PROJECTION = {
@@ -77,7 +79,15 @@ RESULT_PROJECTION = {
     'link': 1,
     'title': 1,
     'body': 1,
-    'tags': 1
+    'tags': 1,
+
+    # Profiles
+    'crowd_id': 1,
+    'first_name': 1,
+    'last_name': 1,
+    'uri': 1,
+    'primary_email': 1,
+    'bio': 1
 }
 
 #-----------------------------------------------------------------------------

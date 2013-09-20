@@ -3,15 +3,18 @@ from scrapers import JSONScraper
 
 class ProfilesScraper(JSONScraper):
     NAME = 'profiles'
-    API_BASE = 'https://corp.10gen.com/api/'
+    API_BASE = 'https://corp.mongodb.com/api/'
     EMPLOYEE_URL = API_BASE + 'employee'
 
     def __init__(self, credentials):
         self.credentials = credentials
 
     def scrape_employee(self, employee):
-        employee_id = employee['uri'].strip('/api/employee/')
+        employee_id = employee['uri'].partition('/api/employee/')[2]
+        employee['crowd_id'] = employee_id
         employee['_id'] = 'employee-' + employee_id
+        employee['full_name'] = ' '.join(
+            [employee['first_name'], employee['last_name']])
         return employee
 
     def scrape(self):

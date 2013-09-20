@@ -35,6 +35,12 @@
     margin-bottom: 0px;
     margin-top: 0px;
     font-size: .9em;
+    min-height: 50px;
+}
+
+.result-snippet img {
+    float: right;
+    margin-left: 10px;
 }
 
 .result-url {
@@ -72,6 +78,10 @@ a {
 
 [data-source="docs"] {
     border-left: 3px solid #6C513A; padding-left: 5px;
+}
+
+[data-source="profiles"] {
+    border-left: 3px solid #f06d54; padding-left: 5px;
 }
 
 /* Left sidebar on results.html */
@@ -143,6 +153,10 @@ a {
 
 .docs_icon{
     background-image:url('/static/img/icon-docs.png');
+}
+
+.profiles_icon{
+    background-image:url('/static/img/icon-profiles.png');
 }
 
 .nonzero{

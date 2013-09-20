@@ -22,6 +22,9 @@ if USER and PASSWORD:
 COMBINED = DB['combined']
 GITHUB = DB['github']
 
+# Drop all the indexes before building
+COMBINED.drop_indexes()
+
 COMBINED.ensure_index([
     # Stack Overflow
     ('title', 'text'),
@@ -44,6 +47,10 @@ COMBINED.ensure_index([
     # GitHub
     ('commit.message', 'text'),
 
+    # Profiles
+    ('full_name', 'text'),
+    ('crowd_id', 'text'),
+
     # Appended field for covered count query
     ('source', 1)
 ],
@@ -55,8 +62,10 @@ COMBINED.ensure_index([
         'fields.description': 5,
         'commit.message': 5,
         'project': 250,
-        '_id' : 300
+        '_id' : 300,
+        'full_name': 500,
+        'crowd_id': 500
     }
 )
 
-GITHUB.ensure_index('tickets')
+#GITHUB.ensure_index('tickets')

@@ -17,7 +17,7 @@
                 {{ source_selector("google", "Google Groups", counts, source, query, sub_source) }}
                 {{ source_selector("stack_overflow", "Stack Overflow", counts, source, query, sub_source) }}
                 {{ source_selector("github", "GitHub", counts, source, query, sub_source) }}
-                {{ source_selector("chat", "Chat", counts, source, query, sub_source) }}
+                {{ source_selector("profiles", "Profiles", counts, source, query, sub_source) }}
                 {{ source_selector("docs", "Docs", counts, source, query, sub_source) }}
                 <!-- to add: -->
                 <!-- 10gen wiki -->
@@ -56,6 +56,8 @@
                     {% include "results/chat_result.html" %}
                 {% elif result.source == 'docs' %}
                     {% include "results/docs_result.html" %}
+                {% elif result.source == 'profiles' %}
+                    {% include "results/profiles_result.html" %}
                 {% endif %}
             {% endfor %}
 
