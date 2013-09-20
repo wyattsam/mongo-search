@@ -16,7 +16,7 @@
             <div class="subsource_list">
                 {% set ss = SUBSOURCES[shortname] %}
                 {% if counts[ss['name']] %}
-                    {% for sub, count in counts[ss['name']].items() %}
+                    {% for sub, count in counts[ss['name']]|dictsort(true) %}
                         <div class="subsource{{ ' selected' if sub==sub_source  else ''}}" >
                             <a href="/search?query={{query}}&source={{shortname}}&{{ss['name']}}={{sub}}" class="subsource_name">
                                   {{sub}}
