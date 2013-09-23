@@ -3,7 +3,7 @@
 {% block result %}
     <a target="_blank" href="{{ result.url }}">
         <div class="result-summary" data-source="{{ result.source }}">
-            {{ result.summary }}
+            {{ result.summary|truncate(125) }}
         </div>
     </a>
     {%- if result.snippet %}

@@ -4,7 +4,7 @@
 <div data-source="{{ result.source }}">
     <div class="result-summary">
         <a target="_blank" href="{{ result.url }}">
-            {{ result.title }}
+            {{ result.title|truncate(125) }}
         </a>
     </div>
     <p class="result-snippet">{{ result.body|truncate(350) }}</p>

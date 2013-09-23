@@ -4,7 +4,7 @@
     <div class="result-summary" data-source="{{ result.source }}">
         <a target="_blank" href="{{ result.url }}">
             <strong>{{ result.id }}</strong>
-            {{ result.summary }}
+            {{ result.summary|truncate(125) }}
         </a>
     </div>
     {%- if result.snippet %}

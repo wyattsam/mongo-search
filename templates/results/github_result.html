@@ -4,7 +4,7 @@
 <div data-source="{{ result.source }}">
     <a target="_blank" href="{{ result.url }}">
         <div class="result-summary">
-            {{ result.commit_msg }}
+            {{ result.commit_msg|truncate(125) }}
         </div>
     </a>
     {% if result.commit_msg_body %}
