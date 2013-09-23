@@ -68,6 +68,7 @@ class GoogleGroupsScraper(Scraper):
 
     def clean_subject(self, subject):
         subject = self.SUBJECT_RE.sub('', subject)
+        subject = subject.replace('\r\n', '')
         return subject
 
     def extract_group(self, subject):
