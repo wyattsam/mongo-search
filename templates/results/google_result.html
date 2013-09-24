@@ -7,9 +7,9 @@
             {{ result.subject|truncate(125) }}
         </a>
     </div>
-    <div class="result-snippet">
-    	<p>{{ result.body|truncate(350) }}</p>
-    </div>
+    <p class="result-snippet">
+        {{ result.body|truncate(350) }}
+    </p>
     <p class="result-url">
         <span class="muted">Group:</span>&nbsp;{{result.group}}&nbsp;&nbsp;&nbsp;<span class="muted">Sender:</span>&nbsp;<span>{{result.from}}</span>
     </p>
