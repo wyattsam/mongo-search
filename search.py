@@ -108,7 +108,8 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template('index.html')
+    version = DB.command({'buildInfo': 1})['version']
+    return render_template('index.html', version=version)
 
 @app.route("/search")
 def submit():
