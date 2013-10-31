@@ -8,6 +8,7 @@ from scripts.stack_overflow import StackOverflowScraper
 from scripts.docs import DocumentationScraper, MmsDocumentationScraper
 from scripts.google_groups import GoogleGroupsScraper
 from scripts.profiles import ProfilesScraper
+from scripts.confluence import ConfluenceScraper
 
 scraper_name = sys.argv[1]
 runner = ScrapeRunner(**settings.MONGO)
@@ -27,5 +28,7 @@ elif scraper_name == 'docs':
     scraper = DocumentationScraper(**settings.DOCS)
 elif scraper_name == 'mms_docs':
     scraper = MmsDocumentationScraper(**settings.MMS_DOCS)
+elif scraper_name == 'confluence':
+    scraper = ConfluenceScraper(**settings.CONFLUENCE)
 
 runner.run(scraper)
