@@ -1,7 +1,7 @@
 import re
-from HTMLParser import HTMLParser
-
 import requests
+
+from HTMLParser import HTMLParser
 from scrapers import JSONScraper
 
 
@@ -20,8 +20,7 @@ class MLStripper(HTMLParser):
 
 class ConfluenceScraper(JSONScraper):
     NAME = 'confluence'
-    SPACES = ['cs']
-    # SPACES = ['10GEN', 'cs']
+    SPACES = ['10GEN', 'cs', 'sales', 'Devops']
     API_BASE = 'https://wiki.mongodb.com/rest/prototype/1/'
 
     def __init__(self, credentials=None, skip=[]):
@@ -41,6 +40,10 @@ class ConfluenceScraper(JSONScraper):
         page_json = requests.get(page_url, auth=(user, password), verify=False).json()
 
         html_body = page_json['body']['value']
+        # Some older documents returned from Confluence contain useful text,
+        # but wrapped in tags that our parser does not properly handle.  To
+        # deal with this here we look for such documents and extract the
+        # useful text before passing it along to strip_tags()
         if "{wiki}" in html_body:
             r = re.compile(r'\{wiki\}(.*)\{wiki\}', re.MULTILINE|re.DOTALL)
             result = r.search(html_body)
@@ -58,18 +61,17 @@ class ConfluenceScraper(JSONScraper):
         return doc
 
     def search_pages(self, space, index):
-        user = self.credentials['user']
-        password = self.credentials['password']
-        index = str(index)
-
-        space_url = ''.join([self.API_BASE, 'search.json?type=page&startIndex=', index, '&spaceKey=', space])
-        space_json = requests.get(space_url, auth=(user, password), verify=False).json()
+        space_url = ''.join([self.API_BASE, 'search.json'])
+        space_params = {
+            'type': 'page',
+            'startIndex': str(index),
+            'spaceKey': space
+        }
+        space_json = self.get_json(space_url, space_params, auth=self.credentials)
 
         result = space_json['result']
         if result:
             return [elem['id'] for elem in result]
-        else:
-            return
 
     def scrape_pages(self, space):
         index = 0
