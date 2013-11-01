@@ -19,8 +19,8 @@
                 {{ source_selector("github", "GitHub", counts, source, query, sub_source) }}
                 {{ source_selector("profiles", "Profiles", counts, source, query, sub_source) }}
                 {{ source_selector("docs", "Docs", counts, source, query, sub_source) }}
+                {{ source_selector("confluence", "Confluence", counts, source, query, sub_source) }}
                 <!-- to add: -->
-                <!-- 10gen wiki -->
                 <!-- 10gen chat -->
                 <!-- etc -->
             </ul>
@@ -58,6 +58,8 @@
                     {% include "results/docs_result.html" %}
                 {% elif result.source == 'profiles' %}
                     {% include "results/profiles_result.html" %}
+                {% elif result.source == 'confluence' %}
+                    {% include "results/confluence_result.html" %}
                 {% endif %}
             {% endfor %}
 

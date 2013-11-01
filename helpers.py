@@ -58,6 +58,8 @@ def massage_results(raw_results, query):
             massaged.append(massage_profile(current))
         elif source == 'google_groups':
             massaged.append(massage_google(current))
+        elif source == 'confluence':
+            massaged.append(massage_confluence(current))
 
     return massaged
 
@@ -135,6 +137,18 @@ def massage_jira(issue):
         'snippet': issue['fields'].get('description', ''),
         'source': 'jira'
     }
+    return massaged
+
+def massage_confluence(page):
+    massaged = {
+        'id': page['_id'],
+        'title': page['title'],
+        'body': page['body'],
+        'url': page['url'],
+        'source': 'confluence',
+        'score': page['score']
+    }
+
     return massaged
 
 class Pagination(object):
