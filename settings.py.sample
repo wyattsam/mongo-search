@@ -54,3 +54,10 @@ partychapp = {
         'ACSID': '<paste-your-acsid-cookie-here>'
     }
 }
+
+CONFLUENCE = {
+    'credentials': {
+        'user': '',
+        'password': ''
+    }
+}
