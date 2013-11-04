@@ -16,6 +16,8 @@ PASSWORD = CREDENTIALS['password']
 # Login if credentials provided
 if USER and PASSWORD:
     DB.authenticate(USER, PASSWORD)
+else:
+    print "Not authenticating, no username or password provided"
 
 # Setup collections
 COMBINED = DB['combined']
