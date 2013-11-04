@@ -33,7 +33,7 @@ SOURCES = {
     'google_groups':  'Google Groups',
     'github':         'GitHub',
     'chat':           '10gen Chat',
-    'confluence':     'Confluence'
+    'confluence':     'Confluence',
     'docs':           'Docs',
     'profiles':       'Profiles'
 }

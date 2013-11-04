@@ -92,6 +92,10 @@ a {
     border-left: 3px solid #f06d54; padding-left: 5px;
 }
 
+[data-source="confluence"] {
+    border-left: 3px solid #4444aa; padding-left: 5px;
+}
+
 /* Left sidebar on results.html */
 #source-list{
     width: 225px;
