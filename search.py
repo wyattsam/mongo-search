@@ -31,6 +31,7 @@ SOURCES = {
     'google_groups':  'Google Groups',
     'github':         'GitHub',
     'chat':           '10gen Chat',
+    'confluence':     'Confluence'
     'docs':           'Docs',
     'profiles':       'Profiles'
 }
@@ -42,6 +43,7 @@ SUBSOURCES = {
     'github':           {'name': 'repo', 'field': 'repo.name'},
     'chat':             None,
     'docs':             {'name': 'manual', 'field': 'manual'},
+    'confluence':       None,
     'profiles':         None
 }
 

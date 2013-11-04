@@ -167,6 +167,10 @@ a {
     background-image:url('/static/img/icon-profiles.png');
 }
 
+.confluence_icon{
+    background-image:url('/static/img/icon-confluence.png');
+}
+
 .nonzero{
     font-weight: bold;
 }
