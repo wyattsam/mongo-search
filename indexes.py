@@ -45,6 +45,11 @@ COMBINED.ensure_index([
     ('fields.comment.comments.body', 'text'),
 
     # GitHub
+    ('commit.sha', 'text'),
+    ('commit.committer.name', 'text'),
+    ('commit.committer.email', 'text'),
+    ('commit.author.name', 'text'),
+    ('commit.author.email', 'text'),
     ('commit.message', 'text'),
 
     # Profiles
