@@ -20,7 +20,7 @@ class MLStripper(HTMLParser):
 
 class ConfluenceScraper(JSONScraper):
     NAME = 'confluence'
-    SPACES = ['10GEN', 'cs', 'sales', 'Devops', 'KB']
+    SPACES = ['10GEN', 'cs', 'sales', 'Devops', 'KB', 'mcs', 'mrkt']
     API_BASE = 'https://wiki.mongodb.com/rest/prototype/1/'
 
     def __init__(self, credentials=None, skip=[]):
@@ -45,7 +45,7 @@ class ConfluenceScraper(JSONScraper):
         # deal with this here we look for such documents and extract the
         # useful text before passing it along to strip_tags()
         if "{wiki}" in html_body:
-            r = re.compile(r'\{wiki\}(.*)\{wiki\}', re.MULTILINE|re.DOTALL)
+            r = re.compile(r'\{wiki\}(.*)\{wiki\}', re.MULTILINE | re.DOTALL)
             result = r.search(html_body)
             if result:
                 html_body = result.group(1)
@@ -56,7 +56,7 @@ class ConfluenceScraper(JSONScraper):
             'title': page_json['title'],
             'body': text_body,
             'url':  page_json['link'][0]['href'],
-            'subsource': space,
+            'space': space,
         }
         return doc
 

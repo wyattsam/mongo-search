@@ -3,11 +3,6 @@ import md5
 from collections import Counter
 from math import ceil
 
-# For crossdomain
-from datetime import timedelta
-from flask import make_response, request, current_app
-from functools import update_wrapper
-
 CORP_URL = 'https://corp.mongodb.com/'
 JIRA_URL = "https://jira.mongodb.org/browse/"
 
@@ -18,7 +13,8 @@ def get_counts(raw_results):
         'repo': Counter(),
         'project': Counter(),
         'tag': Counter(),
-        'docs': Counter()
+        'docs': Counter(),
+        'space': Counter()
     }
 
     for doc in raw_results:
@@ -35,6 +31,9 @@ def get_counts(raw_results):
 
         if obj['source'] == 'docs':
             counts['docs'][obj['subsource']] += 1
+
+        if obj['source'] == 'confluence':
+            counts['space'][obj['space']] += 1
 
     return counts
 
@@ -88,13 +87,13 @@ def massage_github(commit):
         'id': commit['_id'],
         'score': commit['score'],
         'source': 'github',
-        "committer" : commit['commit']['committer']['name'],
-        "committer_avatar" : committer.get('avatar_url', ''),
-        "date_committed" : commit['commit']['committer']['date'],
-        "commit_msg" : commit_msg_header,
-        "commit_msg_body" : commit_msg_body,
-        "url" : commit['html_url'],
-        "repo_name" : commit['repo']['full_name']
+        "committer": commit['commit']['committer']['name'],
+        "committer_avatar": committer.get('avatar_url', ''),
+        "date_committed": commit['commit']['committer']['date'],
+        "commit_msg": commit_msg_header,
+        "commit_msg_body": commit_msg_body,
+        "url": commit['html_url'],
+        "repo_name": commit['repo']['full_name']
     }
     return massaged
 
@@ -129,8 +128,8 @@ def massage_stack_overflow(post):
 def massage_jira(issue):
     massaged = {
         'id': issue['_id'],
-        'fields' : issue['fields'],
-        'status': issue.get('fields',{}).get('status', None),
+        'fields': issue['fields'],
+        'status': issue.get('fields', {}).get('status', None),
         'score': issue['score'],
         'url': JIRA_URL + issue['_id'],
         'summary': issue['fields'].get('summary', ''),
@@ -145,6 +144,7 @@ def massage_confluence(page):
         'title': page['title'],
         'body': page['body'],
         'url': page['url'],
+        'space': page['space'],
         'source': 'confluence',
         'score': page['score']
     }
