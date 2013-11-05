@@ -13,14 +13,14 @@ class MLStripper(HTMLParser):
 
     def handle_data(self, d):
         self.fed.append(d)
- 
+
     def get_data(self):
         return ''.join(self.fed)
 
 
 class ConfluenceScraper(JSONScraper):
     NAME = 'confluence'
-    SPACES = ['10GEN', 'cs', 'sales', 'Devops']
+    SPACES = ['10GEN', 'cs', 'sales', 'Devops', 'KB']
     API_BASE = 'https://wiki.mongodb.com/rest/prototype/1/'
 
     def __init__(self, credentials=None, skip=[]):
