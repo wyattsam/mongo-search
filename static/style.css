@@ -35,10 +35,6 @@ body {
     text-decoration: underline;
 }
 
-[data-source="profiles"] .result-snippet {
-    min-height: 50px;
-}
-
 .result-snippet {
     margin-bottom: 0px;
     margin-top: 0px;
@@ -93,6 +89,7 @@ a {
 }
 
 [data-source="profiles"] {
+    min-height: 50px;
     border-left: 3px solid #f06d54; padding-left: 5px;
 }
 
