@@ -44,7 +44,7 @@ SUBSOURCES = {
     'google_groups':    None,
     'github':           {'name': 'repo', 'field': 'repo.name'},
     'chat':             None,
-    'docs':             {'name': 'manual', 'field': 'manual'},
+    'docs':             {'name': 'section', 'field': 'section'},
     'confluence':       {'name': 'space', 'field': 'space'},
     'profiles':         None
 }
@@ -55,7 +55,7 @@ COUNT_PROJECTION = {
     'repo.name': 1,
     'project': 1,
     'tags': 1,
-    'subsource': 1,
+    'section': 1,
     'space': 1
 }
 
@@ -102,7 +102,10 @@ RESULT_PROJECTION = {
     'group': 1,
 
     # Confluence
-    'space': 1
+    'space': 1,
+
+    # Docs
+    'section': 1
 }
 
 #-----------------------------------------------------------------------------

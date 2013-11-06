@@ -13,7 +13,7 @@ def get_counts(raw_results):
         'repo': Counter(),
         'project': Counter(),
         'tag': Counter(),
-        'docs': Counter(),
+        'section': Counter(),
         'space': Counter()
     }
 
@@ -30,7 +30,7 @@ def get_counts(raw_results):
             counts['project'][obj['project']] += 1
 
         if obj['source'] == 'docs':
-            counts['docs'][obj['subsource']] += 1
+            counts['section'][obj['section']] += 1
 
         if obj['source'] == 'confluence':
             counts['space'][obj['space']] += 1

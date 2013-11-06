@@ -23,7 +23,7 @@ class DocumentationScraper(JSONScraper):
                 'title': file_json['title'],
                 'body': file_json['text'],
                 'url':  file_json['url'],
-                'subsource': kind,
+                'section': kind,
             }
             return doc
         else:
