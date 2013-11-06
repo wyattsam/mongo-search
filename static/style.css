@@ -2,6 +2,10 @@
 /* index.html         */
 /*----------------------*/
 
+body {
+    padding-top: 60px;
+}
+
 .center {
     float: none;
     margin: 0 auto;

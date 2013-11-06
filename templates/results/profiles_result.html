@@ -1,18 +1,16 @@
 {% extends "results/baseresult.html" %}
 
 {% block result %}
-<div data-source="{{ result.source }}">
     <div class="result-summary">
         <a target="_blank" href="{{ result.url }}">
             <strong>{{ result.first_name }} {{ result.last_name }}</strong>
         </a>
     </div>
     <div class="result-snippet">
-    	<img src="http://www.gravatar.com/avatar/{{ result.md5 }}">
-    	<p>{{ result.snippet|truncate(350) }}</p>
+        <img src="http://www.gravatar.com/avatar/{{ result.md5 }}">
+        <p>{{ result.snippet|truncate(350) }}</p>
     </div>
     <p class="result-url">
         <span class="muted">{{result.url}}</span>
     </p>
-</div>
 {% endblock %}

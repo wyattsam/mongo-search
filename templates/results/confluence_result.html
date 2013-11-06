@@ -1,13 +1,13 @@
 {% extends "results/baseresult.html" %}
 
 {% block result %}
-<div class="result-summary" data-source="{{ result.source }}">
+<div class="result-summary">
     <a target="_blank" href="{{ result.url }}">
         {{ result.title|truncate(125) }}
     </a>
 </div>
 {%- if result.body %}
-    <p class="result-snippet" data-source="{{ result.source }}">{{ result.body|truncate(350) }}</p>
+    <p class="result-snippet">{{ result.body|truncate(350) }}</p>
 {% endif %}
-<p class="muted result-url" data-source="{{ result.source }}">{{ result.url }}</p>
+<p class="muted result-url">{{ result.url }}</p>
 {% endblock %}

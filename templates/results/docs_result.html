@@ -1,7 +1,6 @@
 {% extends "results/baseresult.html" %}
 
 {% block result %}
-<div data-source="{{ result.source }}">
     <div class="result-summary">
         <a target="_blank" href="{{ result.url }}">
             {{ result.title|truncate(125) }}
@@ -11,5 +10,4 @@
     <p class="result-url">
         <span class="muted">{{result.url}}</span>
     </p>
-</div>
 {% endblock %}
