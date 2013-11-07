@@ -58,9 +58,6 @@ COMBINED.ensure_index([
 
     # Google Groups
     ('subject', 'text'),
-
-    # Appended field for covered count query
-    ('source', 1)
 ],
     name='search_index',
     weights= {
