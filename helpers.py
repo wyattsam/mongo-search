@@ -1,10 +1,17 @@
 import re
 import md5
+from flask import request
 from collections import Counter
 from math import ceil
 
-CORP_URL = 'https://corp.mongodb.com/'
+CORP_URL = 'https://corp.10gen.com/'
 JIRA_URL = "https://jira.mongodb.org/browse/"
+
+def corp_url():
+    if 'mongodb' in request.referrer:
+        return CORP_URL.replace('10gen', 'mongodb')
+    else:
+        return CORP_URL
 
 def get_counts(raw_results):
     counts = {
@@ -102,7 +109,7 @@ def massage_profile(profile):
         'id': profile['crowd_id'],
         'first_name': profile['first_name'],
         'last_name': profile['last_name'],
-        'url': CORP_URL + 'employees/' + profile['crowd_id'],
+        'url': corp_url() + 'employees/' + profile['crowd_id'],
         'score': profile['score'],
         'source': 'profiles',
         'email': profile['primary_email'],
