@@ -68,6 +68,10 @@ a {
     margin-bottom: 15px;
 }
 
+[data-source="profiles"] .result-snippet {
+    min-height: 50px;
+}
+
 [data-source="jira"] {
     border-left: 3px solid green; padding-left: 5px;
 }
@@ -89,9 +93,7 @@ a {
 }
 
 [data-source="profiles"] {
-    min-height: 50px;
     border-left: 3px solid #f06d54; padding-left: 5px;
-    min-height: 50px;
 }
 
 [data-source="confluence"] {
