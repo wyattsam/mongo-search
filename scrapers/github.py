@@ -66,3 +66,10 @@ class GitHubScraper(JSONScraper):
             for repo in repos:
                 for commit in self.scrape_repo(repo):
                     yield commit
+
+if __name__ == '__main__':
+    import settings
+    from scrapers import ScrapeRunner
+    runner = ScrapeRunner(**settings.MONGO)
+    scraper = GitHubScraper(**settings.GITHUB)
+    runner.run(scraper)

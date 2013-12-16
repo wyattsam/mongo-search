@@ -98,3 +98,10 @@ class ConfluenceScraper(JSONScraper):
         for space in spaces:
             for page in self.scrape_space(space):
                 yield page
+
+if __name__ == '__main__':
+    import settings
+    from scrapers import ScrapeRunner
+    runner = ScrapeRunner(**settings.MONGO)
+    scraper = ConfluenceScraper(**settings.CONFLUENCE)
+    runner.run(scraper)

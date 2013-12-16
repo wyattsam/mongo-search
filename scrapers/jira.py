@@ -62,3 +62,11 @@ class JiraScraper(JSONScraper):
         for project in projects:
             for issue in self.scrape_project(project):
                 yield issue
+
+
+if __name__ == '__main__':
+    import settings
+    from scrapers import ScrapeRunner
+    runner = ScrapeRunner(**settings.MONGO)
+    scraper = JiraScraper(**settings.JIRA)
+    runner.run(scraper)

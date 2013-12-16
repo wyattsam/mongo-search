@@ -62,3 +62,11 @@ class StackOverflowScraper(JSONScraper):
         for tag in self.tags:
             for question in self.scrape_tag(tag):
                 yield question
+
+
+if __name__ == '__main__':
+    import settings
+    from scrapers import ScrapeRunner
+    runner = ScrapeRunner(**settings.MONGO)
+    scraper = StackOverflowScraper(**settings.STACK_OVERFLOW)
+    runner.run(scraper)

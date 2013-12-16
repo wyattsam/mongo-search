@@ -126,3 +126,11 @@ class GoogleGroupsScraper(Scraper):
         }
 
         return msgdoc
+
+
+if __name__ == '__main__':
+    import settings
+    from scrapers import ScrapeRunner
+    runner = ScrapeRunner(**settings.MONGO)
+    scraper = GoogleGroupsScraper(**settings.GOOGLE_GROUPS)
+    runner.run(scraper)

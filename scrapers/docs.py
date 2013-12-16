@@ -49,3 +49,11 @@ class DocumentationScraper(JSONScraper):
 class MmsDocumentationScraper(DocumentationScraper):
     NAME = 'mms'
     API_BASE = 'http://mms.mongodb.com/'
+
+
+if __name__ == '__main__':
+    import settings
+    from scrapers import ScrapeRunner
+    runner = ScrapeRunner(**settings.MONGO)
+    scraper = DocumentationScraper(**settings.DOCS)
+    runner.run(scraper)

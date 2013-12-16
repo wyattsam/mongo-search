@@ -22,6 +22,7 @@ class ScrapeRunner(object):
         self.scrapes = self.db.scrapes
         self.credentials = credentials
         self.scrape_id = None
+
         if credentials:
             self.login()
 
@@ -57,9 +58,17 @@ class ScrapeRunner(object):
         document['source'] = name
         self.combined.save(document)
 
-    def run(self, scraper):
+    def _remove(self, collection, name):
+        collection.remove()
+        self.combined.remove({'source': name})
+
+    def run(self, scraper, remove=False):
         name = scraper.NAME
         collection = self.db[name]
+
+        # clear out old entries
+        if remove: self._remove(collection, name)
+
         self._start_scrape(name)
 
         try:
