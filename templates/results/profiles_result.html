@@ -5,11 +5,19 @@
         <a target="_blank" href="{{ result.url }}">
             <strong>{{ result.first_name }} {{ result.last_name }}</strong>
         </a>
+        ({{ result.title }}, {{ result.team }})
     </div>
     <div class="result-snippet">
         <img src="http://www.gravatar.com/avatar/{{ result.md5 }}">
-        <p>{{ result.snippet|truncate(350) }}</p>
     </div>
+    <p class="structured"><small>
+        <span class="label">office</span>
+        <span class="data">{{result.office}}</span>
+        <span class="label">email</span>
+        <span class="data"><a href="mailto:{{result.email}}">{{result.email}}</a></span>
+        <span class="label">github</span>
+        <span class="data"><a href="https://github.com/{{result.github}}">{{result.github}}</a></span>
+    </small></p>
     <p class="result-url">
         <span class="muted">{{result.url}}</span>
     </p>

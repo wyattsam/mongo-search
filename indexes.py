@@ -55,6 +55,7 @@ COMBINED.ensure_index([
     # Profiles
     ('full_name', 'text'),
     ('crowd_id', 'text'),
+    ('github', 'text'),
 
     # Google Groups
     ('subject', 'text'),

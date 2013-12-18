@@ -33,7 +33,7 @@ body {
     font-weight:bold;
 }
 
-.result-summary {
+.result-summary a {
     font-weight: normal;
     margin-bottom: 0px;
     text-decoration: underline;
@@ -45,10 +45,18 @@ body {
     font-size: .9em;
 }
 
+.structured span.label {
+    margin-right: 3px;
+}
+
+.structured span.data {
+    margin-right: 5px;
+}
+
 .result-snippet img {
     float: right;
     margin-left: 15px;
-    margin-top: -10px;
+    margin-top: -20px;
 }
 
 .result-url {
@@ -73,7 +81,7 @@ a {
 }
 
 [data-source="profiles"] .result-snippet {
-    min-height: 50px;
+    min-height: 10px;
 }
 
 [data-source="jira"] {

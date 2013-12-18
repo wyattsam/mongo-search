@@ -109,10 +109,16 @@ def massage_profile(profile):
         'id': profile['crowd_id'],
         'first_name': profile['first_name'],
         'last_name': profile['last_name'],
+        'full_name': profile['full_name'],
         'url': corp_url() + 'employees/' + profile['crowd_id'],
         'score': profile['score'],
         'source': 'profiles',
+        'team': profile['team']['name'],
+        'office': profile['office'],
         'email': profile['primary_email'],
+        'phone': profile['primary_phone'],
+        'github': profile['github'],
+        'title': profile['title'],
         'md5': md5.new(profile['primary_email'].strip().lower()).hexdigest(),
         'snippet': profile['bio']
     }
