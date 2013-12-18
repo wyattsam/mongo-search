@@ -9,40 +9,8 @@
             </div>
         </form>
         <p class="center">Powered by MongoDB v{{version}}</p>
+        <small><a href="/status">Scraper Status</a></small>
     </div>
-</div>
-
-<div class="status-box span8 center">
-    <table class="table">
-        <tr>
-            <th>Scraper</th>
-            <th>Status</th>
-            <th>Last Run</th>
-            <th>Finish</th>
-        </tr>
-        {% for source, scrape in scrapes.items() %}
-            <tr>
-                <td>{{ source }}</td>
-                <td>
-                    {% if scrape.state == 'running' %}
-                        <span class="label label-info">
-                    {% elif scrape.state == 'complete' %}
-                        <span class="label label-success">
-                    {% elif scrape.state == 'error' %}
-                        <span class="label label-important">
-                    {% endif %}
-                    {{ scrape.state }}
-                    </span>
-                </td>
-                <td>{{ scrape.start.strftime('%m/%d/%Y %I:%M %p') }} UTC</td>
-                <td>
-                    {% if scrape.end %}
-                        {{ scrape.end.strftime('%m/%d/%Y %I:%M %p') }} UTC
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
 </div>
 {% endblock %}
 

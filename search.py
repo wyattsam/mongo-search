@@ -121,8 +121,7 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     version = DB.command({'buildInfo': 1})['version']
-    scrapes = get_scrapes()
-    return render_template('index.html', version=version, scrapes=scrapes)
+    return render_template('index.html', version=version)
 
 @app.route("/search")
 def submit():
@@ -149,6 +148,10 @@ def submit():
         query=mq.query,
         pagination=pagination)
 
+@app.route("/status")
+def status():
+    scrapes = get_scrapes()
+    return render_template('status.html', scrapes=scrapes)
 
 @app.errorhandler(404)
 def page_not_found(e):
