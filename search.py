@@ -22,6 +22,7 @@ else:
 # Setup collections
 COMBINED = DB['combined']
 SEARCHES = DB['searches']
+SCRAPES = DB['scrapes']
 
 # App Settings
 PAGE_SIZE = 10
@@ -120,7 +121,8 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     version = DB.command({'buildInfo': 1})['version']
-    return render_template('index.html', version=version)
+    scrapes = get_scrapes()
+    return render_template('index.html', version=version, scrapes=scrapes)
 
 @app.route("/search")
 def submit():
@@ -155,6 +157,18 @@ def page_not_found(e):
 #-----------------------------------------------------------------------------
 # Helpers
 #-----------------------------------------------------------------------------
+
+def get_scrapes():
+    scrapes = {}
+
+    for source in SOURCES:
+        result = SCRAPES.find_one({'source': source},
+            sort=[('start', -1)])
+        if result:
+            scrapes[source] = result
+
+    return scrapes
+
 
 def parse_args(args):
     page = int(args.get('page', 1))

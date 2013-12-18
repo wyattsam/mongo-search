@@ -11,6 +11,33 @@
         <p class="center">Powered by MongoDB v{{version}}</p>
     </div>
 </div>
+
+<div class="status-box span8 center">
+    <table class="table">
+        <tr>
+            <th>Scraper</th>
+            <th>Status</th>
+            <th>Last Run</th>
+        </tr>
+        {% for source, scrape in scrapes.items() %}
+            <tr>
+                <td>{{ source }}</td>
+                <td>
+                    {% if scrape.state == 'running' %}
+                        <span class="label label-info">
+                    {% elif scrape.state == 'complete' %}
+                        <span class="label label-success">
+                    {% elif scrape.state == 'error' %}
+                        <span class="label label-danger">
+                    {% endif %}
+                    {{ scrape.state }}
+                    </span>
+                </td>
+                <td>{{ scrape.start.strftime('%m-%d-%Y %I:%M %p') }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
 {% endblock %}
 
 {% block footer %}
