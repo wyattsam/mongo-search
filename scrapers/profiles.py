@@ -14,7 +14,7 @@ class ProfilesScraper(JSONScraper):
         employee['_id'] = 'employee-' + employee_id
         employee['full_name'] = ' '.join(
             [employee['first_name'], employee['last_name']])
-        print '[PROFILE] ' + employee['full_name']
+        print u'[PROFILE] ' + employee['full_name'].encode('utf-8')
         return employee
 
     def scrape(self):
