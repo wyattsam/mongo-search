@@ -174,6 +174,11 @@ def get_scrapes():
         result = SCRAPES.find_one({'source': source},
             sort=[('start', -1)])
         if result:
+            last_success = SCRAPES.find_one(
+                {'source': source, 'state': 'complete'},
+                sort=[('start', -1)])
+            if last_success:
+                result['last_success'] = last_success['end']
             scrapes[source] = result
 
     return scrapes

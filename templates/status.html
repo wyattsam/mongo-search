@@ -5,8 +5,7 @@
         <tr>
             <th>Scraper</th>
             <th>Status</th>
-            <th>Last Run</th>
-            <th>Finish</th>
+            <th>Last Successful Finish</th>
         </tr>
         {% for source, scrape in scrapes.items() %}
             <tr>
@@ -22,10 +21,9 @@
                     {{ scrape.state }}
                     </span>
                 </td>
-                <td>{{ scrape.start.strftime('%m/%d/%Y %I:%M %p') }} UTC</td>
                 <td>
-                    {% if scrape.end %}
-                        {{ scrape.end.strftime('%m/%d/%Y %I:%M %p') }} UTC
+                    {% if scrape.last_success %}
+                         {{ scrape.last_success.strftime('%m/%d/%Y %I:%M %p') }} UTC
                     {% endif %}
                 </td>
             </tr>
