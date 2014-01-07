@@ -20,7 +20,7 @@ class MLStripper(HTMLParser):
 
 class ConfluenceScraper(JSONScraper):
     NAME = 'confluence'
-    SPACES = ['10GEN', 'cs', 'sales', 'Devops', 'KB', 'mcs', 'mrkt']
+    SPACES = ['10GEN', 'cs', 'sales', 'Devops', 'KB', 'mcs', 'mrkt', 'HGTC', 'MMS', 'KERNEL']
     API_BASE = 'https://wiki.mongodb.com/rest/prototype/1/'
 
     def __init__(self, credentials=None, skip=[]):
