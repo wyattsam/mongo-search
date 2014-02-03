@@ -20,7 +20,18 @@ class MLStripper(HTMLParser):
 
 class ConfluenceScraper(JSONScraper):
     NAME = 'confluence'
-    SPACES = ['10GEN', 'cs', 'sales', 'Devops', 'KB', 'mcs', 'mrkt', 'HGTC', 'MMS', 'KERNEL']
+    SPACES = [
+        '10GEN',
+        'cs',
+        'sales',
+        'Devops',
+        'KB',
+        'mcs',
+        'mrkt',
+        'HGTC',
+        'MMS',
+        'KERNEL'
+    ]
     API_BASE = 'https://wiki.mongodb.com/rest/prototype/1/'
 
     def __init__(self, credentials=None, skip=[]):
@@ -37,7 +48,11 @@ class ConfluenceScraper(JSONScraper):
         password = self.credentials['password']
 
         page_url = ''.join([self.API_BASE, 'content/', page_id, '.json'])
-        page_json = requests.get(page_url, auth=(user, password), verify=False).json()
+        page_json = requests.get(
+            page_url,
+            auth=(user, password),
+            verify=False
+        ).json()
 
         html_body = page_json['body']['value']
         # Some older documents returned from Confluence contain useful text,
@@ -57,6 +72,7 @@ class ConfluenceScraper(JSONScraper):
             'body': text_body,
             'url':  page_json['link'][0]['href'],
             'space': space,
+            'subsource': space
         }
         return doc
 
@@ -67,7 +83,11 @@ class ConfluenceScraper(JSONScraper):
             'startIndex': str(index),
             'spaceKey': space
         }
-        space_json = self.get_json(space_url, space_params, auth=self.credentials)
+        space_json = self.get_json(
+            space_url,
+            space_params,
+            auth=self.credentials
+        )
 
         result = space_json['result']
         if result:

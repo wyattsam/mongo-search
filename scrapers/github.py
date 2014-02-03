@@ -13,7 +13,7 @@ class GitHubScraper(JSONScraper):
         self.organizations = organizations
 
     def commit_params(self):
-        params = { 'per_page': self.PER_PAGE }
+        params = {'per_page': self.PER_PAGE}
         if self.credentials:
             return dict(self.credentials, **params)
         else:
@@ -25,12 +25,13 @@ class GitHubScraper(JSONScraper):
         return repos
 
     def scrape_commit(self, repo, commit):
+        commit['_id'] = repo['full_name'] + '-' + commit['sha']
         commit['repo'] = {
             'full_name': repo['full_name'],
             'name': repo['name'],
             'url': repo['url']
         }
-        commit['_id'] = repo['full_name'] + '-' + commit['sha']
+        commit['subsource'] = repo['name']
         return commit
 
     def scrape_commits(self, repo):

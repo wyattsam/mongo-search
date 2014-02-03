@@ -1,6 +1,7 @@
 from time import sleep
 from scrapers import JSONScraper
 
+
 class JiraScraper(JSONScraper):
     NAME = 'jira'
     API_BASE = 'https://jira.mongodb.org/rest/api/2/'
@@ -23,6 +24,7 @@ class JiraScraper(JSONScraper):
     def scrape_issue(self, issue, project):
         issue['_id'] = issue['key']
         issue['project'] = project
+        issue['subsource'] = project
         issue['fields']['status'] = issue['fields']['status']['name']
         return issue
 

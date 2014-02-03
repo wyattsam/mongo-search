@@ -1,6 +1,7 @@
 import requests
 from scrapers import JSONScraper
 
+
 class DocumentationScraper(JSONScraper):
     NAME = 'docs'
     API_BASE = 'http://docs.mongodb.org/'
@@ -24,6 +25,7 @@ class DocumentationScraper(JSONScraper):
                 'body': file_json['text'],
                 'url':  file_json['url'],
                 'section': kind,
+                'subsource': kind
             }
             return doc
         else:

@@ -7,11 +7,13 @@ from math import ceil
 CORP_URL = 'https://corp.10gen.com/'
 JIRA_URL = "https://jira.mongodb.org/browse/"
 
+
 def corp_url():
     if request.referrer and 'mongodb' in request.referrer:
         return CORP_URL.replace('10gen', 'mongodb')
     else:
         return CORP_URL
+
 
 def get_counts(raw_results):
     counts = {
@@ -19,55 +21,58 @@ def get_counts(raw_results):
         'source': Counter(),
         'repo': Counter(),
         'project': Counter(),
-        'tag': Counter(),
         'section': Counter(),
         'space': Counter()
     }
 
     for doc in raw_results:
-        obj = doc['obj']
+        source = doc['_id']['source']
 
-        counts['total'] += 1
-        counts['source'][obj['source']] += 1
+        if 'subsource' in doc['_id']:
+            subsource = doc['_id']['subsource']
+        else:
+            subsource = None
 
-        if obj['source'] == 'github':
-            counts['repo'][obj['repo']['name']] += 1
+        count = doc['count']
 
-        if obj['source'] == 'jira':
-            counts['project'][obj['project']] += 1
+        counts['total'] += count
+        counts['source'][source] += count
 
-        if obj['source'] == 'docs':
-            counts['section'][obj['section']] += 1
+        source_subsource_map = {
+            'github': 'repo',
+            'jira': 'project',
+            'docs': 'section',
+            'confluence': 'space'
+        }
 
-        if obj['source'] == 'confluence':
-            counts['space'][obj['space']] += 1
+        if subsource:
+            subsource_name = source_subsource_map[source]
+            counts[subsource_name][subsource] += count
 
     return counts
 
-def massage_results(raw_results, query):
+
+def massage_results(raw_results):
     massaged = []
 
     for result in raw_results:
-        current = result['obj']
-        current['score'] = result['score']
-        source = current['source']
+        source = result['source']
 
-        if source == 'stack_overflow':
-            massaged.append(massage_stack_overflow(current))
-        elif source == 'jira':
-            massaged.append(massage_jira(current))
-        elif source == 'github':
-            massaged.append(massage_github(current))
-        elif source == 'docs':
-            massaged.append(massage_docs(current))
-        elif source == 'profiles':
-            massaged.append(massage_profile(current))
-        elif source == 'google_groups':
-            massaged.append(massage_google(current))
-        elif source == 'confluence':
-            massaged.append(massage_confluence(current))
+        source_massage_map = {
+            'stack_overflow': massage_stack_overflow,
+            'jira': massage_jira,
+            'github': massage_github,
+            'docs': massage_docs,
+            'profiles': massage_profile,
+            'google_groups': massage_google,
+            'confluence': massage_confluence
+        }
+
+        massager = source_massage_map[source]
+        massaged.append(massager(result))
 
     return massaged
+
 
 def massage_google(post):
     massaged = {
@@ -80,6 +85,7 @@ def massage_google(post):
         'sender': post['sender']
     }
     return massaged
+
 
 def massage_github(commit):
     committer = commit['committer'] or {}
@@ -104,6 +110,7 @@ def massage_github(commit):
     }
     return massaged
 
+
 def massage_profile(profile):
     massaged = {
         'id': profile['crowd_id'],
@@ -124,8 +131,10 @@ def massage_profile(profile):
     }
     return massaged
 
+
 def massage_docs(doc):
     return doc
+
 
 def massage_stack_overflow(post):
     massaged = {
@@ -137,6 +146,7 @@ def massage_stack_overflow(post):
         'source': 'stack_overflow'
     }
     return massaged
+
 
 def massage_jira(issue):
     massaged = {
@@ -151,6 +161,7 @@ def massage_jira(issue):
     }
     return massaged
 
+
 def massage_confluence(page):
     massaged = {
         'id': page['_id'],
@@ -163,6 +174,7 @@ def massage_confluence(page):
     }
 
     return massaged
+
 
 class Pagination(object):
 
@@ -177,7 +189,9 @@ class Pagination(object):
 
     @property
     def upper_bound(self):
-        return min((self.page-1) * self.per_page + self.per_page, self.total_count)
+        return min(
+            (self.page - 1) * self.per_page + self.per_page, self.total_count
+        )
 
     @property
     def pages(self):
@@ -193,5 +207,4 @@ class Pagination(object):
 
     def iter_pages(self):
         for num in xrange(self.page, min(self.pages + 1, self.page + 10)):
-           yield num
-
+            yield num

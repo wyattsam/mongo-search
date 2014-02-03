@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, url_for, redirect
 from pymongo import MongoClient
 from datetime import datetime
+from operator import itemgetter
 import helpers
 import settings
 
@@ -26,7 +27,6 @@ SCRAPES = DB['scrapes']
 
 # App Settings
 PAGE_SIZE = 10
-COUNT_LIMIT = 1000000
 
 SOURCES = {
     'stack_overflow': 'Stack Overflow',
@@ -50,18 +50,9 @@ SUBSOURCES = {
     'profiles':         None
 }
 
-COUNT_PROJECTION = {
-    '_id': 0,
-    'source': 1,
-    'repo.name': 1,
-    'project': 1,
-    'tags': 1,
-    'section': 1,
-    'space': 1
-}
-
 RESULT_PROJECTION = {
     # Common
+    'score': {'$meta': 'textScore'},
     'source': 1,
     'status': 1,
     'url': 1,
@@ -112,7 +103,7 @@ RESULT_PROJECTION = {
     'space': 1,
 
     # Docs
-    'section': 1
+    'section': 1,
 }
 
 #-----------------------------------------------------------------------------
@@ -124,10 +115,12 @@ app = Flask(__name__)
 # Controllers
 #-----------------------------------------------------------------------------
 
+
 @app.route("/")
 def index():
     version = DB.command({'buildInfo': 1})['version']
     return render_template('index.html', version=version)
+
 
 @app.route("/search")
 def submit():
@@ -145,19 +138,24 @@ def submit():
     page_limit = page * PAGE_SIZE
 
     results = run_query(mq.query, page, mq.filter, page_limit)
-    pagination = helpers.Pagination(page, PAGE_SIZE, counts['filter_total'])
+    pagination = helpers.Pagination(page, PAGE_SIZE, counts['total'])
 
-    return render_template('results.html', results=results,
+    return render_template(
+        'results.html',
+        results=results,
         counts=counts,
         source=mq.source,
         sub_source=mq.sub_source,
         query=mq.query,
-        pagination=pagination)
+        pagination=pagination
+    )
+
 
 @app.route("/status")
 def status():
     scrapes = get_scrapes()
     return render_template('status.html', scrapes=scrapes)
+
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -167,12 +165,15 @@ def page_not_found(e):
 # Helpers
 #-----------------------------------------------------------------------------
 
+
 def get_scrapes():
     scrapes = {}
 
     for source in SOURCES:
-        result = SCRAPES.find_one({'source': source},
-            sort=[('start', -1)])
+        result = SCRAPES.find_one(
+            {'source': source},
+            sort=[('start', -1)]
+        )
         if result:
             last_success = SCRAPES.find_one(
                 {'source': source, 'state': 'complete'},
@@ -193,9 +194,9 @@ def parse_args(args):
 def covered_count(query, source_filter):
     covered_results = run_count_query(query)
     counts = helpers.get_counts(covered_results)
-    counts['filter_total'] = len(run_count_query(query, source_filter))
 
     return counts
+
 
 def log_search(args):
     search = {
@@ -215,27 +216,34 @@ def log_search(args):
 
     SEARCHES.insert(search)
 
+
 def run_count_query(query, docfilter=None):
-    return DB.command('text', 'combined',
-        search=query,
-        filter=docfilter,
-        project=COUNT_PROJECTION,
-        limit=COUNT_LIMIT
-    )['results']
+    return COMBINED.aggregate([
+        {'$match': {'$text': {'$search': query}}},
+        {'$group':
+            {
+                '_id': {'source': '$source', 'subsource': '$subsource'},
+                'count': {'$sum': 1}
+            }
+         },
+    ])['result']
+
 
 def run_query(query, page, docfilter, limit):
-    results = DB.command('text', 'combined',
-        search=query,
-        filter=docfilter,
+    query_doc = {'$text': {'$search': query}}
+    print query_doc
+    results = COMBINED.find(
+        query_doc,
         limit=limit,
-        project=RESULT_PROJECTION
-    )['results']
+        fields=RESULT_PROJECTION,
+        sort=[('score', {'$meta': 'textScore'})]
+    )
 
-    massaged = helpers.massage_results(results, query)
+    massaged = helpers.massage_results(results)
 
     start = (page - 1) * PAGE_SIZE
     end = page * PAGE_SIZE
-    return sorted(massaged, key=lambda k: -k['score'])[start:end]
+    return massaged[start:end]
 
 def url_for_other_page(page):
     args = request.args.copy()
