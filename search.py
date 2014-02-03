@@ -1,7 +1,6 @@
 from flask import Flask, request, render_template, url_for, redirect
 from pymongo import MongoClient
 from datetime import datetime
-from operator import itemgetter
 import helpers
 import settings
 
@@ -138,7 +137,7 @@ def submit():
     page_limit = page * PAGE_SIZE
 
     results = run_query(mq.query, page, mq.filter, page_limit)
-    pagination = helpers.Pagination(page, PAGE_SIZE, counts['total'])
+    pagination = helpers.Pagination(page, PAGE_SIZE, counts['filter_total'])
 
     return render_template(
         'results.html',
@@ -194,6 +193,9 @@ def parse_args(args):
 def covered_count(query, source_filter):
     covered_results = run_count_query(query)
     counts = helpers.get_counts(covered_results)
+    counts['filter_total'] = sum(
+        (source['count'] for source in run_count_query(query, source_filter))
+    )
 
     return counts
 
@@ -218,8 +220,13 @@ def log_search(args):
 
 
 def run_count_query(query, docfilter=None):
+    query_doc = {'$text': {'$search': query}}
+
+    if docfilter:
+        query_doc.update(docfilter)
+
     return COMBINED.aggregate([
-        {'$match': {'$text': {'$search': query}}},
+        {'$match': query_doc},
         {'$group':
             {
                 '_id': {'source': '$source', 'subsource': '$subsource'},
@@ -230,13 +237,18 @@ def run_count_query(query, docfilter=None):
 
 
 def run_query(query, page, docfilter, limit):
+    # must use $orderby for sort until pymongo is updated
     query_doc = {'$text': {'$search': query}}
-    print query_doc
+    query_doc.update(docfilter)
+    sort_doc = {'score': {'$meta': 'textScore'}}
+
     results = COMBINED.find(
-        query_doc,
+        {
+            '$query': query_doc,
+            '$orderby': sort_doc
+        },
         limit=limit,
-        fields=RESULT_PROJECTION,
-        sort=[('score', {'$meta': 'textScore'})]
+        fields=RESULT_PROJECTION
     )
 
     massaged = helpers.massage_results(results)
@@ -244,6 +256,7 @@ def run_query(query, page, docfilter, limit):
     start = (page - 1) * PAGE_SIZE
     end = page * PAGE_SIZE
     return massaged[start:end]
+
 
 def url_for_other_page(page):
     args = request.args.copy()
