@@ -195,7 +195,7 @@ def covered_count(query, source_filter):
     counts = helpers.get_counts(covered_results)
     print counts
 
-    if 'subsource' in source_filter:
+    if any(x in source_filter for x in SUBSOURCES):
         counts['filter_total'] = counts[source_filter['subsource']]
     elif 'source' in source_filter:
         counts['filter_total'] = counts['source'][source_filter['source']]
