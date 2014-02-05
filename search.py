@@ -193,11 +193,12 @@ def parse_args(args):
 def covered_count(query, source_filter):
     covered_results = run_count_query(query)
     counts = helpers.get_counts(covered_results)
+    print counts
 
     if 'subsource' in source_filter:
         counts['filter_total'] = counts[source_filter['subsource']]
     elif 'source' in source_filter:
-        counts['filter_total'] = counts[source_filter['source']]
+        counts['filter_total'] = counts['source'][source_filter['source']]
     else:
         counts['filter_total'] = counts['total']
 
