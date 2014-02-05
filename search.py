@@ -193,9 +193,13 @@ def parse_args(args):
 def covered_count(query, source_filter):
     covered_results = run_count_query(query)
     counts = helpers.get_counts(covered_results)
-    counts['filter_total'] = sum(
-        (source['count'] for source in run_count_query(query, source_filter))
-    )
+
+    if 'subsource' in source_filter:
+        counts['filter_total'] = counts[source_filter['subsource']]
+    elif 'source' in source_filter:
+        counts['filter_total'] = counts[source_filter['source']]
+    else:
+        counts['filter_total'] = counts['total']
 
     return counts
 
@@ -221,14 +225,12 @@ def log_search(args):
 
 def run_count_query(query, docfilter=None):
     query_doc = {'$text': {'$search': query}}
-    project_doc = {'_id': 0, 'source': 1, 'subsource': 1}
 
     if docfilter:
         query_doc.update(docfilter)
 
     return COMBINED.aggregate([
         {'$match': query_doc},
-        {'$project': project_doc},
         {'$group':
             {
                 '_id': {'source': '$source', 'subsource': '$subsource'},
