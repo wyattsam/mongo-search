@@ -2,7 +2,7 @@ import requests
 import sys
 import traceback
 from datetime import datetime
-from pymongo import MongoClient
+from pymongo import MongoClient, errors
 from requests.auth import HTTPDigestAuth
 
 
@@ -67,13 +67,17 @@ class ScrapeRunner(object):
         collection = self.db[name]
 
         # clear out old entries
-        if remove: self._remove(collection, name)
+        if remove:
+            self._remove(collection, name)
 
         self._start_scrape(name)
 
         try:
             for document in scraper.scrape():
-                self._save(name, collection, document)
+                try:
+                    self._save(name, collection, document)
+                except errors.OperationFailure:
+                    continue
         except Exception as error:
             self._scrape_error(error)
             return
