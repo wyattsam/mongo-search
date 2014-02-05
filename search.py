@@ -221,12 +221,14 @@ def log_search(args):
 
 def run_count_query(query, docfilter=None):
     query_doc = {'$text': {'$search': query}}
+    project_doc = {'_id': 0, 'source': 1, 'subsource': 1}
 
     if docfilter:
         query_doc.update(docfilter)
 
     return COMBINED.aggregate([
         {'$match': query_doc},
+        {'$project': project_doc},
         {'$group':
             {
                 '_id': {'source': '$source', 'subsource': '$subsource'},
