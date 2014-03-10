@@ -12,7 +12,7 @@ class GitHubScraper(JSONScraper):
         self.credentials = credentials
         self.organizations = organizations
 
-    def commit_params(self):
+    def request_params(self):
         params = {'per_page': self.PER_PAGE}
         if self.credentials:
             return dict(self.credentials, **params)
@@ -21,7 +21,7 @@ class GitHubScraper(JSONScraper):
 
     def get_repos(self, organization):
         url = self.ORGS_URL + organization + '/repos'
-        repos = self.get_json(url, self.credentials)
+        repos = self.get_json(url, params=self.request_params())
         return repos
 
     def scrape_commit(self, repo, commit):
@@ -36,7 +36,7 @@ class GitHubScraper(JSONScraper):
 
     def scrape_commits(self, repo):
         commits_url = repo['url'] + '/commits'
-        response = requests.get(commits_url, params=self.commit_params())
+        response = requests.get(commits_url, params=self.request_params())
 
         while True:
             try:
@@ -52,7 +52,10 @@ class GitHubScraper(JSONScraper):
 
             if 'next' in response.links:
                 next_link = response.links['next']['url']
-                response = requests.get(next_link, params=self.commit_params())
+                response = requests.get(
+                    next_link,
+                    params=self.request_params()
+                )
             else:
                 break
 
