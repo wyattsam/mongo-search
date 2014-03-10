@@ -54,7 +54,6 @@ class MongoQuery(object):
             filter_doc['source'] = source
 
             if sub_source:
-                subsource_field = SUBSOURCES[source]['field']
-                filter_doc[subsource_field] = sub_source
+                filter_doc['subsource'] = sub_source
 
         return filter_doc
