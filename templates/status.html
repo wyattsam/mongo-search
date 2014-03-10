@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="status-box span8 center">
+<div class="col-md-5 center">
     <table class="table">
         <tr>
             <th>Scraper</th>
@@ -16,10 +16,9 @@
                     {% elif scrape.state == 'complete' %}
                         <span class="label label-success">
                     {% elif scrape.state == 'error' %}
-                        <span class="label label-important">
+                        <span class="label label-danger">
                     {% endif %}
-                    {{ scrape.state }}
-                    </span>
+                    {{ scrape.state }}</span>
                 </td>
                 <td>
                     {% if scrape.last_success %}

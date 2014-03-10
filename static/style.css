@@ -16,9 +16,6 @@ body {
     margin: 100px 0px 100px;
 }
 
-.status-box {
-    width: 500px;
-}
 
 /*----------------------*/
 /* results.html         */
@@ -31,6 +28,19 @@ body {
 
 .source-search{
     font-weight:bold;
+}
+
+#small-search {
+    width: 250px;
+}
+
+#results {
+    margin-top: 20px;
+}
+
+#result-set {
+    margin-top: -45px;
+
 }
 
 .result-summary a {

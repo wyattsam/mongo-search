@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="search-box">
-    <div class="span8 center">
-        <form class="form-search" method="get" action="/search">
-            <div class="input-append">
-                <input class="span6" type="text" name="query" placeholder="Search" autofocus="autofocus">
-                <button type="submit" class="btn">Submit</button>
+    <div class="col-md-8 center">
+        <form method="get" action="/search">
+            <div class="input-group">
+                <input class="form-control" type="text" name="query" placeholder="Search" autofocus="autofocus">
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="button">Submit</button>
+                </span>
             </div>
         </form>
         <p class="center">Powered by MongoDB v{{version}}</p>

@@ -1,17 +1,19 @@
 {% extends "base.html" %}
 {% block title %} - Results{% endblock %}
 {% block content %}
-<form class="form-search" method="get" action="/search" id="search">
-    <div class="input-append">
-        <input type="text" name="query" placeholder="Search" value="{{ query }}">
-        <button type="submit" class="btn">Submit</button>
+<form method="get" action="/search" id="search">
+    <div class="input-group col-md-3" id="small-search">
+        <input class="form-control" type="text" name="query" placeholder="Search" value="{{ query }}">
+        <span class="input-group-btn">
+            <button type="button" class="btn btn-default">Submit</button>
+        </span>
     </div>
 </form>
 
 <div class="container-fluid">
-    <div class="row-fluid">
-        <div class="span2">
-            <ul class="unstyled" id="source-list">
+    <div class="row" id="results">
+        <div class="col-md-2">
+            <ul class="list-unstyled" id="source-list">
                 {% from "_template_helpers.html" import source_selector %}
                 {{ source_selector("jira", "JIRA", counts, source, query, sub_source) }}
                 {{ source_selector("google_groups", "Google Groups", counts, source, query, sub_source) }}
@@ -25,7 +27,7 @@
                 <!-- etc -->
             </ul>
         </div>
-        <div class="offset1 span9">
+        <div class="col-md-offset-3" id="result-set">
             <p>Results:
                 {% if pagination.total_count == 0 %}
                     0
@@ -63,8 +65,8 @@
                 {% endif %}
             {% endfor %}
 
-            <div class="pagination pagination-centered">
-                <ul>
+            <div class="center">
+                <ul class="pagination">
                     {% if pagination.has_prev %}
                         <li><a href="{{url_for_other_page(pagination.page -1)}}">«</a></li>
                     {% endif %}
