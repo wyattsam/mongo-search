@@ -5,9 +5,9 @@
         <a target="_blank" href="{{ result.url }}">
             <strong>{{ result.first_name }} {{ result.last_name }}</strong>
         </a>
-        ({{ result.title }}, {{ result.team }})
     </div>
     <div class="result-snippet">
+        {{ result.title }}, {{ result.team }}
         <img src="http://www.gravatar.com/avatar/{{ result.md5 }}">
     </div>
     <p class="structured">
@@ -17,8 +17,5 @@
         <span class="data"><a href="mailto:{{result.email}}">{{result.email}}</a></span>
         <span class="label label-default">github</span>
         <span class="data"><a href="https://github.com/{{result.github}}">{{result.github}}</a></span>
-    </p>
-    <p class="result-url">
-        <span class="muted">{{result.url}}</span>
     </p>
 {% endblock %}

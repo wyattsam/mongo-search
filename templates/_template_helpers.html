@@ -1,4 +1,24 @@
 {% macro source_selector(shortname, fullname, counts, source, query, sub_source) -%}
+<a class="list-group-item {{"active" if shortname == source}}" href="/search?query={{query}}{% if shortname != source %}&source={{shortname}}{% endif %}">
+    <span class="badge">
+        {{counts['source'][shortname]}}
+    </span>
+    {{fullname}}
+</a>
+{% set ss = SUBSOURCES[shortname] %}
+{% if (shortname == source) and counts[ss['name']] %}
+    <ul>
+    {% for sub, count in counts[ss['name']]|dictsort(true) %}
+    <li class="{% if sub == sub_source %}bg-info{% endif %}" >
+            <a href="/search?query={{query}}&source={{shortname}}&{{ss['name']}}={{sub}}">
+                {{sub}}
+            </a>
+            <span>({{count}})</span>
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+<!--
     <li>
         <div class="source">
             <div class="source_header {% if shortname == source %} selected {% endif %}>">
@@ -24,4 +44,5 @@
             </div>
         </label>
     </li>
+-->
 {% endmacro %}

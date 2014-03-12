@@ -51,7 +51,7 @@ SUBSOURCES = {
 
 RESULT_PROJECTION = {
     # Common
-    'score': {'$meta': 'textScore'},
+    'text_score': {'$meta': 'textScore'},
     'source': 1,
     'status': 1,
     'url': 1,
@@ -71,12 +71,17 @@ RESULT_PROJECTION = {
     'project': 1,
     'fields.summary': 1,
     'fields.description': 1,
+    'fields.status': 1,
+    'fields.comment.total': 1,
 
     # Stack Overflow
     'link': 1,
     'title': 1,
     'body': 1,
     'tags': 1,
+    'answer_count': 1,
+    'is_answered': 1,
+    'score': 1,
 
     # Profiles
     'crowd_id': 1,
@@ -247,7 +252,7 @@ def run_query(query, page, docfilter, limit):
     # must use $orderby for sort until pymongo is updated
     query_doc = {'$text': {'$search': query}}
     query_doc.update(docfilter)
-    sort_doc = {'score': {'$meta': 'textScore'}}
+    sort_doc = {'text_score': {'$meta': 'textScore'}}
 
     results = COMBINED.find(
         {

@@ -76,7 +76,6 @@ def massage_results(raw_results):
 
 def massage_google(post):
     massaged = {
-        'score': post['score'],
         'source': 'google',
         'subject': post['subject'],
         'body': post['body'],
@@ -98,7 +97,6 @@ def massage_github(commit):
 
     massaged = {
         'id': commit['_id'],
-        'score': commit['score'],
         'source': 'github',
         "committer": commit['commit']['committer']['name'],
         "committer_avatar": committer.get('avatar_url', ''),
@@ -118,7 +116,6 @@ def massage_profile(profile):
         'last_name': profile['last_name'],
         'full_name': profile['full_name'],
         'url': corp_url() + 'employees/' + profile['crowd_id'],
-        'score': profile['score'],
         'source': 'profiles',
         'team': profile['team']['name'],
         'office': profile['office'],
@@ -140,6 +137,8 @@ def massage_stack_overflow(post):
     massaged = {
         'id': post['_id'],
         'score': post['score'],
+        'answered': post['is_answered'],
+        'answers': post['answer_count'],
         'url': post['link'],
         'summary': post['title'],
         'snippet': re.sub('<[^<]+?>', '', post['body']),
@@ -153,7 +152,7 @@ def massage_jira(issue):
         'id': issue['_id'],
         'fields': issue['fields'],
         'status': issue.get('fields', {}).get('status', None),
-        'score': issue['score'],
+        'comments': issue.get('fields', {}).get('comment', {}).get('total', 0),
         'url': JIRA_URL + issue['_id'],
         'summary': issue['fields'].get('summary', ''),
         'snippet': issue['fields'].get('description', ''),
@@ -170,7 +169,6 @@ def massage_confluence(page):
         'url': page['url'],
         'space': page['space'],
         'source': 'confluence',
-        'score': page['score']
     }
 
     return massaged

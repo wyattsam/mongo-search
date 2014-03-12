@@ -22,16 +22,16 @@ body {
 /*----------------------*/
 
 
-.bounds{
+.bounds {
     font-weight:bold;
 }
 
-.source-search{
+.source-search {
     font-weight:bold;
 }
 
-#small-search {
-    width: 250px;
+.list-group-item .badge {
+    font-weight: normal;
 }
 
 #results {
@@ -50,7 +50,7 @@ body {
 }
 
 .result-snippet {
-    margin-bottom: 0px;
+    margin-bottom: 6px;
     margin-top: 0px;
     font-size: .9em;
 }
@@ -75,7 +75,7 @@ body {
 }
 
 a {
-    color: #12c;
+    color: #16c;
 }
 
 .pagination {
@@ -91,7 +91,7 @@ a {
 }
 
 [data-source="profiles"] .result-snippet {
-    min-height: 10px;
+    min-height: 30px;
 }
 
 [data-source="jira"] {
@@ -127,14 +127,19 @@ a {
     width: 225px;
 }
 
-#source-list a{
-    color: #333333;
+#source-list a {
     text-decoration: none;
 }
 
-#source-list li{
-    line-height: 24px;
-    margin-bottom:4px;
+#source-list ul {
+    margin-top: 10px;
+    list-style-type: none;
+}
+
+#source-list li a {
+    line-height: 12px;
+    margin-bottom: 2px;
+    margin-top: 3px;
 }
 
 .source{
@@ -149,15 +154,6 @@ a {
     font-size: .8em;
     margin-left: 40px;
     line-height: 1.6em;
-}
-
-.selected{
-    background-color:#DDD;
-    font-weight:bold;
-}
-
-.source .subsource_count{
-    font-weight: bold;
 }
 
 .source_icon{
@@ -199,10 +195,6 @@ a {
 
 .confluence_icon{
     background-image:url('/static/img/icon-confluence.png');
-}
-
-.nonzero{
-    font-weight: bold;
 }
 
 .gh-commit-message{

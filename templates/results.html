@@ -2,7 +2,7 @@
 {% block title %} - Results{% endblock %}
 {% block content %}
 <form method="get" action="/search" id="search">
-    <div class="input-group col-md-3" id="small-search">
+    <div class="input-group col-md-3">
         <input class="form-control" type="text" name="query" placeholder="Search" value="{{ query }}">
         <span class="input-group-btn">
             <button type="submit" class="btn btn-default">Submit</button>
@@ -12,8 +12,8 @@
 
 <div class="container-fluid">
     <div class="row" id="results">
-        <div class="col-md-2">
-            <ul class="list-unstyled" id="source-list">
+        <div class="col-md-3">
+            <div class="list-group" id="source-list">
                 {% from "_template_helpers.html" import source_selector %}
                 {{ source_selector("jira", "JIRA", counts, source, query, sub_source) }}
                 {{ source_selector("google_groups", "Google Groups", counts, source, query, sub_source) }}
@@ -22,10 +22,7 @@
                 {{ source_selector("profiles", "Profiles", counts, source, query, sub_source) }}
                 {{ source_selector("docs", "Docs", counts, source, query, sub_source) }}
                 {{ source_selector("confluence", "Confluence", counts, source, query, sub_source) }}
-                <!-- to add: -->
-                <!-- 10gen chat -->
-                <!-- etc -->
-            </ul>
+            </div>
         </div>
         <div class="col-md-offset-4" id="result-set">
             <p>Results:
