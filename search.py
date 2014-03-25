@@ -5,6 +5,7 @@ import helpers
 import settings
 
 CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
+CONNECTION.write_concern['w'] = 0
 
 # Setup database
 DB = CONNECTION['xgen']
@@ -198,8 +199,6 @@ def parse_args(args):
 def covered_count(query, source_filter):
     covered_results = run_count_query(query)
     counts = helpers.get_counts(covered_results)
-    print source_filter
-    print counts
 
     if 'subsource' in source_filter:
         subsource_name = SUBSOURCES[source_filter['source']]['name']
