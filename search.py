@@ -3,6 +3,8 @@ from pymongo import MongoClient
 from datetime import datetime
 from query_parse import MongoQuery
 from sources import SOURCES, SUBSOURCES
+from flask_debugtoolbar import DebugToolbarExtension
+from flask_debugtoolbar_lineprofilerpanel.profile import line_profile
 import helpers
 import settings
 
@@ -269,9 +271,6 @@ app.jinja_env.globals['SUBSOURCES'] = SUBSOURCES
 if __name__ == "__main__":
     app.debug = True
     app.config['SECRET_KEY'] = 'supersekretkey'
-
-    from flask_debugtoolbar import DebugToolbarExtension
-    from flask_debugtoolbar_lineprofilerpanel.profile import line_profile
 
     # Specify the debug panels you want
     app.config['DEBUG_TB_PANELS'] = [
