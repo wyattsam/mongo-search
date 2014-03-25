@@ -3,11 +3,12 @@ import md5
 from flask import request
 from collections import Counter
 from math import ceil
+from flask_debugtoolbar_lineprofilerpanel.profile import line_profile
 
 CORP_URL = 'https://corp.10gen.com/'
 JIRA_URL = "https://jira.mongodb.org/browse/"
 
-
+@line_profile
 def corp_url():
     if request.referrer and 'mongodb' in request.referrer:
         return CORP_URL.replace('10gen', 'mongodb')
@@ -15,6 +16,7 @@ def corp_url():
         return CORP_URL
 
 
+@line_profile
 def get_counts(raw_results):
     counts = {
         'total': 0,
@@ -52,6 +54,7 @@ def get_counts(raw_results):
     return counts
 
 
+@line_profile
 def massage_results(raw_results):
     massaged = []
 
@@ -74,6 +77,7 @@ def massage_results(raw_results):
     return massaged
 
 
+@line_profile
 def massage_google(post):
     massaged = {
         'source': 'google',
@@ -86,6 +90,7 @@ def massage_google(post):
     return massaged
 
 
+@line_profile
 def massage_github(commit):
     committer = commit['committer'] or {}
     commit_msg_header = commit['commit']['message']
@@ -109,6 +114,7 @@ def massage_github(commit):
     return massaged
 
 
+@line_profile
 def massage_profile(profile):
     massaged = {
         'id': profile['crowd_id'],
@@ -129,6 +135,7 @@ def massage_profile(profile):
     return massaged
 
 
+@line_profile
 def massage_docs(doc):
     return doc
 
@@ -147,6 +154,7 @@ def massage_stack_overflow(post):
     return massaged
 
 
+@line_profile
 def massage_jira(issue):
     massaged = {
         'id': issue['_id'],
@@ -161,6 +169,7 @@ def massage_jira(issue):
     return massaged
 
 
+@line_profile
 def massage_confluence(page):
     massaged = {
         'id': page['_id'],
@@ -174,6 +183,7 @@ def massage_confluence(page):
     return massaged
 
 
+@line_profile
 class Pagination(object):
 
     def __init__(self, page, per_page, total_count):

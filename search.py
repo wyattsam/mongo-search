@@ -1,11 +1,12 @@
 from flask import Flask, request, render_template, url_for, redirect
 from pymongo import MongoClient
 from datetime import datetime
+from query_parse import MongoQuery
+from sources import SOURCES, SUBSOURCES
 import helpers
 import settings
 
 CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
-CONNECTION.write_concern['w'] = 0
 
 # Setup database
 DB = CONNECTION['xgen']
@@ -27,28 +28,6 @@ SCRAPES = DB['scrapes']
 
 # App Settings
 PAGE_SIZE = 10
-
-SOURCES = {
-    'stack_overflow': 'Stack Overflow',
-    'jira':           'JIRA',
-    'google_groups':  'Google Groups',
-    'github':         'GitHub',
-    'chat':           '10gen Chat',
-    'confluence':     'Confluence',
-    'docs':           'Docs',
-    'profiles':       'Profiles'
-}
-
-SUBSOURCES = {
-    'stack_overflow':   None,
-    'jira':             {'name': 'project', 'field': 'project'},
-    'google_groups':    None,
-    'github':           {'name': 'repo', 'field': 'repo.name'},
-    'chat':             None,
-    'docs':             {'name': 'section', 'field': 'section'},
-    'confluence':       {'name': 'space', 'field': 'space'},
-    'profiles':         None
-}
 
 RESULT_PROJECTION = {
     # Common
@@ -122,12 +101,14 @@ app = Flask(__name__)
 
 
 @app.route("/")
+@line_profile
 def index():
     version = DB.command({'buildInfo': 1})['version']
     return render_template('index.html', version=version)
 
 
 @app.route("/search")
+@line_profile
 def submit():
     args = request.args
     log_search(args)
@@ -157,6 +138,7 @@ def submit():
 
 
 @app.route("/status")
+@line_profile
 def status():
     scrapes = get_scrapes()
     return render_template('status.html', scrapes=scrapes)
@@ -170,7 +152,7 @@ def page_not_found(e):
 # Helpers
 #-----------------------------------------------------------------------------
 
-
+@line_profile
 def get_scrapes():
     scrapes = {}
 
@@ -190,12 +172,13 @@ def get_scrapes():
     return scrapes
 
 
+@line_profile
 def parse_args(args):
     page = int(args.get('page', 1))
-    from query_parse import MongoQuery
     return MongoQuery(args), page
 
 
+@line_profile
 def covered_count(query, source_filter):
     covered_results = run_count_query(query)
     counts = helpers.get_counts(covered_results)
@@ -210,7 +193,7 @@ def covered_count(query, source_filter):
 
     return counts
 
-
+@line_profile
 def log_search(args):
     search = {
         'time': datetime.utcnow(),
@@ -227,9 +210,9 @@ def log_search(args):
         if subsource and args.get(subsource['name']):
             search['subsource'] = args[subsource['name']]
 
-    SEARCHES.insert(search)
+    SEARCHES.insert(search, w=0)
 
-
+@line_profile
 def run_count_query(query, docfilter=None):
     query_doc = {'$text': {'$search': query}}
 
@@ -246,7 +229,7 @@ def run_count_query(query, docfilter=None):
          },
     ])['result']
 
-
+@line_profile
 def run_query(query, page, docfilter, limit):
     # must use $orderby for sort until pymongo is updated
     query_doc = {'$text': {'$search': query}}
@@ -268,7 +251,7 @@ def run_query(query, page, docfilter, limit):
     end = page * PAGE_SIZE
     return massaged[start:end]
 
-
+@line_profile
 def url_for_other_page(page):
     args = request.args.copy()
     args['page'] = page
@@ -285,6 +268,27 @@ app.jinja_env.globals['SUBSOURCES'] = SUBSOURCES
 
 if __name__ == "__main__":
     app.debug = True
+    app.config['SECRET_KEY'] = 'supersekretkey'
+
+    from flask_debugtoolbar import DebugToolbarExtension
+    from flask_debugtoolbar_lineprofilerpanel.profile import line_profile
+
+    # Specify the debug panels you want
+    app.config['DEBUG_TB_PANELS'] = [
+        'flask_debugtoolbar.panels.versions.VersionDebugPanel',
+        'flask_debugtoolbar.panels.timer.TimerDebugPanel',
+        'flask_debugtoolbar.panels.headers.HeaderDebugPanel',
+        'flask_debugtoolbar.panels.request_vars.RequestVarsDebugPanel',
+        'flask_debugtoolbar.panels.template.TemplateDebugPanel',
+        'flask_debugtoolbar.panels.logger.LoggingPanel',
+        'flask_debugtoolbar.panels.profiler.ProfilerDebugPanel',
+        # Add the line profiling
+        'flask_debugtoolbar_lineprofilerpanel.panels.LineProfilerPanel'
+        # Add the MongoDB profiling
+        #'flask_debugtoolbar_mongo.panel.MongoDebugPanel'
+    ]
+
+    toolbar = DebugToolbarExtension(app)
 
     if not app.debug:
         ADMINS = ['tyler@10gen.com']

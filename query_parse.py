@@ -1,6 +1,6 @@
 import pyparsing
 import operator
-from search import SOURCES, SUBSOURCES
+from sources import SOURCES, SUBSOURCES
 from pyparsing import Literal, CaselessKeyword, Word, \
     Suppress, ZeroOrMore, Optional, Each
 
