@@ -34,7 +34,8 @@ class JiraScraper(JSONScraper):
             'jql': jql,
             'startAt': 0,
             'maxResults': self.PAGE_SIZE,
-            'fields': 'key,summary,description,comment,status'
+            'fields': 'key,summary,description,comment,status',
+            'expand': 'changelog'
         }
 
         while True:
