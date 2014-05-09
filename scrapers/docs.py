@@ -10,7 +10,7 @@ class DocumentationScraper(JSONScraper):
         self.kinds = kinds
 
     def get_urls(self, kind):
-        file_urls_url = self.API_BASE + kind + '/json/.file_list'
+        file_urls_url = self.API_BASE + '/' + kind + '/json/.file_list'
         file_urls = requests.get(file_urls_url).text.split('\n')
         return file_urls
 
