@@ -1,2 +1,5 @@
 notes/*
 *.pyc
+*.swp
+*.o
+*.bak

@@ -1,4 +1,3 @@
-import requests
 import inspect
 import scrapers
 
