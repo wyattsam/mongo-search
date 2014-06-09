@@ -1,0 +1,48 @@
+{% macro source_selector(shortname, fullname, counts, source, query, sub_source) -%}
+<a class="list-group-item {{"active" if shortname == source}}" href="/search?query={{query}}{% if shortname != source %}&source={{shortname}}{% endif %}">
+    <span class="badge">
+        {{counts['source'][shortname]}}
+    </span>
+    {{fullname}}
+</a>
+{% set ss = SUBSOURCES[shortname] %}
+{% if (shortname == source) and counts[ss['name']] %}
+    <ul>
+    {% for sub, count in counts[ss['name']]|dictsort(true) %}
+    <li class="{% if sub == sub_source %}bg-info{% endif %}" >
+            <a href="/search?query={{query}}&source={{shortname}}&{{ss['name']}}={{sub}}">
+                {{sub}}
+            </a>
+            <span>({{count}})</span>
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+<!--
+    <li>
+        <div class="source">
+            <div class="source_header {% if shortname == source %} selected {% endif %}>">
+                <span class="source_icon {{shortname}}_icon">&nbsp;</span>
+                    <a href="/search?query={{query}}&source={{shortname}}">
+                        {{fullname}}
+                    </a>
+                </span>
+                <span class="source_count {{"nonzero" if counts['source'][shortname] > 0}}">({{counts['source'][shortname]}})</span>
+            </div>
+            <div class="subsource_list">
+                {% set ss = SUBSOURCES[shortname] %}
+                {% if counts[ss['name']] %}
+                    {% for sub, count in counts[ss['name']]|dictsort(true) %}
+                        <div class="subsource{{ ' selected' if sub==sub_source  else ''}}" >
+                            <a href="/search?query={{query}}&source={{shortname}}&{{ss['name']}}={{sub}}" class="subsource_name">
+                                  {{sub}}
+                            </a>
+                            <span class="subsource_count">({{count}})</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </label>
+    </li>
+-->
+{% endmacro %}

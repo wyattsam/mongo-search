@@ -1,0 +1,12 @@
+{% extends "results/baseresult.html" %}
+
+{% block result %}
+<div class="result-summary">
+    <a target="_blank" href="{{ result.url }}">
+        {{ result.title|truncate(125) }}
+    </a>
+</div>
+{%- if result.body %}
+    <p class="result-snippet">{{ result.body|truncate(350) }}</p>
+{% endif %}
+{% endblock %}

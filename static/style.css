@@ -1,0 +1,207 @@
+/*----------------------*/
+/* index.html         */
+/*----------------------*/
+
+body {
+    padding-top: 60px;
+}
+
+.center {
+    float: none;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.search-box {
+    margin: 100px 0px 100px;
+}
+
+
+/*----------------------*/
+/* results.html         */
+/*----------------------*/
+
+
+.bounds {
+    font-weight:bold;
+}
+
+.source-search {
+    font-weight:bold;
+}
+
+.list-group-item .badge {
+    font-weight: normal;
+}
+
+#results {
+    margin-top: 20px;
+}
+
+#result-set {
+    margin-top: -45px;
+
+}
+
+.result-summary a {
+    font-weight: normal;
+    margin-bottom: 0px;
+    text-decoration: underline;
+}
+
+.result-snippet {
+    margin-bottom: 6px;
+    margin-top: 0px;
+    font-size: .9em;
+}
+
+.structured span.label {
+    margin-right: 3px;
+}
+
+.structured span.data {
+    margin-right: 5px;
+}
+
+.result-snippet img {
+    float: right;
+    margin-left: 15px;
+    margin-top: -20px;
+}
+
+.result-url {
+    margin-top: 0px;
+    font-size: .9em
+}
+
+a {
+    color: #16c;
+}
+
+.pagination {
+    margin-top: 30px;
+}
+
+.highlight {
+    font-weight: bold;
+}
+
+.result {
+    margin-bottom: 15px;
+}
+
+[data-source="profiles"] .result-snippet {
+    min-height: 30px;
+}
+
+[data-source="jira"] {
+    border-left: 3px solid green; padding-left: 5px;
+}
+
+[data-source="stack_overflow"] {
+    border-left: 3px solid orange; padding-left: 5px;
+}
+
+[data-source="github"] {
+    border-left: 3px solid black; padding-left: 5px;
+}
+
+[data-source="docs"] {
+    border-left: 3px solid #6C513A; padding-left: 5px;
+}
+
+[data-source="google"] {
+    border-left: 3px solid #0000AA; padding-left: 5px;
+}
+
+[data-source="profiles"] {
+    border-left: 3px solid #f06d54; padding-left: 5px;
+}
+
+[data-source="confluence"] {
+    border-left: 3px solid #4444aa; padding-left: 5px;
+}
+
+/* Left sidebar on results.html */
+#source-list{
+    width: 225px;
+}
+
+#source-list a {
+    text-decoration: none;
+}
+
+#source-list ul {
+    margin-top: 10px;
+    list-style-type: none;
+}
+
+#source-list li a {
+    line-height: 12px;
+    margin-bottom: 2px;
+    margin-top: 3px;
+}
+
+.source{
+    margin-bottom: 15px;
+}
+
+.subsource_list{
+    margin-top: 5px;
+}
+
+.subsource{
+    font-size: .8em;
+    margin-left: 40px;
+    line-height: 1.6em;
+}
+
+.source_icon{
+    background-size:24px 24px;
+    background-repeat:no-repeat;
+    width:24px;
+    height:24px;
+    display:inline-block;
+    padding-right: 5px;
+}
+
+.google_groups_icon{
+    background-image:url('/static/img/icon-google.png');
+}
+
+.github_icon{
+    background-image:url('/static/img/icon-github.png');
+}
+
+.stack_overflow_icon{
+    background-image:url('/static/img/icon-stack-overflow.png');
+}
+
+.jira_icon{
+    background-image:url('/static/img/icon-jira.png');
+}
+
+.chat_icon{
+    background-image:url('/static/img/icon-chat.png');
+}
+
+.docs_icon{
+    background-image:url('/static/img/icon-docs.png');
+}
+
+.profiles_icon{
+    background-image:url('/static/img/icon-profiles.png');
+}
+
+.confluence_icon{
+    background-image:url('/static/img/icon-confluence.png');
+}
+
+.gh-commit-message{
+    font-weight:bold;
+}
+
+.gh-avatar{
+    width:32px;
+    height:32px;
+}

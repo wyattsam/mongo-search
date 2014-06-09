@@ -1,0 +1,19 @@
+{% extends "results/baseresult.html" %}
+
+{% block result %}
+    <div class="result-summary">
+        <a target="_blank" href="{{ result.url }}">
+            <strong>{{ result.id }}</strong>
+            {{ result.summary|truncate(125) }}
+        </a>
+    </div>
+    {%- if result.snippet %}
+        <p class="result-snippet">{{ result.snippet|truncate(350) }}</p>
+    {% endif %}
+    <p class="structured">
+    <p class="result-url">
+        <span class="text-muted">status:</span>&nbsp;<span class="gh-username">{{result.status}}</span>&nbsp;<span class="text-muted">comments:</span>&nbsp;<span>{{result.comments}}</span>
+        <br/>
+    </p>
+    </p>
+{% endblock %}

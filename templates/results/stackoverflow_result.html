@@ -1,0 +1,26 @@
+{% extends "results/baseresult.html" %}
+
+{% block result %}
+    <div class="reuslt-summary">
+        <a target="_blank" href="{{ result.url }}">
+            {{ result.summary|truncate(125) }}
+        </a>
+    </div>
+    {%- if result.snippet %}
+        <p class="result-snippet">{{ result.snippet|truncate(350) }}</p>
+    {% endif %}
+    <p class="structured">
+        <span class="label label-default">score</span>
+        <span class="data">{{result.score}}</span>
+        <span class="label label-default">answered</span>
+        <span class="data">
+            {% if result.answered %}
+            <span class="glyphicon glyphicon-ok"></span>
+            {% else %}
+            <span class="glyphicon glyphicon-remove"></span>
+            {% endif %}
+        </span>
+        <span class="label label-default">answers</span>
+        <span class="data">{{result.answers}}</span>
+    </p>
+{% endblock %}

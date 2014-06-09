@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="col-md-8 center">
+    <table class="table">
+        <tr>
+            <th>Scraper</th>
+            <th>Status</th>
+            <th>Last Successful Finish</th>
+        </tr>
+        {% for source, scrape in scrapes.items() %}
+            <tr>
+                <td class="text-left">{{ source }}</td>
+                <td class="text-left">
+                    {% if scrape.state == 'running' %}
+                        <span class="label label-info">
+                    {% elif scrape.state == 'complete' %}
+                        <span class="label label-success">
+                    {% elif scrape.state == 'error' %}
+                        <span class="label label-danger">
+                    {% endif %}
+                    {{ scrape.state }}</span>
+                </td>
+                <td class="text-left">
+                    {% if scrape.last_success %}
+                         {{ scrape.last_success.strftime('%m/%d/%Y %I:%M %p') }} UTC
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
