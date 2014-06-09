@@ -48,6 +48,7 @@ class BaseScraper(object):
                                         auth=self.auth, verify=False,
                                         headers=headers)
             except requests.exceptions.MissingSchema:
+                # TODO is this a reliable terminator?
                 return
             yield self._scrape(response.json(strict=False))
 
@@ -56,6 +57,12 @@ class BaseScraper(object):
            If the scraper has internal state, it should be
            updated here."""
         return doc
+
+    def setup(self):
+        """Front for _setup. Do not override."""
+        self.loading = True
+        self._setup()
+        self.loading = False
 
     def _setup(self):
         """Any additional setup that's required."""

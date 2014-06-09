@@ -4,6 +4,7 @@ import requests
 class DocsScraper(BaseScraper):
     def __init__(self, name, **kwargs):
         BaseScraper.__init__(self, name, **kwargs)
+        print "docs initializing as", name
         kinds = kwargs['kinds']
         self.apiurl = "http://docs.mongodb.org/"
         self.kinds = kinds
@@ -34,11 +35,6 @@ class DocsScraper(BaseScraper):
             self.finished = True
         return ret
 
-    def setup(self):
-        self.loading = True
-        self._setup()
-        self.loading = False
-
     def _setup(self):
         # TODO: can the self.loading stuff be taken care of with a decorator?
         for k in self.kinds:
@@ -48,4 +44,3 @@ class DocsScraper(BaseScraper):
         url = self.urlexts.pop(0)
         self.kind = url[0]
         self.apiurl = url[1]
-        self.info("finished setup")

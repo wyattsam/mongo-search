@@ -42,7 +42,6 @@ class StackOverflowScraper(BaseScraper):
             else:
                 self.params['page'] += 1
         else:
-            self.err("Received unexpected message %s" % doc)
             self.finished = True
 
         if 'backoff' in doc:
