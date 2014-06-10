@@ -280,16 +280,16 @@ def run_query(query, page, docfilter, limit):
 @line_profile
 def advanced_options(doc, args):
     basic_args = ['query', 'source', 'page', 'advanced', 'project', 'repo', 'space']
-    #aargs = [{k: args[k]} for k in args if k not in basic_args]
     aargs = []
     # TODO should use a generic visitor here
     for k in args:
         if k not in basic_args:
-            try:
-                v = int(args[k])
-                aargs.append({k: v})
-            except ValueError:
-                aargs.append({k: args[k]})
+            if args[k]:
+                try:
+                    v = int(args[k])
+                    aargs.append({k: v})
+                except ValueError:
+                    aargs.append({k: args[k]})
     for a in aargs:
         doc.update(dict(a))
     return doc
