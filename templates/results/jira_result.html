@@ -18,7 +18,7 @@
     {% if result.last_comment %}
     <p class="structured">
     <span class="text-muted">Last comment of {{ result.comments }} total:</span>&nbsp;<span class="gh-username">
-        <a href={{ "https://jira.mongodb.org/secure/ViewProfile.jspa?name="+result.last_comment.email }}>
+        <a href={{ "https://jira.mongodb.org/secure/ViewProfile.jspa?name="+result.last_comment.user }}>
             <img src={{ result.last_comment.avatar }} /> {{ result.last_comment.name }}
         </a> says...</span>
         <p class="result-snippet">{{ result.last_comment.body|truncate(100) }}</p>

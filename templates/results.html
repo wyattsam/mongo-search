@@ -1,15 +1,6 @@
 {% extends "base.html" %}
 {% block title %} - Results{% endblock %}
 {% block content %}
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('#advanced-search').hide();
-        $('#advanced-search-expand').click(function(e) {
-            $('#advanced-search').toggle();
-            e.preventDefault();
-        });
-    })
-</script>
 <form method="get" action="/search" id="search">
     <div class="input-group col-md-3">
         <input class="form-control" type="text" name="query" placeholder="Search" value="{{ query }}">
@@ -45,6 +36,9 @@
                     {% endif %}
                     <small><a id="advanced-search-expand"><br/>Advanced options</a></small>
                     <div class="well" id="advanced-search">
+                        {% from "_template_helpers.html" import advanced %}
+                        {% set sconfig = CONFIG[source] %}
+                        {{ advanced(source, sconfig, query) }}
                     </div>
                 {% endif %}
             </p>
@@ -78,6 +72,11 @@
 <script>
     $(document).ready(function() {
         $('.result-summary, .result-snippet').highlight( "{{ query }}" );
+        $('#advanced-search').hide();
+        $('#advanced-search-expand').click(function(e) {
+            $('#advanced-search').toggle();
+            e.preventDefault();
+        });
     });
 </script>
 {% endblock %}

@@ -133,11 +133,11 @@ def submit():
         return redirect('/')
 
     #run the counts separately using covered query
-    counts = covered_count(mq.query, mq.filter)
+    counts = covered_count(mq, mq.filter)
 
     page_limit = page * PAGE_SIZE
 
-    results = run_query(mq.query, page, mq.filter, page_limit)
+    results = run_query(mq, page, mq.filter, page_limit)
     pagination = helpers.Pagination(page, PAGE_SIZE, counts['filter_total'])
 
     return render_template(
@@ -228,7 +228,10 @@ def log_search(args):
 
 @line_profile
 def run_count_query(query, docfilter=None):
-    query_doc = {'$text': {'$search': query}}
+    query_doc = {'$text': {'$search': query.query}}
+
+    if 'advanced' in query.args and query.args['advanced']:
+        query_doc = advanced_options(query_doc, query.args)
 
     if docfilter:
         query_doc.update(docfilter)
@@ -246,9 +249,13 @@ def run_count_query(query, docfilter=None):
 @line_profile
 def run_query(query, page, docfilter, limit):
     # must use $orderby for sort until pymongo is updated
-    query_doc = {'$text': {'$search': query}}
+    query_doc = {'$text': {'$search': query.query}}
     query_doc.update(docfilter)
     sort_doc = {'text_score': {'$meta': 'textScore'}}
+
+    # perform advanced search
+    if 'advanced' in query.args and query.args['advanced']:
+        query_doc = advanced_options(query_doc, query.args)
 
     results = COMBINED.find(
         {
@@ -269,6 +276,23 @@ def run_query(query, page, docfilter, limit):
     start = (page - 1) * PAGE_SIZE
     end = page * PAGE_SIZE
     return transformed[start:end]
+
+@line_profile
+def advanced_options(doc, args):
+    basic_args = ['query', 'source', 'page', 'advanced', 'project', 'repo', 'space']
+    #aargs = [{k: args[k]} for k in args if k not in basic_args]
+    aargs = []
+    # TODO should use a generic visitor here
+    for k in args:
+        if k not in basic_args:
+            try:
+                v = int(args[k])
+                aargs.append({k: v})
+            except ValueError:
+                aargs.append({k: args[k]})
+    for a in aargs:
+        doc.update(dict(a))
+    return doc
 
 @line_profile
 def url_for_other_page(page):

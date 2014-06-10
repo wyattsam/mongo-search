@@ -46,3 +46,23 @@
     </li>
 -->
 {% endmacro %}
+
+{% macro advanced(source, sconfig, query) %}
+    <form method="get" action="/search" id="advanced-form">
+    <input type="hidden" name="query" value={{query}}>
+    <input type="hidden" name="source" value={{source}}>
+    <input type="hidden" name="advanced" value="1">
+    {% for item in sconfig['advanced'] %}
+        {% if item['type'] == 'text' %}
+            <input type="text" name={{item['field']}} placeholder={{item['name']}}>
+        {% elif item['type'] == 'dropdown' %}
+            <select name={{item['field']}}>
+            {% for opt in item['options'] %}
+                <option name={{opt}}>{{opt}}</option>
+            {% endfor %}
+            </select>
+        {% endif %}
+    {% endfor %}
+    <button type="submit" class="btn bts-default">Advanced search</button>
+    </form>
+{% endmacro %}

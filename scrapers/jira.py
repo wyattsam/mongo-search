@@ -19,7 +19,7 @@ class JiraScraper(BaseScraper):
 
     def _setup(self):
         projects = requests.get(url='https://jira.mongodb.org/rest/api/2/project/', auth=self.auth, verify=False).json(strict=False)
-        self.pkeys = [p['key'] for p in projects if p not in self.skip]
+        self.pkeys = [p['key'] for p in projects if p['key'] not in self.skip]
         self.project = self.pkeys.pop(0)
         self.params['jql'] = 'PROJECT={project} order by KEY asc'.format(project=self.project)
         self.info("Searching projects %s" % self.pkeys)
@@ -38,7 +38,6 @@ class JiraScraper(BaseScraper):
                 self.debug("'issues' was None in result document")
         else:
             self.info("'issues' was not present in result document")
-            self.finished = True
 
         if issues and len(issues) >= self.limit: # we got as many as we could; this means there are more issues
             self.params['startAt'] += len(issues)

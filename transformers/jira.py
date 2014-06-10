@@ -15,12 +15,12 @@ class JiraTransformer(BaseTransformer):
             author = com_list[num_comments[0]-1]['author']
             last_com_name = author['displayName']
             last_com_avatar = author['avatarUrls']['32x32'] 
-            last_com_email = author['emailAddress']
+            last_com_un = author['name']
             last_com_body = com_list[num_comments[0]-1]['body']
             last_comment = {
                 'name': last_com_name,
                 'avatar': last_com_avatar,
-                'email': last_com_email,
+                'user': last_com_un,
                 'body': last_com_body
             }
         else:
