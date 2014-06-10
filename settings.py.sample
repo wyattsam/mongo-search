@@ -1,0 +1,114 @@
+import scrapers
+import transformers
+
+CONFIG = {
+    'stackoverflow': {
+        'fullname': 'Stack Overflow',
+        'scraper': None,
+        'transformer': None,
+        'subsources': None,
+        'projector': { },
+        'tags': ['mongodb', 'replication', 'sharding', 'nosql']
+    },
+    'docs': {
+        'fullname': 'Documentation',
+        'scraper': None,
+        'transformer': None,
+        'subsources': {
+            'name': 'section',
+            'field': 'section'
+        },
+        'projector': {
+            '_id': 1,
+            'title': 1,
+            'text': 1,
+            'subsource': 1,
+            'section': 1,
+            'current_page_name': 1,
+            'meta': 1,
+            'url': 1,
+            'metatags': 1
+        },
+        'kinds': ['manual', 'ecosystem'],
+        'index': { } # TODO
+    },
+    'jira': {
+        'fullname': 'JIRA',
+        'scraper': scrapers.JiraScraper,
+        'transformer': transformers.JiraTransformer,
+        'subsources': {
+            'name': 'project',
+            'field': 'project'
+        },
+        'projector': {
+            '_id': 1,
+            'fields': 1,
+            'subsource': 1,
+            'id': 1
+        },
+        'view': 'results/jira_result.html',
+        'advanced': [
+            {
+                'name': 'Status',
+                'field': 'fields.status',
+                'type': 'dropdown',
+                'options': ['Open', 'Resolved', 'Closed']
+            },
+            {
+                'name': 'Total Comments',
+                'field': 'fields.comment.total',
+                'type': 'text'
+            }
+        ],
+        'auth': {
+            'user': '',
+            'password': ''
+        },
+        'skip': ['FREE', 'CS', 'XGEN', 'SERVER'],
+    },
+    'github': {
+        'fullname': 'GitHub',
+        'scraper': None,
+        'transformer': None,
+        'subsources': {
+            'name': 'repo',
+            'field': 'repo.name'
+        },
+        'projector': { },
+        'view': 'results/github_result.html'
+    },
+    'googlegroups': {
+        'fullname': 'Google Groups',
+        'scraper': None,
+        'transformer': None,
+        'subsources': None,
+        'projector': { }
+    },
+    'profiles': {
+        'fullname': 'Profiles',
+        'scraper': None,
+        'transformer': None,
+        'subsources': None,
+        'projector': { }
+    },
+    'chat': {
+        'fullname': 'MongoDB Chat',
+        'scraper': None,
+        'transformer': None,
+        'subsources': None,
+        'projector': { }
+    },
+    'confluence': {
+        'fullname': 'Confluence',
+        'scraper': None,
+        'transformer': None,
+        'subsources': {
+            'name': 'space',
+            'field': 'space'
+        },
+        'projector': { }
+    },
+    '_loglevel': 10
+}
+
+SEARCH = {'credentials': {'user': None, 'password': None}}
