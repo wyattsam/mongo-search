@@ -13,9 +13,8 @@ class ScrapeRunner(object):
         self.combined = self.db.combined
         self.cfg = cfg
 
-        scps = [k for k in self.cfg.keys() if k[0] != '_']
-        scraper_classes = [self.cfg[c]['cls'] for c in scps]
-        self.scrapers = [f(n, **cfg[n]) for (f, n) in zip(scraper_classes, scps) if self.cfg[n]['cls']]
+        cfgs = [k for k in self.cfg.keys() if k[0] != '_']
+        self.scrapers = self.cfg_instantiate('scraper', cfgs)
 
         for s in self.scrapers:
             if s.needs_setup:
@@ -31,11 +30,19 @@ class ScrapeRunner(object):
         self.logger.addHandler(so)
         self.logger.setLevel(cfg['_loglevel'])
 
+    def cfg_instantiate(self, typ, cfgs):
+        clss = [self.cfg[c][typ] for c in cfgs]
+        return [f(n, **self.cfg[n]) for (f, n) in zip(clss, cfgs) if self.cfg[n][typ]]
+
     def save(self, document, srcname):
         document['source'] = srcname
         _id = document['_id']
         return self.combined.update(dict(_id=_id), document, True)
 
+    def do_save(self, document, srcname):
+        oid = self.save(self.join(document, self.cfg[srcname]['projector']), srcname)
+        self.logger.info("scraper '%s' saved oid %s" % (srcname, document['_id']))
+        
     def join(self, doc, proj):
         ret = {}
         # if no projector is available, just return everything
@@ -56,15 +63,13 @@ class ScrapeRunner(object):
                     if isinstance(d, types.GeneratorType): # FIXME bad news...
                         for d1 in d:
                             try:
-                                oid = self.save(self.join(d1, self.cfg[s.name]['projector']), s.name)
-                                self.logger.info("scraper '%s' saved oid %s" % (s.name, d1['_id']))
+                                self.do_save(d1, s.name)
                             except KeyError as e:
                                 self.logger.error("documents exception:" + str(e))
                                 continue
                     else:
                         try:
-                            oid = self.save(self.join(d, self.cfg[s.name]['projector']), s.name)
-                            self.logger.info("scraper '%s' saved oid %s" % (s.name, d['_id']))
+                            self.do_save(d, s.name)
                         except KeyError as e:
                             self.logger.error("documents exception:" + str(e))
                             continue

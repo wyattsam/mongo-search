@@ -24,13 +24,9 @@
         <div class="col-md-3">
             <div class="list-group" id="source-list">
                 {% from "_template_helpers.html" import source_selector %}
-                {{ source_selector("jira", "JIRA", counts, source, query, sub_source) }}
-                {{ source_selector("google_groups", "Google Groups", counts, source, query, sub_source) }}
-                {{ source_selector("stack_overflow", "Stack Overflow", counts, source, query, sub_source) }}
-                {{ source_selector("github", "GitHub", counts, source, query, sub_source) }}
-                {{ source_selector("profiles", "Profiles", counts, source, query, sub_source) }}
-                {{ source_selector("docs", "Docs", counts, source, query, sub_source) }}
-                {{ source_selector("confluence", "Confluence", counts, source, query, sub_source) }}
+                {% for src in SOURCES %}
+                    {{ source_selector(src, CONFIG[src]['fullname'], counts, source, query, sub_source) }}
+                {% endfor %}
             </div>
         </div>
         <div class="col-md-offset-4" id="result-set">
@@ -43,7 +39,7 @@
                 {% endif %}
                 results for <strong>{{query}}</strong>
                 {% if source %}
-                    in <span class="source-search">{{SOURCES[source]}}</span>
+                    in <span class="source-search">{{ CONFIG[source]['fullname'] }}</span>
                     {% if sub_source %}
                         ({{ sub_source }})
                     {% endif %}
@@ -54,24 +50,8 @@
             </p>
 
             {% for result in results %}
-                {#{result}#}
-                {% if result.source == 'jira' %}
-                    {% include "results/jira_result.html" %}
-                {% elif result.source == 'github' %}
-                    {% include "results/github_result.html" %}
-                {% elif result.source == 'stack_overflow' %}
-                    {% include "results/stackoverflow_result.html" %}
-                {% elif result.source == 'google' %}
-                    {% include "results/google_result.html" %}
-                {% elif result.source == 'chat' %}
-                    {% include "results/chat_result.html" %}
-                {% elif result.source == 'docs' %}
-                    {% include "results/docs_result.html" %}
-                {% elif result.source == 'profiles' %}
-                    {% include "results/profiles_result.html" %}
-                {% elif result.source == 'confluence' %}
-                    {% include "results/confluence_result.html" %}
-                {% endif %}
+                {% set template = CONFIG[result.source]['view'] %}
+                {% include template %}
             {% endfor %}
 
             <div class="center">

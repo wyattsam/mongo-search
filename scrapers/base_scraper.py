@@ -2,6 +2,7 @@ import requests
 import logging
 import itertools
 import sys
+import ssl
 
 class BaseScraper(object):
     def __init__(self, name, **kwargs):
@@ -46,10 +47,18 @@ class BaseScraper(object):
             try:
                 response = requests.get(self.apiurl, params=self.params, 
                                         auth=self.auth, verify=False,
-                                        headers=headers)
+                                        headers=headers,
+                                        timeout=60)
             except requests.exceptions.MissingSchema:
                 # TODO is this a reliable terminator?
                 return
+            # timeouts :(
+            except requests.exceptions.SSLError:
+                self.warn("Experienced requests.exceptions.SSLError timeout; continuing")
+                continue
+            except ssl.SSLError:
+                self.warn("Experienced ssl.SSLError timeout; continuing")
+                continue
             yield self._scrape(response.json(strict=False))
 
     def _scrape(self, doc):

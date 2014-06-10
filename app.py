@@ -2,7 +2,6 @@ from flask import Flask, request, render_template, url_for, redirect
 from pymongo import MongoClient
 from datetime import datetime
 from query_parse import MongoQuery
-from sources import SOURCES, SUBSOURCES
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_debugtoolbar_lineprofilerpanel.profile import line_profile
 import helpers
@@ -28,9 +27,13 @@ COMBINED = DB['combined']
 SEARCHES = DB['searches']
 SCRAPES = DB['scrapes']
 
+SOURCES = [k for k in settings.CONFIG.keys() if k[0] != '_']
+SUBSOURCES = dict([(n, settings.CONFIG[n]['subsources']) for n in SOURCES])
+
 # App Settings
 PAGE_SIZE = 10
 
+"""
 RESULT_PROJECTION = {
     # Common
     'text_score': {'$meta': 'textScore'},
@@ -91,7 +94,16 @@ RESULT_PROJECTION = {
     # Docs
     'section': 1,
 }
+"""
 
+RESULT_PROJECTION = {
+    'text_score': {'$meta': 'textScore'},
+    'source': 1,
+    'subsource': 1
+}
+
+for s in SOURCES:
+    RESULT_PROJECTION.update(settings.CONFIG[s]['projector'])
 #-----------------------------------------------------------------------------
 # App Config
 #-----------------------------------------------------------------------------
@@ -247,11 +259,16 @@ def run_query(query, page, docfilter, limit):
         fields=RESULT_PROJECTION
     )
 
-    massaged = helpers.massage_results(results)
+    transformed = []
+    for result in results:
+        source = result['source']
+        if settings.CONFIG[source]['transformer']:
+            transformer = settings.CONFIG[source]['transformer']()
+            transformed.append(transformer.transform(result))
 
     start = (page - 1) * PAGE_SIZE
     end = page * PAGE_SIZE
-    return massaged[start:end]
+    return transformed[start:end]
 
 @line_profile
 def url_for_other_page(page):
@@ -262,6 +279,7 @@ def url_for_other_page(page):
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 app.jinja_env.globals['SOURCES'] = SOURCES
 app.jinja_env.globals['SUBSOURCES'] = SUBSOURCES
+app.jinja_env.globals['CONFIG'] = settings.CONFIG
 
 
 #-----------------------------------------------------------------------------

@@ -9,9 +9,10 @@ class JiraScraper(BaseScraper):
         self.apiurl = 'https://jira.mongodb.org/rest/api/2/search/'
         self.pkeys = []
         self.needs_setup = True
+        self.limit = 100
         self.params = {
             'startAt': 0,
-            'maxResults': 100,
+            'maxResults': self.limit,
             'fields': 'key,summary,description,comment,status'
         }
         self.project = ""
@@ -35,16 +36,17 @@ class JiraScraper(BaseScraper):
                     yield issue
             else:
                 self.debug("'issues' was None in result document")
-                self.finished = True
         else:
-            self.debug("'issues' was not present in result document")
+            self.info("'issues' was not present in result document")
             self.finished = True
-        self.params['startAt'] += len(issues)
-        sleep(1)
 
-        if len(self.pkeys) == 0:
-            self.debug("no more projects to scrape")
-            self.finished = True
-        else:
-            self.project = self.pkeys.pop(0)
-            self.params['jql'] = 'PROJECT={project} order by KEY asc'.format(project=self.project)
+        if issues and len(issues) >= self.limit: # we got as many as we could; this means there are more issues
+            self.params['startAt'] += len(issues)
+            sleep(1)
+        else: # we exhausted this project, time to move on
+            if len(self.pkeys) == 0:
+                self.debug("no more projects to scrape")
+                self.finished = True
+            else:
+                self.project = self.pkeys.pop(0)
+                self.params['jql'] = 'PROJECT={project} order by KEY asc'.format(project=self.project)
