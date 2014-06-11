@@ -9,7 +9,7 @@
                 ({{ result.status }})
             {% endif %}
             <strong>{{ result.id }}</strong>
-            {{ result.summary|truncate(125) }}
+            {{ result.title|truncate(125) }}
         </a>
     </div>
     {%- if result.snippet %}

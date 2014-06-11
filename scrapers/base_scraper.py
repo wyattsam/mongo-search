@@ -15,7 +15,7 @@ class BaseScraper(object):
         so.setFormatter(
             logging.Formatter('[%(levelname)s] %(asctime)s %(name)s: %(message)s'))
         self.log.addHandler(so)
-        self.log.setLevel(logging.INFO)
+        self.log.setLevel(kwargs['_loglevel'])
 
         self.params = {}
 

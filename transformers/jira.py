@@ -30,7 +30,7 @@ class JiraTransformer(BaseTransformer):
             'status': obj.get('fields', {}).get('status', None),
             'comments': num_comments[0],
             'url': self.baseurl + obj['_id'],
-            'summary': obj['fields'].get('summary', ''),
+            'title': obj['fields'].get('summary', ''),
             'snippet': obj['fields'].get('description', '')
         })
         if last_comment:
