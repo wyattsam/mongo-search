@@ -4,8 +4,8 @@ from datetime import datetime
 from query_parse import MongoQuery
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_debugtoolbar_lineprofilerpanel.profile import line_profile
-import helpers
-import settings
+import util.helpers as helpers
+import config.duckduckmongo as settings
 
 CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
 

@@ -1,5 +1,5 @@
 notes/*
-settings.py
+config/duckduckmongo.py
 *.pyc
 *.swp
 *.o

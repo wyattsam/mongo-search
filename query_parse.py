@@ -1,8 +1,10 @@
 import pyparsing
 import operator
-from sources import SOURCES, SUBSOURCES
+import config.duckduckmongo as settings
 from pyparsing import Literal, CaselessKeyword, Word, \
     Suppress, ZeroOrMore, Optional, Each
+
+SUBSOURCES = [settings.CONFIG[k]['subsources'] for k in settings.CONFIG.keys() if k[0] != '_']
 
 class MongoQuery(object):
 
