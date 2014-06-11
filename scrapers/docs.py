@@ -4,7 +4,6 @@ import requests
 class DocsScraper(BaseScraper):
     def __init__(self, name, **kwargs):
         BaseScraper.__init__(self, name, **kwargs)
-        print "docs initializing as", name
         kinds = kwargs['kinds']
         self.apiurl = "http://docs.mongodb.org/"
         self.kinds = kinds
