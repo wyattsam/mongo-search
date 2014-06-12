@@ -1,0 +1,3 @@
+import pyparsing
+
+class AdvancedQuery

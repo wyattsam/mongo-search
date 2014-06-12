@@ -15,7 +15,7 @@ class MongoQuery(object):
             Suppress(":") + Word(pyparsing.alphanums).setResultsName('source')
 
         subsource_selector = reduce(
-            operator.or_, (CaselessKeyword(x['name']) for x in SUBSOURCES.values() if x)
+            operator.or_, (CaselessKeyword(x['name']) for x in SUBSOURCES if x)
         ) + Suppress(":") + Word(pyparsing.alphanums).setResultsName('subsource')
 
         query_parser = Optional(
@@ -39,7 +39,7 @@ class MongoQuery(object):
     def sub_source(self):
         arg_sub = None
 
-        for sub_source in (x['name'] for x in SUBSOURCES.values() if x):
+        for sub_source in (x['name'] for x in SUBSOURCES if x):
             if sub_source in self.args:
                 arg_sub = self.args[sub_source]
 

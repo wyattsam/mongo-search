@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, url_for, redirect
 from pymongo import MongoClient
 from datetime import datetime
 from query_parse import MongoQuery
+from query.query_parse import BasicQuery, BasicQueryVisitor
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_debugtoolbar_lineprofilerpanel.profile import line_profile
 import util.helpers as helpers
@@ -133,20 +134,35 @@ def submit():
         return redirect('/')
 
     #run the counts separately using covered query
-    counts = covered_count(mq, mq.filter)
+    visitor = BasicQueryVisitor(mq)
+    query_json = visitor.visit()
+    counts = covered_count(query_json, args)
 
     page_limit = page * PAGE_SIZE
 
-    results = run_query(mq, page, mq.filter, page_limit)
+    results = run_query(query_json, args, page, page_limit)
     pagination = helpers.Pagination(page, PAGE_SIZE, counts['filter_total'])
+
+    source = None
+    subsource = None
+
+    if 'source' in mq.aggs:
+        source = mq.aggs.source[0]
+    elif 'source' in args:
+        source = args['source']
+
+    if 'subsource' in mq.aggs:
+        subsource = mq.aggs.subsource
+    elif 'subsource' in args:
+        subsource = args['subsource']
 
     return render_template(
         'results.html',
         results=results,
         counts=counts,
-        source=mq.source,
-        sub_source=mq.sub_source,
-        query=mq.query,
+        source=source,
+        sub_source=subsource,
+        query=mq.terms,
         pagination=pagination
     )
 
@@ -189,19 +205,20 @@ def get_scrapes():
 @line_profile
 def parse_args(args):
     page = int(args.get('page', 1))
-    return MongoQuery(args), page
+    #return MongoQuery(args), page
+    return BasicQuery(args, settings.CONFIG), page
 
 
 @line_profile
-def covered_count(query, source_filter):
-    covered_results = run_count_query(query)
+def covered_count(query_doc, args):
+    covered_results = run_count_query(query_doc, args)
     counts = helpers.get_counts(covered_results)
 
-    if 'subsource' in source_filter:
-        subsource_name = SUBSOURCES[source_filter['source']]['name']
-        counts['filter_total'] = counts[subsource_name][source_filter['subsource']]
-    elif 'source' in source_filter:
-        counts['filter_total'] = counts['source'][source_filter['source']]
+    if 'subsource' in query_doc:
+        subsource_name = SUBSOURCES[query_doc['source']]['name']
+        counts['filter_total'] = counts[subsource_name][query_doc['subsource']]
+    elif 'source' in query_doc:
+        counts['filter_total'] = counts['source'][query_doc['source']]
     else:
         counts['filter_total'] = counts['total']
 
@@ -227,17 +244,16 @@ def log_search(args):
     SEARCHES.insert(search, w=0)
 
 @line_profile
-def run_count_query(query, docfilter=None):
-    query_doc = {'$text': {'$search': query.query}}
-
-    if 'advanced' in query.args and query.args['advanced']:
-        query_doc = advanced_options(query_doc, query.args)
-
-    if docfilter:
-        query_doc.update(docfilter)
+def run_count_query(query_doc, args):
+    if 'advanced' in args and args['advanced']:
+        query_doc = advanced_options(query_doc, args)
+    q = {}
+    for k,v in query_doc.iteritems():
+        if k not in ['source', 'subsource']:
+            q[k] = v
 
     return COMBINED.aggregate([
-        {'$match': query_doc},
+        {'$match': q},
         {'$group':
             {
                 '_id': {'source': '$source', 'subsource': '$subsource'},
@@ -247,15 +263,18 @@ def run_count_query(query, docfilter=None):
     ])['result']
 
 @line_profile
-def run_query(query, page, docfilter, limit):
+def run_query(query_doc, args, page, limit):
     # must use $orderby for sort until pymongo is updated
-    query_doc = {'$text': {'$search': query.query}}
-    query_doc.update(docfilter)
+    #query_doc = {'$text': {'$search': query.query}}
+    #query_doc.update(docfilter)
     sort_doc = {'text_score': {'$meta': 'textScore'}}
 
     # perform advanced search
-    if 'advanced' in query.args and query.args['advanced']:
-        query_doc = advanced_options(query_doc, query.args)
+    if 'advanced' in args and args['advanced']:
+        query_doc = advanced_options(query_doc, args)
+
+    print args
+    print query_doc
 
     results = COMBINED.find(
         {
