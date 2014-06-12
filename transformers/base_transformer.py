@@ -10,5 +10,5 @@ class BaseTransformer(object):
            """
         return {
             'source': obj['source'],
-            'subsource': obj['subsource']
+            'subsource': obj['subsource'] if 'subsource' in obj else None
         }
