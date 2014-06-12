@@ -12,7 +12,7 @@ class DocsScraper(BaseScraper):
 
         self.needs_setup = True
 
-    def _scrape(self, doc):
+    def _scrape(self, doc, links=None):
         ret = None
         if 'text' in doc:
             pname = doc['current_page_name']
@@ -32,7 +32,7 @@ class DocsScraper(BaseScraper):
             self.apiurl = url[1]
         else:
             self.finished = True
-        return ret
+        yield ret
 
     def _setup(self):
         # TODO: can the self.loading stuff be taken care of with a decorator?

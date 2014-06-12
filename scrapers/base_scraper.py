@@ -24,15 +24,23 @@ class BaseScraper(object):
 
         if 'auth' in kwargs:
             auth = kwargs['auth']
-            user = auth['user']
-            password = auth['password']
-            if user and password:
-                if 'digest' in kwargs and kwargs['digest']:
-                    self.auth = requests.HTTPDigestAuth(user, password)
-                else:
-                    self.auth = (user, password)
+            if 'user' in auth and 'password' in auth:
+                self._auth(auth, 'user', 'password', kwargs)
+            elif 'client_id' in auth and 'client_secret' in auth:
+                self._auth(auth, 'client_id', 'client_secret', kwargs)
             else:
                 self.auth = None
+        else:
+            self.auth = None
+            
+    def _auth(self, auth, un, pw, kwargs):
+        user = auth[un]
+        password = auth[pw]
+        if user and password:
+            if 'digest' in kwargs and kwargs['digest']:
+                self.auth = requests.auth.HTTPDigestAuth(user, password)
+            else:
+                self.auth = (user, password)
         else:
             self.auth = None
 
@@ -59,9 +67,10 @@ class BaseScraper(object):
             except ssl.SSLError:
                 self.warn("Experienced ssl.SSLError timeout; continuing")
                 continue
-            yield self._scrape(response.json(strict=False))
+            json = response.json(strict=False)
+            yield self._scrape(json, response.links)
 
-    def _scrape(self, doc):
+    def _scrape(self, doc, links=None):
         """Transform a response document into the desired form.
            If the scraper has internal state, it should be
            updated here."""

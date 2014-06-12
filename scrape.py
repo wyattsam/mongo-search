@@ -103,14 +103,15 @@ class ScrapeRunner(object):
         self.logger.info("running scraper: %s" % s.name)
         self.log_scrape_start(s)
         for d in s.documents():
-            if isinstance(d, types.GeneratorType): # FIXME bad news...
-                for d1 in d:
-                    try:
-                        self.save(d1, s.name)
-                    except Exception as e:
-                        self.logger.error("documents exception: " + str(e))
-                        self.log_scrape_error(e)
-                        return
+            #if isinstance(d, types.GeneratorType): # FIXME bad news...
+            for d1 in d:
+                try:
+                    self.save(d1, s.name)
+                except Exception as e:
+                    self.logger.error("documents exception: " + str(e))
+                    self.log_scrape_error(e)
+                    return
+            """
             else:
                 try:
                     self.save(d, s.name)
@@ -118,6 +119,7 @@ class ScrapeRunner(object):
                     self.log_scrape_error(e)
                     self.logger.error("documents exception: " + str(e))
                     return
+            """
         self.log_scrape_finish(s)
 
     def runall(self):

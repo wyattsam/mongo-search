@@ -18,15 +18,14 @@ class StackOverflowScraper(BaseScraper):
             }
         # TODO I think I messed up the credentials thing maybe
 
-    def _scrape(self, doc):
+    def _scrape(self, doc, links=None):
         self.info('[%s] page %s' % (self.params['tagged'], self.params['page']))
         items = doc.get('items', [])
-        accum = [] # FIXME this method should generate instead!!!
         if items:
             for item in items:
                 key = self.name + "-" + str(item['question_id'])
                 item['_id'] = key
-                accum.append(item)
+                yield item
 
             # this tag is empty
             if not doc['has_more']:
@@ -48,4 +47,3 @@ class StackOverflowScraper(BaseScraper):
             backoff = doc['backoff']
             self.warn('backing off from stackoverflow for %s seconds' % backoff)
             sleep(backoff)
-        return accum
