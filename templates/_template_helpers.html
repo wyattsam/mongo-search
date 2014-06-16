@@ -48,26 +48,38 @@
 {% endmacro %}
 
 {% macro advanced(source, sconfig, query) %}
-    <form method="get" action="/search" id="advanced-form">
+    <form method="get" action="/search" class="form-horizontal" id="advanced-form">
     <input type="hidden" name="query" value={{query}}>
     <input type="hidden" name="source" value={{source}}>
     <input type="hidden" name="advanced" value="1">
     {% for item in sconfig['advanced'] %}
+        <div class="form-group">
+        <label class="control-label col-sm-2">{{item['name']}}</label>
         {% if item['type'] == 'text' %}
-            <div class="form-group">
-                <label>{{item['name']}}</label>
+            <div class="col-sm-10">
                 <input type="text" name={{item['field']}} class="form-control">
             </div>
         {% elif item['type'] == 'dropdown' %}
-            <div class="form-group">
-                <label>{{item['name']}}</label>
-                <select name={{item['field']}} class="form-control">
+            <div class="col-sm-10">
+            <select name={{item['field']}} class="form-control">
                 {% for opt in item['options'] %}
                     <option name={{opt}}>{{opt}}</option>
                 {% endfor %}
                 </select>
             </div>
+        {% elif item['type'] == 'radio' %}
+            <div class="col-sm-10">
+                {% for name, val in item['options'] %}
+                <div class="radio radio-inline">
+                    <label>
+                        <input type="radio" name={{item['field']}} value={{val}}>
+                        {{name}}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
         {% endif %}
+        </div>
     {% endfor %}
     <button type="submit" class="btn bts-default">Advanced search</button>
     </form>

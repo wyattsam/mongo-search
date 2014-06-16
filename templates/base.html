@@ -14,8 +14,8 @@
         <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
         <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" rel="stylesheet">
         -->
-        <link href="/static/css/mongostrap.css" rel="stylesheet">
-        <link href="/static/css/mongostrap-theme.css" rel="stylesheet">
+        <link href="/static/css/mongostrap.min.css" rel="stylesheet">
+        <!--<link href="/static/css/mongostrap-theme.css" rel="stylesheet">-->
         <link href="/static/style.css" rel="stylesheet">
 
         <!-- SUPPORT FOR IE6-8 OF HTML5 ELEMENTS -->
@@ -26,6 +26,7 @@
         <link rel="shortcut icon" href="{{ url_for('static', filename='ico/favicon.ico') }}">
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script src="/static/js/mongostrap.min.js"></script>
         <script src="/static/jquery.highlight-4.js"></script>
         {% endblock %}
     </head>
@@ -33,15 +34,11 @@
     <body>
 
         {% block navbar %}
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <div class="container">
                 <a class="navbar-brand" href="/">Mongo Search</a>
-                <div class="nav-collapse">
-                    <ul class="nav navbar-right">
-                    {% block navbar_right %}
-                    {% endblock %}
-                    </ul>
-                </div><!--/.nav-collapse -->
+                {% block navbar_right %}
+                {% endblock %}
             </div>
         </div>
         {% endblock %}
@@ -63,7 +60,6 @@
         <!--
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
         -->
-        <script src="/static/dist/js/mongostrap.js"></script>
         {% endblock %}
     </body>
 </html>
