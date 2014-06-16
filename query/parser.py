@@ -17,8 +17,10 @@ class Query(Node):
         #if we have a source/subsource option from the U:, use that
         if 'source' in vis.query.args and vis.query.args['source']:
             vis.doc['source'] = vis.query.args['source']
-            if 'subsource' in vis.query.args and vis.query.args['subsource']:
-                vis.doc['subsource'] = vis.query.args['subsource']
+            ss = vis.query.subsources
+            for k in vis.query.subsources.keys():
+                if ss[k] and ss[k]['name'] in vis.query.args and vis.query.args[ss[k]['name']]:
+                    vis.doc['subsource'] = vis.query.args[ss[k]['field']]
 
         for s in self.selectors:
             s.accept(vis)
@@ -167,7 +169,8 @@ class QueryParseException(Exception):
 
 ### Parsing
 class BasicQuery(object):
-    def __init__(self, args):
+    def __init__(self, args, ss):
+        self.subsources = ss
         self.args = args.to_dict()
         self._selectors = ['source']
 
@@ -271,7 +274,7 @@ class BasicQuery(object):
     ## Properties
     @property
     def terms(self):
-        return " ".join([str(s) for s in self.ast.terms])
+        return " ".join([str(s) for s in self.ast.terms]).strip()
 
     @property
     def selectors(self):
@@ -279,7 +282,7 @@ class BasicQuery(object):
 
     @property
     def constraints(self):
-        return " ".join([str(s) for s in self.ast.selectors])
+        return " ".join([str(s) for s in self.ast.selectors]).strip()
 
     @property
     def has_more(self):

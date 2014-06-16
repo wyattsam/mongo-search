@@ -133,10 +133,12 @@ def submit():
         return redirect('/')
 
     #run the counts separately using covered query
+    print args
     visitor = BasicQueryVisitor(mq)
     query_json = visitor.visit_all()
     if 'advanced' in args and args['advanced']:
         query_json = advanced_options(query_json, mq.args)
+    print query_json
     counts = covered_count(query_json, mq.args)
 
     page_limit = page * PAGE_SIZE
@@ -193,7 +195,7 @@ def get_scrapes():
 @line_profile
 def parse_args(args):
     page = int(args.get('page', 1))
-    return BasicQuery(args), page
+    return BasicQuery(args, SUBSOURCES), page
 
 
 @line_profile
@@ -232,8 +234,9 @@ def log_search(args):
 
 @line_profile
 def run_count_query(query_doc, args):
+    q = dict([(k,v) for (k,v) in query_doc.iteritems() if k != 'source' and k != 'subsource'])
     return COMBINED.aggregate([
-        {'$match': query_doc},
+        {'$match': q},
         {'$group':
             {
                 '_id': {'source': '$source', 'subsource': '$subsource'},
