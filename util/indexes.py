@@ -1,4 +1,3 @@
-import settings
 from pymongo import MongoClient
 
 #-----------------------------------------------------------------------------
@@ -9,7 +8,7 @@ CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
 
 # Setup database
 DB = CONNECTION['duckduckmongo']
-
+"""
 CREDENTIALS = settings.SEARCH['credentials']
 USER = CREDENTIALS['user']
 PASSWORD = CREDENTIALS['password']
@@ -17,7 +16,7 @@ PASSWORD = CREDENTIALS['password']
 # Login if credentials provided
 if USER and PASSWORD:
     DB.authenticate(USER, PASSWORD)
-
+"""
 # Setup collections
 COMBINED = DB['combined']
 
@@ -59,7 +58,7 @@ COMBINED.ensure_index([
 
     # Google Groups
     ('subject', 'text'),
-],
+    ],
     name='search_index',
     weights= {
         'title': 150,
@@ -73,4 +72,11 @@ COMBINED.ensure_index([
         'crowd_id': 500,
         'subject': 100
     }
+)
+
+COMBINED.ensure_index([
+    ('source', 1),
+    ('subsource', 1)
+    ],
+    name='source_index'
 )
