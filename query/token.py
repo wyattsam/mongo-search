@@ -1,5 +1,5 @@
 
-TK_SPECIAL = ['"', '&', '$']
+TK_SPECIAL = ['"', '&', '$', ':', '/']
 WHITESPACE = [' ', '\n', '\r', '\t', '\f'] # nevar 4get
 
 class Token(object):
@@ -27,7 +27,9 @@ class Tokenizer(object):
     def _get_type(self, ch):
         m = {'"': 'QUOTE',
              '&': 'AMP',
-             '$': 'DOLLAR'
+             '$': 'DOLLAR',
+             '/': 'SLASH',
+             ':': 'COLON'
              }
         return m[ch]
 
@@ -60,6 +62,8 @@ class Tokenizer(object):
                 return
         else:
             yield self._token("IDENT")
+        # terminate
+        yield Token("EOF", "EOF")
 
 if __name__ == "__main__":
     import sys

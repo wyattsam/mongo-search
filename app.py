@@ -1,8 +1,7 @@
 from flask import Flask, request, render_template, url_for, redirect
 from pymongo import MongoClient
 from datetime import datetime
-from query_parse import MongoQuery
-from query.query_parse import BasicQuery, BasicQueryVisitor
+from query.parser import BasicQuery, BasicQueryVisitor
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_debugtoolbar_lineprofilerpanel.profile import line_profile
 import util.helpers as helpers
@@ -135,34 +134,23 @@ def submit():
 
     #run the counts separately using covered query
     visitor = BasicQueryVisitor(mq)
-    query_json = visitor.visit()
-    counts = covered_count(query_json, args)
+    query_json = visitor.visit_all()
+    if 'advanced' in args and args['advanced']:
+        query_json = advanced_options(query_json, mq.args)
+    counts = covered_count(query_json, mq.args)
 
     page_limit = page * PAGE_SIZE
 
-    results = run_query(query_json, args, page, page_limit)
+    results = run_query(query_json, mq.args, page, page_limit)
     pagination = helpers.Pagination(page, PAGE_SIZE, counts['filter_total'])
-
-    source = None
-    subsource = None
-
-    if 'source' in mq.aggs:
-        source = mq.aggs.source[0]
-    elif 'source' in args:
-        source = args['source']
-
-    if 'subsource' in mq.aggs:
-        subsource = mq.aggs.subsource
-    elif 'subsource' in args:
-        subsource = args['subsource']
 
     return render_template(
         'results.html',
         results=results,
         counts=counts,
-        source=source,
-        sub_source=subsource,
-        query=mq.terms,
+        source=mq.args.get('source', ''),
+        sub_source=mq.args.get('subsource', ''),
+        query=mq,
         pagination=pagination
     )
 
@@ -205,8 +193,7 @@ def get_scrapes():
 @line_profile
 def parse_args(args):
     page = int(args.get('page', 1))
-    #return MongoQuery(args), page
-    return BasicQuery(args, settings.CONFIG), page
+    return BasicQuery(args), page
 
 
 @line_profile
@@ -245,15 +232,8 @@ def log_search(args):
 
 @line_profile
 def run_count_query(query_doc, args):
-    if 'advanced' in args and args['advanced']:
-        query_doc = advanced_options(query_doc, args)
-    q = {}
-    for k,v in query_doc.iteritems():
-        if k not in ['source', 'subsource']:
-            q[k] = v
-
     return COMBINED.aggregate([
-        {'$match': q},
+        {'$match': query_doc},
         {'$group':
             {
                 '_id': {'source': '$source', 'subsource': '$subsource'},
@@ -268,13 +248,6 @@ def run_query(query_doc, args, page, limit):
     #query_doc = {'$text': {'$search': query.query}}
     #query_doc.update(docfilter)
     sort_doc = {'text_score': {'$meta': 'textScore'}}
-
-    # perform advanced search
-    if 'advanced' in args and args['advanced']:
-        query_doc = advanced_options(query_doc, args)
-
-    print args
-    print query_doc
 
     results = COMBINED.find(
         {
@@ -308,9 +281,14 @@ def advanced_options(doc, args):
                     v = int(args[k])
                     aargs.append({k: v})
                 except ValueError:
-                    aargs.append({k: args[k]})
+                    v = args[k]
+                    if args[k] == 'true':
+                        v = True
+                    if args[k] == 'false':
+                        v = False
+                    aargs.append({k: v})
     for a in aargs:
-        doc.update(dict(a))
+        doc.update(a)
     return doc
 
 @line_profile
