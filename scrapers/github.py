@@ -19,6 +19,7 @@ class GithubScraper(BaseScraper):
             self.params.update(**params)
         else:
             self.params = params
+        self.auth = None
 
     def _setup(self):
         url = self.orgurl + self.org + "/repos"
