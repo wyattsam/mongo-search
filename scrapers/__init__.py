@@ -4,3 +4,5 @@ from jira import JiraScraper
 from profiles import ProfilesScraper
 from github import GithubScraper
 from generic_scraper import GenericScraper
+from confluence import ConfluenceScraper
+from imap import IMAPScraper

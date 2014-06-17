@@ -6,7 +6,7 @@
         {{ result.title|truncate(125) }}
     </a>
 </div>
-{%- if result.body %}
-    <p class="result-snippet">{{ result.body|truncate(350) }}</p>
+{%- if result.snippet %}
+    <p class="result-snippet">{{ result.snippet|truncate(350) }}</p>
 {% endif %}
 {% endblock %}
