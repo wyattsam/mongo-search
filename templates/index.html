@@ -4,7 +4,7 @@
     <div class="col-md-8 center">
         <form method="get" action="/search">
             <div class="input-group">
-                <input class="form-control" type="text" name="query" placeholder="Search" autofocus="autofocus">
+                <input class="form-control" type="text" name="query" placeholder="Search" autofocus="autofocus" id="searchbar">
                 <span class="input-group-btn">
                     <button class="btn btn-primary" type="submit">Submit</button>
                 </span>
@@ -27,4 +27,22 @@
     </p>
     <code>"node.js" "memory leak"</code>
 </div>
+<script type="text/javascript">
+    /*
+       TODO what on earth is the problem here????????????
+    $('#searchbar').bind('keyup', function() {
+        req = new XMLHttpRequest();
+        prefix = $("#searchbar").attr('value')
+        req.open("POST", "/", true);
+        req.send(prefix);
+        //alert("starting");
+        //alert("{{ ac|safe }}");
+        var tags = "{{ ac|safe }}";
+        //alert(tags);
+        $("#searchbar").autocomplete({
+            source: tags
+        });
+    });
+    */
+</script>
 {% endblock %}

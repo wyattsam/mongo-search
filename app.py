@@ -6,6 +6,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask_debugtoolbar_lineprofilerpanel.profile import line_profile
 import util.helpers as helpers
 import config.duckduckmongo as settings
+import json
 
 CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
 
@@ -29,6 +30,14 @@ SCRAPES = DB['scrapes']
 
 SOURCES = [k for k in settings.CONFIG.keys() if k[0] != '_']
 SUBSOURCES = dict([(n, settings.CONFIG[n]['subsources']) for n in SOURCES])
+
+BASIC_OPTS = [  'query' 
+              , 'source'
+              , 'subsource'
+              , 'page'
+              , 'advanced'
+              ]
+BASIC_OPTS.extend([k for k in SUBSOURCES.keys() if SUBSOURCES[k]])
 
 # App Settings
 PAGE_SIZE = 10
@@ -114,18 +123,33 @@ app = Flask(__name__)
 #-----------------------------------------------------------------------------
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 @line_profile
 def index():
+    ac = ""
+    if request.method == 'POST':
+        ac = autocomplete_list(str(request.data))
+
     version = DB.command({'buildInfo': 1})['version']
-    return render_template('index.html', version=version)
+
+    if len(ac) > 0:
+        ac = map(str, ac)
+        ac = map(json.dumps, ac)
+
+    return render_template('index.html', version=version, ac=ac)
 
 
-@app.route("/search")
+@app.route("/search", methods=["GET", "POST"])
 @line_profile
 def submit():
+    ac = ""
+    if request.method == 'POST':
+        ac = autocomplete_list(str(request.data))
     args = request.args
     log_search(args)
+    if len(ac) > 0:
+        ac = map(str, ac)
+        ac = map(json.dumps, ac)
 
     mq, page = parse_args(args)
 
@@ -133,12 +157,10 @@ def submit():
         return redirect('/')
 
     #run the counts separately using covered query
-    print args
     visitor = BasicQueryVisitor(mq)
     query_json = visitor.visit_all()
     if 'advanced' in args and args['advanced']:
         query_json = advanced_options(query_json, mq.args)
-    print query_json
     counts = covered_count(query_json, mq.args)
 
     page_limit = page * PAGE_SIZE
@@ -153,6 +175,7 @@ def submit():
         source=mq.args.get('source', ''),
         sub_source=mq.args.get('subsource', ''),
         query=mq,
+        ac=ac,
         pagination=pagination
     )
 
@@ -200,8 +223,11 @@ def parse_args(args):
 
 @line_profile
 def covered_count(query_doc, args):
-    covered_results = run_count_query(query_doc, args)
-    counts = helpers.get_counts(covered_results)
+    unfiltered_results = run_count_query(query_doc)
+    filtered_results = run_filtered_count_query(query_doc)
+    counts = helpers.get_counts(unfiltered_results, SUBSOURCES)
+    if filtered_results < counts['total']:
+        counts['filtered'] = filtered_results
 
     if 'subsource' in query_doc:
         subsource_name = SUBSOURCES[query_doc['source']]['name']
@@ -233,8 +259,9 @@ def log_search(args):
     SEARCHES.insert(search, w=0)
 
 @line_profile
-def run_count_query(query_doc, args):
-    q = dict([(k,v) for (k,v) in query_doc.iteritems() if k != 'source' and k != 'subsource'])
+def run_count_query(query_doc):
+    # remove all filters for the overall count query
+    q = dict([('$text', query_doc['$text'])])
     return COMBINED.aggregate([
         {'$match': q},
         {'$group':
@@ -246,10 +273,12 @@ def run_count_query(query_doc, args):
     ])['result']
 
 @line_profile
+def run_filtered_count_query(query_doc):
+    return COMBINED.find(query_doc).count()
+
+@line_profile
 def run_query(query_doc, args, page, limit):
     # must use $orderby for sort until pymongo is updated
-    #query_doc = {'$text': {'$search': query.query}}
-    #query_doc.update(docfilter)
     sort_doc = {'text_score': {'$meta': 'textScore'}}
 
     results = COMBINED.find(
@@ -274,31 +303,71 @@ def run_query(query_doc, args, page, limit):
 
 @line_profile
 def advanced_options(doc, args):
-    basic_args = ['query', 'source', 'page', 'advanced', 'project', 'repo', 'space']
     aargs = []
     # TODO should use a generic visitor here
+    # also this is horrible
     for k in args:
-        if k not in basic_args:
+        if k not in BASIC_OPTS:
             if args[k]:
-                try:
-                    v = int(args[k])
-                    aargs.append({k: v})
-                except ValueError:
-                    v = args[k]
-                    if args[k] == 'true':
-                        v = True
-                    if args[k] == 'false':
-                        v = False
-                    aargs.append({k: v})
+                aargs.append(parse_advanced(k, args[k]))
     for a in aargs:
         doc.update(a)
     return doc
+
+@line_profile
+def parse_advanced(k, arg):
+    digits = '0123456789'
+    bools = {
+        'true': True,
+        'false': False
+    }
+    ineqs = {
+        '+': '$gte',
+        '-': '$lte'
+    }
+    if arg[0] in digits:
+        try:
+            if len(arg) > 1:
+                lastchar = arg[-1:]
+                v = int(arg[:-1])
+                if lastchar in ineqs.keys():
+                    return {k: {ineqs[lastchar]: v}}
+            return {k: int(arg)}
+        except:
+            pass
+    elif arg in bools.keys():
+        return {k: bools[arg]}
+    else:
+        return {k: arg}
 
 @line_profile
 def url_for_other_page(page):
     args = request.args.copy()
     args['page'] = page
     return url_for(request.endpoint, **args)
+
+def autocomplete_list(prefix):
+    v = SEARCHES.aggregate([{
+        '$match': {
+            'query': { '$regex': prefix }
+        }
+    },
+    {
+        '$group': {
+            '_id': { 'query': '$query' },
+            'count': { '$sum': 1 }
+        }
+    },
+    {
+        '$sort': {
+            'count': -1
+        }
+    }
+    ])['result'][:15]
+    ret = [doc['_id']['query'] for doc in v]
+    print ret
+    return ret
+
 
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 app.jinja_env.globals['SOURCES'] = SOURCES

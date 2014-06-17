@@ -7,7 +7,7 @@
 </a>
 {% set ss = SUBSOURCES[shortname] %}
 {% if (shortname == source) and counts[ss['name']] %}
-    <ul>
+    <ul class="pre-scrollable">
     {% for sub, count in counts[ss['name']]|dictsort(true) %}
     <li class="{% if sub == sub_source %}bg-info{% endif %}" >
             <a href="/search?query={{query}}&source={{shortname}}&{{ss['name']}}={{sub}}">
@@ -49,8 +49,8 @@
 
 {% macro advanced(source, sconfig, query) %}
     <form method="get" action="/search" class="form-horizontal" id="advanced-form">
-    <input type="hidden" name="query" value={{query}}>
-    <input type="hidden" name="source" value={{source}}>
+    <input type="hidden" name="query" value="{{query}}">
+    <input type="hidden" name="source" value="{{source}}">
     <input type="hidden" name="advanced" value="1">
     {% for item in sconfig['advanced'] %}
         <div class="form-group">
@@ -81,6 +81,6 @@
         {% endif %}
         </div>
     {% endfor %}
-    <button type="submit" class="btn bts-default">Advanced search</button>
+    <button type="submit" class="btn btn-default">Advanced search</button>
     </form>
 {% endmacro %}

@@ -167,21 +167,7 @@ class QueryParseException(Exception):
     def __str__(self):
         return repr(self.value)
 
-### Parsing
-class BasicQuery(object):
-    def __init__(self, args, ss):
-        self.subsources = ss
-        self.args = args.to_dict()
-        self._selectors = ['source']
-
-        text = args['query']
-        self.query = text
-        tokenizer = token.Tokenizer(text)
-        self.tokens = [t for t in tokenizer.tokenize()]
-        self.curr = self.tokens.pop(0)
-        self.ast = self._query()
-
-    ## Utility
+class Parser(object):
     def advance(self):
         self.curr = self.tokens.pop(0)
 
@@ -205,6 +191,20 @@ class BasicQuery(object):
             self.advance()
             return True
         return False
+
+### Parsing
+class BasicQuery(Parser):
+    def __init__(self, args, ss):
+        self.subsources = ss
+        self.args = args.to_dict()
+        self._selectors = ['source']
+
+        text = args['query']
+        self.query = text
+        tokenizer = token.Tokenizer(text)
+        self.tokens = [t for t in tokenizer.tokenize()]
+        self.curr = self.tokens.pop(0)
+        self.ast = self._query()
 
     ## Parse rules
     def _query(self):

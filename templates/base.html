@@ -10,12 +10,7 @@
         <meta charset="utf-8">
 
         <link rel="shortcut icon" type="image/png" href="static/favicon.png"/>
-        <!--
-        <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
-        <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" rel="stylesheet">
-        -->
         <link href="/static/css/mongostrap.min.css" rel="stylesheet">
-        <!--<link href="/static/css/mongostrap-theme.css" rel="stylesheet">-->
         <link href="/static/style.css" rel="stylesheet">
 
         <!-- SUPPORT FOR IE6-8 OF HTML5 ELEMENTS -->
@@ -27,7 +22,7 @@
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script src="/static/js/mongostrap.min.js"></script>
-        <script src="/static/jquery.highlight-4.js"></script>
+        <!--<script src="/static/jquery.highlight-4.js"></script>-->
         {% endblock %}
     </head>
 
@@ -36,7 +31,7 @@
         {% block navbar %}
         <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <div class="container">
-                <a class="navbar-brand" href="/">Mongo Search</a>
+                <a class="navbar-brand navbar-left" href="/">Mongo Search</a>
                 {% block navbar_right %}
                 {% endblock %}
             </div>
@@ -57,9 +52,6 @@
             </footer>
         </div>
         {% block js_footer %}
-        <!--
-        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-        -->
         {% endblock %}
     </body>
 </html>
