@@ -8,21 +8,16 @@ CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
 
 # Setup database
 DB = CONNECTION['duckduckmongo']
-"""
-CREDENTIALS = settings.SEARCH['credentials']
-USER = CREDENTIALS['user']
-PASSWORD = CREDENTIALS['password']
 
-# Login if credentials provided
-if USER and PASSWORD:
-    DB.authenticate(USER, PASSWORD)
-"""
 # Setup collections
 COMBINED = DB['combined']
+SEARCHES = DB['searches']
+USERS = DB['users']
 
 # Drop all the indexes before building
 COMBINED.drop_indexes()
 
+### Primary text index
 COMBINED.ensure_index([
     # Stack Overflow
     ('title', 'text'),
@@ -74,9 +69,24 @@ COMBINED.ensure_index([
     }
 )
 
+### Source filtering
 COMBINED.ensure_index([
     ('source', 1),
     ('subsource', 1)
     ],
     name='source_index'
+)
+
+### Autocomplete
+SEARCHES.ensure_index([
+    ('query', 'text')
+    ],
+    name='query_text'
+)
+
+### User authentication
+USERS.ensure_index([
+    ('ip': 1)
+    ],
+    name='user_index'
 )

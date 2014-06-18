@@ -1,9 +1,10 @@
 from flask import Flask, request, render_template, url_for, redirect
 from pymongo import MongoClient
 from datetime import datetime
-from query.parser import BasicQuery, BasicQueryVisitor
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_debugtoolbar_lineprofilerpanel.profile import line_profile
+from query.parser import BasicQuery, BasicQueryVisitor
+from indexing import IndexDaemon
 import util.helpers as helpers
 import config.duckduckmongo as settings
 import json
@@ -41,6 +42,8 @@ BASIC_OPTS.extend([k for k in SUBSOURCES.keys() if SUBSOURCES[k]])
 
 # App Settings
 PAGE_SIZE = 10
+
+DAEMON = IndexDaemon()
 
 """
 RESULT_PROJECTION = {
@@ -179,6 +182,39 @@ def submit():
         pagination=pagination
     )
 
+@app.route("/hook", methods=["GET", "POST"])
+@line_profile
+def hook(response=None, rclass=None):
+    if request.method == "POST":
+        headers = request.headers
+        env = request.environ
+        msg = request.get_json()
+        return DAEMON.handle(msg, headers, env)
+    elif request.method == "GET":
+        return render_template("hook_register.html"
+                ,response=response
+                ,rclass=rclass)
+
+@app.route("/hook/register", methods=["POST"])
+def hook_register():
+    f = request.form
+    subsource = None
+    if 'subsource' in f:
+        subsource = f['subsource']
+    result = DAEMON.register(
+        f['fullname'],
+        f['hostname'],
+        f['authtype'],
+        f['auth'],
+        f['id_field'],
+        subsource)
+    if result:
+        response = "Registration successful!"
+        rclass = "info"
+    else:
+        response = "An error occured while registering."
+        rclass = "alert"
+    return redirect("/hook")
 
 @app.route("/status")
 @line_profile
