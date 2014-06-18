@@ -44,69 +44,6 @@ def get_counts(raw_results, ss):
             counts[subsource_name][subsource] += count
 
     return counts
-"""
-def get_counts(raw_results):
-    counts = {
-        'total': 0,
-        'source': Counter(),
-        'repo': Counter(),
-        'project': Counter(),
-        'section': Counter(),
-        'space': Counter()
-    }
-
-    for doc in raw_results:
-        source = doc['_id']['source']
-
-        if 'subsource' in doc['_id']:
-            subsource = doc['_id']['subsource']
-        else:
-            subsource = None
-
-        count = doc['count']
-
-        counts['total'] += count
-        counts['source'][source] += count
-
-        source_subsource_map = {
-            'github': 'repo',
-            'jira': 'project',
-            'docs': 'section',
-            'confluence': 'space'
-        }
-
-        if subsource:
-            subsource_name = source_subsource_map[source]
-            counts[subsource_name][subsource] += count
-
-    return counts
-"""
-
-@line_profile
-def massage_google(post):
-    massaged = {
-        'source': 'google',
-        'subject': post['subject'],
-        'body': post['body'],
-        'group': post['group'],
-        'from': post['from'],
-        'sender': post['sender']
-    }
-    return massaged
-
-@line_profile
-def massage_confluence(page):
-    massaged = {
-        'id': page['_id'],
-        'title': page['title'],
-        'body': page['body'],
-        'url': page['url'],
-        'space': page['space'],
-        'source': 'confluence',
-    }
-
-    return massaged
-
 
 @line_profile
 class Pagination(object):

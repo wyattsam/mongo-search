@@ -85,38 +85,67 @@ a {
     margin-bottom: 15px;
 }
 
+/* result coloring */
+[data-source="jira"] .result {
+    border-left: 3px solid green; padding-left: 5px;
+}
+
+[data-source="stackoverflow"] .result {
+    border-left: 3px solid orange; padding-left: 5px;
+}
+
+[data-source="github"] .result {
+    border-left: 3px solid black; padding-left: 5px;
+}
+
+[data-source="docs"] .result {
+    border-left: 3px solid #6C513A; padding-left: 5px;
+}
+
+[data-source="googlegroups"] .result {
+    border-left: 3px solid #0000AA; padding-left: 5px;
+}
+
+[data-source="profiles"] .result {
+    border-left: 3px solid #f06d54; padding-left: 5px;
+}
+
 [data-source="profiles"] .result-snippet {
     min-height: 30px;
 }
 
-[data-source="jira"] {
-    border-left: 3px solid green; padding-left: 5px;
-}
-
-[data-source="stackoverflow"] {
-    border-left: 3px solid orange; padding-left: 5px;
-}
-
-[data-source="github"] {
-    border-left: 3px solid black; padding-left: 5px;
-}
-
-[data-source="docs"] {
-    border-left: 3px solid #6C513A; padding-left: 5px;
-}
-
-[data-source="google"] {
-    border-left: 3px solid #0000AA; padding-left: 5px;
-}
-
-[data-source="profiles"] {
-    border-left: 3px solid #f06d54; padding-left: 5px;
-}
-
-[data-source="confluence"] {
+[data-source="confluence"] .result {
     border-left: 3px solid #4444aa; padding-left: 5px;
 }
 
+/* result badge coloring */
+.badge-jira {
+    background-color: green; color: white;
+}
+
+.badge-stackoverflow {
+    background-color: orange; color: white;
+}
+
+.badge-github {
+    background-color: black; color: white;
+}
+
+.badge-docs {
+    background-color: #6C513A; color: white;
+}
+
+.badge-googlegroups {
+    background-color: #0000AA; color: white;
+}
+
+.badge-profiles {
+    background-color: #f06d54; color: white;
+}
+
+.badge-confluence {
+    background-color: #4444aa; color: white;
+}
 /* Left sidebar on results.html */
 #source-list{
     width: 225px;

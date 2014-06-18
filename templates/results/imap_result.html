@@ -2,12 +2,12 @@
 
 {% block result %}
     <div class="result-summary">
-        <a target="_blank" href="http://www.google.com/search?q=site:groups.google.com {{ result.subject|truncate(100)|e }}&btnI">
-            {{ result.subject|truncate(125) }}
+        <a target="_blank" href="{{result.url|truncate(154)|e}}">
+            {{ result.title|truncate(125) }}
         </a>
     </div>
     <p class="result-snippet">
-        {{ result.body|truncate(350) }}
+        {{ result.snippet|truncate(350) }}
     </p>
     <p class="result-url">
         <span class="text-muted">Group:</span>&nbsp;{{ result.group }}&nbsp;&nbsp;&nbsp;<span class="text-muted">Sender:</span>&nbsp;<span>{{result.from}}</span>
