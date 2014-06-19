@@ -241,7 +241,9 @@ class ParseEnd(Node):
 ### Exceptions
 class Backtrack(Exception):
     def __init__(self, value):
-        print "[BACKTRACK]", value
+        self.debug = False
+        if self.debug:
+            print "[BACKTRACK]", value
 
     def __str__(self):
         return repr(self.value)
