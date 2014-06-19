@@ -161,19 +161,25 @@ class BasicQuery(Parser):
 
     def list_selector(self, sel):
         self.consume('OP_BRACK')
-        lst = self.sep_by('IDENT', 'COMMA', self.selector_source, sel)
+        lst = self.sep_by('IDENT', 'COMMA', self.named_selector, sel)
         self.consume('CL_BRACK')
         return ListSelector(lst)
 
     def selector_source(self, sel):
+        print "in selector_source with sel", sel
+        print "curr is", self.curr
         if not self.expect1('IDENT'):
             raise QueryParseException("expecting ident in source selector")
         src = self.curr.v
         self.advance()
+        print "after advancing, curr is", self.curr
         has_ssrc = self.try_(self.consume, 'SLASH')
         if has_ssrc:
-            if self.has_more:
-                return SourceSelector(sel, src, self.curr.v)
+            ret = SourceSelector(sel, src, self.curr.v)
+            print repr(ret)
+            self.advance()
+            print "before returning, curr is", self.curr
+            return ret
         return SourceSelector(sel, src, None)
 
     def term(self):

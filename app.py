@@ -168,7 +168,7 @@ def submit():
     counts = covered_count(query_json, mq.args)
 
     page_limit = page * PAGE_SIZE
-
+    print "query_json", query_json
     results = run_query(query_json, mq.args, page, page_limit)
     pagination = helpers.Pagination(page, PAGE_SIZE, counts['filter_total'])
 
@@ -266,11 +266,17 @@ def covered_count(query_doc, args):
     if filtered_results < counts['total']:
         counts['filtered'] = filtered_results
 
-    if 'source' in query_doc and isinstance(query_doc['source'], str):
-        counts['filter_total'] = counts['source'][query_doc['source']]
-    if 'subsource' in query_doc:
-        subsource_name = SUBSOURCES[query_doc['source']]['name']
-        counts['filter_total'] = counts[subsource_name][query_doc['subsource']]
+    # FIXME this just looks wrong
+    if 'source' in query_doc:
+        if isinstance(query_doc['source'], str):
+            counts['filter_total'] = counts['source'][query_doc['source']]
+            if 'subsource' in query_doc and isinstance(query_doc['subsource'], str):
+                subsource_name = SUBSOURCES[query_doc['source']]['name']
+                counts['filter_total'] = counts[subsource_name][query_doc['subsource']]
+            else:
+                counts['filter_total'] = counts['total']
+        else:
+            counts['filter_total'] = counts['total']
     else:
         counts['filter_total'] = counts['total']
 
