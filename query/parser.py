@@ -1,179 +1,33 @@
-import token
+import query_token
+from ast import Query, Selector, SourceSelector, \
+                IdentTerm, QuotedTerm, ConjTerm, \
+                NegativeSelector, ListSelector, \
+                GenericSelector, ParseEnd
+from ast import Backtrack, QueryParseException, QueryParseEOF
+from werkzeug.datastructures import ImmutableMultiDict
 
-### AST definition
-# TODO should be in its own file maybe
-class Node(object):
-    def accept(self, vis):
-        pass
-
-class Query(Node):
-    def __init__(self, terms, selectors):
-        self.terms = terms
-        self.selectors = selectors
-    def accept(self, vis):
-        for t in self.terms:
-            t.accept(vis)
-
-        #if we have a source/subsource option from the U:, use that
-        if 'source' in vis.query.args and vis.query.args['source']:
-            vis.doc['source'] = vis.query.args['source']
-            ss = vis.query.subsources
-            for k in vis.query.subsources.keys():
-                if ss[k] and ss[k]['name'] in vis.query.args and vis.query.args[ss[k]['name']]:
-                    vis.doc['subsource'] = vis.query.args[ss[k]['field']]
-
-        for s in self.selectors:
-            s.accept(vis)
-        vis.doc['$text']['$search'] = vis.doc['$text']['$search'].strip()
-        return vis.doc
-
-    def __repr__(self):
-        return '[QUERY]\n' \
-                + "\n".join([str(s) for s in self.terms]) \
-                + "\n" \
-                + "\n".join([str(s) for s in self.selectors])
-
-    def __contains__(self, item):
-        for t in self.terms:
-            if item in t:
-                return True
-        for s in self.selectors:
-            if item == s.sel:
-                return True
-        return False
-
-    def __getitem__(self, key):
-        #only search selectors; terms don't have logical name
-        for s in self.selectors:
-            if key == s.sel:
-                return s
-
-class Selector(Node):
-    def __init__(self, sel):
-        self.sel = sel
-
-    def __str__(self):
-        return ''
-
-    def __repr__(self):
-        return '[SELECTOR]\n' + str(self.sel) + ":\n\t"
-
-class SourceSelector(Selector):
-    def __init__(self, sel, src, ssrc):
-        Selector.__init__(self, sel)
-        self.src = src
-        self.ssrc = ssrc
-
-    def accept(self, vis):
-        vis.query.args['source'] = self.src
-        if self.ssrc:
-            vis.query.args['subsource'] = self.ssrc
-
-    def __str__(self):
-        return 'source=' + self.src + ('/' + self.ssrc if self.ssrc else '')
-
-    def __repr__(self):
-        s = Selector.__str__(self)
-        ssrc = '[SUBSOURCE] ' + str(self.ssrc) if self.ssrc else ''
-        return s + '[SOURCE] ' + str(self.src) + '\n\t' + ssrc
-
-class IdentTerm(Node):
-    def __init__(self, val):
-        self.val = val
-
-    def accept(self, vis):
-        vis.doc['$text']['$search'] += self.val + " "
-
-    def __str__(self):
-        return str(self.val)
-
-    def __repr__(self):
-        return '[IDENT] ' + str(self.val)
-
-    def __contains__(self, item):
-        return self.val == item
-
-class QuotedTerm(Node):
-    def __init__(self, vals):
-        self.vals = vals
-
-    def accept(self, vis):
-        vis.doc['$text']['$search'] += '"' + ' '.join([q.val for q in self.vals]) + '" '
-
-    def __str__(self):
-        return '"' + ' '.join(str(v) for v in self.vals) + '"'
-
-    def __repr__(self):
-        return '[QUOTED] ' +  " ".join(repr(v) for v in self.vals)
-
-    def __contains__(self, item):
-        return item in self.vals
-
-class ConjTerm(Node):
-    def __init__(self, l, r):
-        self.l = l
-        self.r = r
-    def accept(self, vis):
-        vis.doc['$text']['$search'] += '"'
-        self._accept(vis)
-        vis.doc['$text']['$search'] = vis.doc['$text']['$search'].strip()
-        vis.doc['$text']['$search'] += '" '
-
-    def _accept(self, vis):
-        if isinstance(self.l, ConjTerm):
-            self.l._accept(vis)
-        else:
-            self.l.accept(vis)
-
-        if isinstance(self.r, ConjTerm):
-            self.r._accept(vis)
-        else:
-            self.r.accept(vis)
-
-    def __str__(self):
-        return ' and '.join([str(self.l), str(self.r)])
-
-    def __repr__(self):
-        return '[CONJUNCTION] ' +  repr(self.l) + " " + repr(self.r)
-
-    def __contains__(self, item):
-        return (item in self.l) or (item in self.r)
-
-class ParseEnd(Node):
-    def __repr__(self):
-        return '[EOF]\n'
-
-    def __str__(self):
-        return ''
-
-    def accept(self, vis):
-        vis.doc['$text']['$search'] = vis.doc['$text']['$search'].strip()
-
-    def __contains__(self, item):
-        return False
-
-### Exceptions
-class Backtrack(Exception):
-    def __init__(self, value):
-        print "[BACKTRACK]", value
-
-    def __str__(self):
-        return repr(self.value)
-
-class QueryParseException(Exception):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return repr(self.value)
-
+### Base parser
 class Parser(object):
+    def __init__(self, args):
+        self.args = args
+        if isinstance(args, ImmutableMultiDict):
+            self.args = args.to_dict()
+        text = args['query']
+        self.query = text
+        tokenizer = query_token.Tokenizer(text)
+        self.tokens = [t for t in tokenizer.tokenize()]
+        self.index = 0
+        self.curr = self.tokens[self.index]
+
     def advance(self):
-        self.curr = self.tokens.pop(0)
+        self.index += 1
+        if not self.has_more:
+            raise QueryParseEOF(self.curr)
+        self.curr = self.tokens[self.index]
 
     def peek(self, n):
-        if len(self.tokens) > n:
-            return self.tokens[n]
+        if len(self.tokens) > self.index + n:
+            return self.tokens[self.index + n]
 
     def many1(self, t):
         while self.curr.t == t and self.has_more:
@@ -184,26 +38,75 @@ class Parser(object):
         return self.curr.t == t
 
     def lookahead(self, t):
-        return self.peek(0).t == t
+        t1 = self.peek(1)
+        if t1:
+            return t1.t == t
 
-    def skip1(self, t):
-        if self.lookahead(t) and self.has_more:
+    def vlookahead(self, v):
+        v1 = self.peek(1)
+        if v1:
+            return v1.v == v
+
+    def skip_any(self):
+        if self.has_more:
             self.advance()
             return True
         return False
 
+    def try_(self, parser, *args):
+        curr_index = self.index
+        try:
+            return parser(*args) or True
+        except QueryParseException:
+            self.index = curr_index
+            self.curr = self.tokens[self.index]
+            return None
+        except Backtrack:
+            self.index = curr_index
+            self.curr = self.tokens[self.index]
+            return None
+
+    def consume(self, t):
+        if self.expect1(t):
+            self.advance()
+        else:
+            raise Backtrack("expecting %s" % t)
+
+    def conjunct(self, parsers):
+        for p, args in parsers:
+            try:
+                result = p(*args)
+                if result:
+                    return result
+            except:
+                continue
+
+    def sep_by(self, list_t, sep_t, list_parser, *args):
+        accum = []
+        state = list_t
+        while self.expect1(list_t) or self.expect1(sep_t):
+            if self.expect1(list_t) and state == list_t:
+                it = list_parser(*args)
+                accum.append(it)
+                state = sep_t
+            elif self.expect1(sep_t) and state == sep_t:
+                self.skip_any()
+                state = list_t
+            else:
+                raise Backtrack("encountered some error in sep_by")
+        return accum
+
+    @property
+    def has_more(self):
+        return self.index < len(self.tokens)
+
 ### Parsing
 class BasicQuery(Parser):
     def __init__(self, args, ss):
+        Parser.__init__(self, args)
         self.subsources = ss
-        self.args = args.to_dict()
         self._selectors = ['source']
 
-        text = args['query']
-        self.query = text
-        tokenizer = token.Tokenizer(text)
-        self.tokens = [t for t in tokenizer.tokenize()]
-        self.curr = self.tokens.pop(0)
         self.ast = self._query()
 
     ## Parse rules
@@ -211,40 +114,65 @@ class BasicQuery(Parser):
         selectors = []
         terms = []
         while True:
-            self._do_query(terms, selectors)
-            if not self.has_more:
+            try:
+                self._do_query(terms, selectors)
+                self.advance()
+            except QueryParseEOF:
                 break
-            self.advance()
-        # don't forget the last token
         if not self.expect1('EOF'):
             self._do_query(terms, selectors)
         return Query(terms, selectors)
 
     def _do_query(self, terms, selectors):
-        if self.curr.v in self._selectors:
+        p = self.peek(1)
+        if p and p.t == 'COLON': # it is a selector
             c = self.curr
             try:
                 self.advance()
                 selectors.append(self.selector(c))
             except Backtrack:
+                #thought it was a selector, turned out we were wrong
+                #this is probably not necessary anymore. oh well.
                 terms.append(IdentTerm(c.v))
-        else: # it is a term
+        else: # it is a term TODO or a generic selector!
             terms.append(self.term())
 
     def selector(self, sel):
-        if not self.expect1('COLON'):
-            raise Backtrack("expecting :")
-        self.advance()
+        self.consume('COLON')
+        return self.conjunct([
+            (self.not_selector, (sel,)),
+            (self.list_selector, (sel,)),
+            (self.named_selector, (sel,)),
+            (self.generic_selector, (sel,))
+        ])
+
+    def generic_selector(self, sel):
+        if not self.expect1('IDENT'):
+            raise QueryParseException("expecting ident in generic selector")
+        val = self.curr.v
+        return GenericSelector(sel, val)
+
+    def named_selector(self, sel):
         return getattr(self, 'selector_'+sel.v)(sel)
+
+    def not_selector(self, sel):
+        self.consume('BANG')
+        return NegativeSelector(self.named_selector(sel))
+
+    def list_selector(self, sel):
+        self.consume('OP_BRACK')
+        lst = self.sep_by('IDENT', 'COMMA', self.selector_source, sel)
+        self.consume('CL_BRACK')
+        return ListSelector(lst)
 
     def selector_source(self, sel):
         if not self.expect1('IDENT'):
-            raise QueryParseException("expecting ident in selector value")
+            raise QueryParseException("expecting ident in source selector")
         src = self.curr.v
-        if self.peek(0).t == 'SLASH':
-            self.advance()
+        self.advance()
+        has_ssrc = self.try_(self.consume, 'SLASH')
+        if has_ssrc:
             if self.has_more:
-                self.advance()
                 return SourceSelector(sel, src, self.curr.v)
         return SourceSelector(sel, src, None)
 
@@ -263,11 +191,9 @@ class BasicQuery(Parser):
             t1 = IdentTerm(self.curr.v)
         elif self.expect1('EOF'):
             t1 = ParseEnd()
-        p = self.peek(0)
-        if p and (p.t == '&' or p.v.lower() == 'and'):
+        if self.lookahead('AMP') or self.vlookahead('and'):
             self.advance() # skip over peeked token
-            if self.has_more:
-                self.advance()
+            if self.skip_any():
                 return ConjTerm(t1, self.term())
         return t1
 
@@ -283,10 +209,6 @@ class BasicQuery(Parser):
     @property
     def constraints(self):
         return " ".join([str(s) for s in self.ast.selectors]).strip()
-
-    @property
-    def has_more(self):
-        return len(self.tokens) > 0
 
 class BasicQueryVisitor(object):
     def __init__(self, query):

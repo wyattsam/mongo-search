@@ -4,6 +4,7 @@ from datetime import datetime
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_debugtoolbar_lineprofilerpanel.profile import line_profile
 from query.parser import BasicQuery, BasicQueryVisitor
+from query.ast import parse_advanced
 from indexing import IndexDaemon
 import util.helpers as helpers
 import config.duckduckmongo as settings
@@ -265,11 +266,11 @@ def covered_count(query_doc, args):
     if filtered_results < counts['total']:
         counts['filtered'] = filtered_results
 
+    if 'source' in query_doc and isinstance(query_doc['source'], str):
+        counts['filter_total'] = counts['source'][query_doc['source']]
     if 'subsource' in query_doc:
         subsource_name = SUBSOURCES[query_doc['source']]['name']
         counts['filter_total'] = counts[subsource_name][query_doc['subsource']]
-    elif 'source' in query_doc:
-        counts['filter_total'] = counts['source'][query_doc['source']]
     else:
         counts['filter_total'] = counts['total']
 
@@ -326,6 +327,11 @@ def run_query(query_doc, args, page, limit):
         fields=RESULT_PROJECTION
     )
 
+    # if we did any fancy negations or similar, just kind of sweep it under the rug
+    for k in args.keys():
+        if not (isinstance(args[k], str) or isinstance(args[k], unicode)):
+            args[k] = ''
+
     transformed = []
     for result in results:
         source = result['source']
@@ -340,41 +346,15 @@ def run_query(query_doc, args, page, limit):
 @line_profile
 def advanced_options(doc, args):
     aargs = []
-    # TODO should use a generic visitor here
-    # also this is horrible
     for k in args:
         if k not in BASIC_OPTS:
             if args[k]:
-                aargs.append(parse_advanced(k, args[k]))
+                upd_dict = parse_advanced(k, args[k])
+                if upd_dict:
+                    aargs.append(upd_dict)
     for a in aargs:
         doc.update(a)
     return doc
-
-@line_profile
-def parse_advanced(k, arg):
-    digits = '0123456789'
-    bools = {
-        'true': True,
-        'false': False
-    }
-    ineqs = {
-        '+': '$gte',
-        '-': '$lte'
-    }
-    if arg[0] in digits:
-        try:
-            if len(arg) > 1:
-                lastchar = arg[-1:]
-                v = int(arg[:-1])
-                if lastchar in ineqs.keys():
-                    return {k: {ineqs[lastchar]: v}}
-            return {k: int(arg)}
-        except:
-            pass
-    elif arg in bools.keys():
-        return {k: bools[arg]}
-    else:
-        return {k: arg}
 
 @line_profile
 def url_for_other_page(page):
@@ -401,7 +381,6 @@ def autocomplete_list(prefix):
     }
     ])['result'][:15]
     ret = [doc['_id']['query'] for doc in v]
-    print ret
     return ret
 
 

@@ -1,6 +1,5 @@
-
-TK_SPECIAL = ['"', '&', '$', ':', '/']
-WHITESPACE = [' ', '\n', '\r', '\t', '\f'] # nevar 4get
+TK_SPECIAL = ['"', '&', '$', ':', '/', '!', '[', ']', ',']
+WHITESPACE = [' ', '\n', '\r', '\t', '\f'] # can't forget form feed
 
 class Token(object):
     def __init__(self, value, typ):
@@ -29,6 +28,10 @@ class Tokenizer(object):
              '&': 'AMP',
              '$': 'DOLLAR',
              '/': 'SLASH',
+             '!': 'BANG',
+             '[': 'OP_BRACK',
+             ']': 'CL_BRACK',
+             ',': 'COMMA',
              ':': 'COLON'
              }
         return m[ch]
