@@ -10,19 +10,23 @@ def parse_advanced(k, arg):
     if isinstance(arg, dict):
         for k1 in arg.keys():
             if not k1 == '$search':
-                arg.update(parse_advanced(k1, arg[k1]))
+                upd_dict = parse_advanced(k1, arg[k1])
+                if upd_dict:
+                    arg.update(upd_dict)
         return None
-    lastchar = arg[-1:]
-    if lastchar in ineqs.keys():
-        rest = json.loads(arg[:-1])
-        if isinstance(rest, int):
-            return {k: {ineqs[lastchar]: rest}}
+    elif isinstance(arg, str):
+        lastchar = arg[-1:]
+        if lastchar in ineqs.keys():
+            rest = json.loads(arg[:-1])
+            if isinstance(rest, int):
+                return {k: {ineqs[lastchar]: rest}}
+        else:
+            try:
+                return {k: json.loads(arg)}
+            except:
+                return {k: arg}
     else:
-        try:
-            return {k: json.loads(arg)}
-        except:
-            return {k: arg}
-
+        return None
 
 class Node(object):
     def accept(self, vis):
