@@ -142,7 +142,7 @@ class BasicQuery(Parser):
         return self.conjunct([
             (self.not_selector, (sel,)),
             (self.list_selector, (sel,)),
-            (self.named_selector, (sel,)),
+            (self.try_, (self.named_selector, sel)),
             (self.generic_selector, (sel,))
         ])
 
@@ -166,20 +166,16 @@ class BasicQuery(Parser):
         return ListSelector(lst)
 
     def selector_source(self, sel):
-        print "in selector_source with sel", sel
-        print "curr is", self.curr
         if not self.expect1('IDENT'):
             raise QueryParseException("expecting ident in source selector")
         src = self.curr.v
-        self.advance()
-        print "after advancing, curr is", self.curr
-        has_ssrc = self.try_(self.consume, 'SLASH')
-        if has_ssrc:
-            ret = SourceSelector(sel, src, self.curr.v)
-            print repr(ret)
+        if self.lookahead('SLASH'):
             self.advance()
-            print "before returning, curr is", self.curr
-            return ret
+            has_ssrc = self.try_(self.consume, 'SLASH')
+            if has_ssrc:
+                ret = SourceSelector(sel, src, self.curr.v)
+                self.advance()
+                return ret
         return SourceSelector(sel, src, None)
 
     def term(self):

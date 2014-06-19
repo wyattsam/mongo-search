@@ -2,6 +2,7 @@ import re
 import json
 
 def parse_advanced(k, arg):
+    print "checking key", k
     ineqs = {
         '+': '$gte',
         '-': '$lte'
@@ -14,7 +15,7 @@ def parse_advanced(k, arg):
                 if upd_dict:
                     arg.update(upd_dict)
         return None
-    elif isinstance(arg, str):
+    elif isinstance(arg, str) or isinstance(arg, unicode):
         lastchar = arg[-1:]
         if lastchar in ineqs.keys():
             rest = json.loads(arg[:-1])
