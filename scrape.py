@@ -20,6 +20,14 @@ class ScrapeRunner(object):
         cfgs = [k for k in self.cfg.keys() if k[0] != '_']
         self.scrapers = self.cfg_instantiate('scraper', snames or cfgs)
 
+        self.logger = logging.getLogger("ScrapeRunner")
+        so = logging.StreamHandler(sys.stdout)
+        so.setFormatter(
+            logging.Formatter('[%(levelname)s] %(asctime)s %(name)s: %(message)s'))
+        self.logger.addHandler(so)
+        self.logger.setLevel(cfg['_loglevel'])
+
+    def do_setup(self):
         for s in self.scrapers:
             if s.needs_setup:
                 # _setup may take time; let scraping continue while we do setup
@@ -28,13 +36,6 @@ class ScrapeRunner(object):
                     thread.start_new_thread(s.setup, ())
                 else:
                     s.setup()
-
-        self.logger = logging.getLogger("ScrapeRunner")
-        so = logging.StreamHandler(sys.stdout)
-        so.setFormatter(
-            logging.Formatter('[%(levelname)s] %(asctime)s %(name)s: %(message)s'))
-        self.logger.addHandler(so)
-        self.logger.setLevel(cfg['_loglevel'])
 
     def cfg_instantiate(self, typ, cfgs):
         clss = [self.cfg[c][typ] for c in cfgs]
@@ -108,7 +109,7 @@ class ScrapeRunner(object):
                 try:
                     self.save(d1, s.name)
                 except Exception as e:
-                    self.logger.error("documents exception: " + str(e))
+                    self.logger.error("documents exception: " + repr(e))
                     self.log_scrape_error(e)
                     return
         self.log_scrape_finish(s)
@@ -130,4 +131,5 @@ if __name__ == "__main__":
     else:
         names = sys.argv[1:]
         runner = ScrapeRunner(settings.CONFIG, snames=names)
+    runner.do_setup()
     runner.runall()

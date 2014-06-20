@@ -7,15 +7,18 @@ app = Celery('tasks')
 app.config_from_object(celery_settings)
 
 cfg = search_settings.CONFIG
-scraper = ScrapeRunner(cfg)
 
 sources = [k for k in cfg.keys() if k[0] != '_']
 
 @app.task
 def scrape_source(source):
-    scraper.run(cfg[source]['scraper'])
-    scrape_stackoverflow.delay(source)
+    scraper = ScrapeRunner(cfg, snames=[source])
+    scraper.do_setup()
+    scraper.runall()
+    #TODO what is the right behavior here?
+    #scrape_source.delay(source)
 
 if __name__ == '__main__':
     for source in sources:
+        print source
         scrape_source.delay(source)
