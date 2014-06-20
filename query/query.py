@@ -71,7 +71,7 @@ class BasicQuery(object):
 
     def _query(self):
         ## Utility
-        ident = pp.Word(pp.srange("[a-zA-Z0-9_.]"))
+        ident = pp.Word(pp.srange("[a-zA-Z0-9_.+-]"))
 
         ## Terms
         ident_term = pp.Word(pp.srange("[a-zA-Z0-9_.]")).setParseAction(
@@ -109,6 +109,18 @@ class BasicQuery(object):
         query = pp.ZeroOrMore(selector | term).setParseAction(
                 make_Query)
         return query.parseString(self.query)
+
+    @property
+    def terms(self):
+        return " ".join([str(s) for s in self.ast.terms]).strip()
+
+    @property
+    def selectors(self):
+        return self.ast.selectors
+
+    @property
+    def constraints(self):
+        return " ".join([str(s) for s in self.ast.selectors]).strip()
 
 class BasicQueryVisitor(object):
     def __init__(self, query):

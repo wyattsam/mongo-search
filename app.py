@@ -168,7 +168,6 @@ def submit():
     counts = covered_count(query_json, mq.args)
 
     page_limit = page * PAGE_SIZE
-    print "query_json", query_json
     results = run_query(query_json, mq.args, page, page_limit)
     pagination = helpers.Pagination(page, PAGE_SIZE, counts['filter_total'])
 
