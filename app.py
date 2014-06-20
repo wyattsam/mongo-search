@@ -3,7 +3,7 @@ from pymongo import MongoClient
 from datetime import datetime
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_debugtoolbar_lineprofilerpanel.profile import line_profile
-from query.parser import BasicQuery, BasicQueryVisitor
+from query.query import BasicQuery, BasicQueryVisitor
 from query.ast import parse_advanced
 from indexing import IndexDaemon
 import util.helpers as helpers

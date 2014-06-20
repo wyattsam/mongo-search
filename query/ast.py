@@ -2,7 +2,6 @@ import re
 import json
 
 def parse_advanced(k, arg):
-    print "checking key", k
     ineqs = {
         '+': '$gte',
         '-': '$lte'
@@ -121,8 +120,12 @@ class GenericSelector(Selector):
         self.val = val
 
     def accept(self, vis):
-        vis.query.args[self.sel.v] = self.val
-        vis.doc[self.sel.v] = self.val
+        vis.query.args[self.sel] = self.val
+        vis.doc[self.sel] = self.val
+
+    def __repr__(self):
+        s = Selector.__str__(self)
+        return s + '[GENERIC]\n' + str(self.sel) + '=' + str(self.val)
 
 class NegativeSelector(Selector):
     def __init__(self, sel):
@@ -132,7 +135,7 @@ class NegativeSelector(Selector):
         attrs = dir(self.sel)
         for attr in attrs:
             field = getattr(self.sel, attr)
-            if not (attr[0] == '_' and attr[1] == '_') and (isinstance(field, str) or isinstance(field, unicode)): #TODO this should only ignore clownshoes
+            if not (attr[0] == '_' and attr[1] == '_') and (isinstance(field, str) or isinstance(field, unicode)) and not attr == 'sel': #TODO this should only ignore clownshoes
                 vis.query.args[attr] = { '$not': re.compile(field) }
                 vis.doc[attr] = { '$not': re.compile(field) }
 
@@ -152,7 +155,7 @@ class ListSelector(Selector):
             attrs = dir(sel)
             for attr in attrs:
                 field = getattr(sel, attr)
-                if not (attr[0] == '_' and attr[1] == '_') and (isinstance(field, str) or isinstance(field, unicode)): #TODO this should only ignore clownshoes
+                if not (attr[0] == '_' and attr[1] == '_') and (isinstance(field, str) or isinstance(field, unicode)) and not attr == 'sel': #TODO this should only ignore clownshoes
                     if attr not in vis.query.args:
                         vis.query.args[attr] = { '$in': [field] }
                     else:
