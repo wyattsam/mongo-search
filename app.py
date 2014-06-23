@@ -183,18 +183,13 @@ def submit():
         pagination=pagination
     )
 
-@app.route("/hook", methods=["GET", "POST"])
+@app.route("/hook/<sourcename>", methods=["POST"])
 @line_profile
-def hook(response=None, rclass=None):
+def hook(sourcename, response=None, rclass=None):
     if request.method == "POST":
         headers = request.headers
-        env = request.environ
         msg = request.get_json()
-        return DAEMON.handle(msg, headers, env)
-    elif request.method == "GET":
-        return render_template("hook_register.html"
-                ,response=response
-                ,rclass=rclass)
+        return DAEMON.handle(sourcename, msg, headers)
 
 @app.route("/hook/register", methods=["POST"])
 def hook_register():
@@ -402,7 +397,7 @@ app.jinja_env.globals['CONFIG'] = settings.CONFIG
 
 if __name__ == "__main__":
     from socket import gethostname, gethostbyname
-    #app.debug = True
+    app.debug = True
     app.config['SECRET_KEY'] = 'supersekretkey'
 
     # Specify the debug panels you want
@@ -439,4 +434,4 @@ if __name__ == "__main__":
         app.logger.addHandler(mail_handler)
         """
 
-    app.run(host=gethostname())
+    app.run(host='ec2-54-88-113-255.compute-1.amazonaws.com')

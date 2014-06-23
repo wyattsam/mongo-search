@@ -6,11 +6,10 @@ class GithubHook(BaseHook):
     def __init__(self):
         BaseHook.__init__(self, 'http://github.com')
         #self.needs_auth = True
-
         self.authtype = 'X-Hub-Signature'
         self.sha1 = SHA.new()
 
-    def authenticate(self, msg, h)
+    def authenticate(self, msg, h):
         # TODO: how much is auth necessary? JIRA can't even use it
         pass
         """
@@ -20,7 +19,6 @@ class GithubHook(BaseHook):
         return result, (h == hasher.hexdigest()) # secure compare I suppose
         """
 
-    @self.celery.task
     def handle(self, msg):
         name = msg['repository']['name']
         org = msg['repository']['owner']['name']
