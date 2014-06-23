@@ -49,21 +49,27 @@
 
 {% macro advanced(source, sconfig, query) %}
     <form method="get" action="/search" class="form-horizontal" id="advanced-form">
-    <input type="hidden" name="query" value="{{query}}">
+    <input type="hidden" name="query" value="{{query.query}}">
     <input type="hidden" name="source" value="{{source}}">
     <input type="hidden" name="advanced" value="1">
     {% for item in sconfig['advanced'] %}
+        {% if item['field'] in query.args %}
+            {% set value = query.args[item['field']] %}
+        {% else %}
+            {% set value = "" %}
+        {% endif %}
         <div class="form-group">
-        <label class="control-label col-sm-2">{{item['name']}}</label>
+        <label class="control-label col-sm-2 initialism" title="{{item['field']}}">{{item['name']}}</label>
         {% if item['type'] == 'text' %}
             <div class="col-sm-10">
-                <input type="text" name={{item['field']}} class="form-control">
+                <input type="text" name={{item['field']}} class="form-control" value={{value}}>
             </div>
         {% elif item['type'] == 'dropdown' %}
             <div class="col-sm-10">
-            <select name={{item['field']}} class="form-control">
+            <select name="{{item['field']}}" class="form-control">
+                <option></option>
                 {% for opt in item['options'] %}
-                    <option name={{opt}}>{{opt}}</option>
+                <option name="{{opt}}" {% if value==opt %}selected="selected"{% endif %}>{{opt}}</option>
                 {% endfor %}
                 </select>
             </div>
@@ -72,7 +78,7 @@
                 {% for name, val in item['options'] %}
                 <div class="radio radio-inline">
                     <label>
-                        <input type="radio" name={{item['field']}} value={{val}}>
+                        <input type="radio" name="{{item['field']}}" value="{{val}}" {% if value==item['field'] %}checked{% endif %}>
                         {{name}}
                     </label>
                 </div>

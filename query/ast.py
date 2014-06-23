@@ -9,6 +9,7 @@ def parse_advanced(k, arg):
     #make sure we go all the way down if there is a tree
     if isinstance(arg, dict):
         for k1 in arg.keys():
+            #TODO there should be a better way around this
             if not k1 == '$search':
                 upd_dict = parse_advanced(k1, arg[k1])
                 if upd_dict:

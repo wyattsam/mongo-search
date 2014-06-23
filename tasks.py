@@ -15,10 +15,7 @@ def scrape_source(source):
     scraper = ScrapeRunner(cfg, snames=[source])
     scraper.do_setup()
     scraper.runall()
-    #TODO what is the right behavior here?
-    #scrape_source.delay(source)
 
 if __name__ == '__main__':
     for source in sources:
-        print source
         scrape_source.delay(source)

@@ -171,6 +171,7 @@ def submit():
     page_limit = page * PAGE_SIZE
     results = run_query(query_json, mq.args, page, page_limit)
     pagination = helpers.Pagination(page, PAGE_SIZE, counts['filter_total'])
+    print "args", mq.args
 
     return render_template(
         'results.html',
@@ -389,6 +390,8 @@ app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 app.jinja_env.globals['SOURCES'] = SOURCES
 app.jinja_env.globals['SUBSOURCES'] = SUBSOURCES
 app.jinja_env.globals['CONFIG'] = settings.CONFIG
+#importing basic python functions
+app.jinja_env.globals['min'] = min
 
 
 #-----------------------------------------------------------------------------

@@ -11,12 +11,13 @@
         {% if pagination.total_count == 0 %}
             0
         {% else %}
-            <span class="bounds">{{pagination.lower_bound}}-{{pagination.upper_bound}}</span> of
             {% if counts['filtered'] %}
-                <span class="bounds">{{counts['filtered']}}</span>
+                {% set ct = counts['filtered'] %}
             {% else %}
-                <span class="bounds">{{pagination.total_count}}</span>
+                {% set ct = pagination.total_count %}
             {% endif %}
+            <span class="bounds">{{pagination.lower_bound}}-{{min(ct,pagination.upper_bound)}}</span> of
+            <span class="bounds">{{ct}}</span>
         {% endif %}
         for <strong>{{query.terms}}</strong>
         {% if source %}
@@ -54,7 +55,7 @@
                             <div class="panel-body">
                                 {% from "_template_helpers.html" import advanced %}
                                 {% set sconfig = CONFIG[source] %}
-                                {{ advanced(source, sconfig, query.query) }}
+                                {{ advanced(source, sconfig, query) }}
                             </div>
                         </div>
                     </div>
