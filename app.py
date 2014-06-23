@@ -8,6 +8,7 @@ from query.ast import parse_advanced
 from indexing import IndexDaemon
 import util.helpers as helpers
 import config.duckduckmongo as settings
+import config.celery as celery_settings
 import json
 
 CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
@@ -44,7 +45,7 @@ BASIC_OPTS.extend([k for k in SUBSOURCES.keys() if SUBSOURCES[k]])
 # App Settings
 PAGE_SIZE = 10
 
-DAEMON = IndexDaemon()
+DAEMON = IndexDaemon(settings.HOOKS)
 
 """
 RESULT_PROJECTION = {
@@ -400,7 +401,8 @@ app.jinja_env.globals['CONFIG'] = settings.CONFIG
 #-----------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    app.debug = True
+    from socket import gethostname, gethostbyname
+    #app.debug = True
     app.config['SECRET_KEY'] = 'supersekretkey'
 
     # Specify the debug panels you want
@@ -421,8 +423,9 @@ if __name__ == "__main__":
     toolbar = DebugToolbarExtension(app)
 
     if not app.debug:
-        ADMINS = ['tyler@10gen.com']
+        ADMINS = ['tyler@10gen.com', 'austin.estep@10gen.com']
 
+        """
         import logging
         from logging.handlers import SMTPHandler
         from logging.handlers import RotatingFileHandler
@@ -434,5 +437,6 @@ if __name__ == "__main__":
         file_handler.setLevel(logging.WARNING)
         app.logger.addHandler(file_handler)
         app.logger.addHandler(mail_handler)
+        """
 
-    app.run()
+    app.run(host=gethostname())

@@ -18,14 +18,44 @@
 
 {% block footer %}
 <div class="center muted">
-    <p>
-        <small>
-            To search for documents that contain the term "node.js"
-            <strong>AND</strong>
-            the term "memory leak" use:
-        </small>
-    </p>
-    <code>"node.js" "memory leak"</code>
+    <a data-toggle="collapse" data-target="#cheat-sheet">
+        <h5 class="text-muted">Cheat sheet</h5>
+    </a>
+    <div id="cheat-sheet" class="collapse in">
+        <table class="table table-bordered table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th>Query</th>
+                    <th>Matched documents</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-left"><code>foo</code></td>
+                    <td class="text-left">Contains "foo"</td>
+                </tr>
+                <tr>
+                    <td class="text-left"><code>foo source:jira</code></td>
+                    <td class="text-left">JIRA results containing "foo"</td>
+                </tr>
+                <tr>
+                    <td class="text-left"><code>foo source:jira/BUILD</code></td>
+                    <td class="text-left">JIRA results from the BUILD project containing "foo"</td>
+                <tr>
+                    <td class="text-left"><code>foo some_field:5+</code></td>
+                    <td class="text-left">Contains "foo", has a some_field attribute that is at least 5</td>
+                </tr>
+                <tr>
+                    <td class="text-left"><code>foo source:!jira</code></td>
+                    <td class="text-left">Contains "foo" and is not a JIRA result</td>
+                </tr>
+                <tr>
+                    <td class="text-left"><code>foo source:[jira,github]</code></td>
+                    <td class="text-left">Contains "foo" and is either a JIRA or GitHub result</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 <script type="text/javascript">
     /*

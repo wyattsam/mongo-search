@@ -28,7 +28,7 @@ class JiraScraper(BaseScraper):
         self.info("Beginning project %s" % self.project)
 
     def _scrape(self, doc, links=None):
-        issues = None # why do i have to do this?
+        issues = None
         if 'issues' in doc and 'total' in doc:
             issues = doc['issues']
             self.total = doc['total']
