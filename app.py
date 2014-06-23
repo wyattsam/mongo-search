@@ -434,4 +434,4 @@ if __name__ == "__main__":
         app.logger.addHandler(mail_handler)
         """
 
-    app.run(host='ec2-54-88-113-255.compute-1.amazonaws.com')
+    app.run()

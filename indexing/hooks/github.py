@@ -1,16 +1,19 @@
 from base_hook import BaseHook
-from Crypto.Hash import SHA
-from Crypto.Hash import HMAC
+"""
+from celery import Celery
+from celery.contrib.methods import task_method
+
+celery = Celery('github', broker="mongodb://localhost:27017")
+"""
 
 class GithubHook(BaseHook):
     def __init__(self):
         BaseHook.__init__(self, 'http://github.com')
         #self.needs_auth = True
         self.authtype = 'X-Hub-Signature'
-        self.sha1 = SHA.new()
 
     def authenticate(self, msg, h):
-        # TODO: how much is auth necessary? JIRA can't even use it
+        #TODO implement this
         pass
         """
         token = str(user['auth']) # cannot be unicode
@@ -19,6 +22,7 @@ class GithubHook(BaseHook):
         return result, (h == hasher.hexdigest()) # secure compare I suppose
         """
 
+    #@celery.task(name="github.handle", filter=task_method)
     def handle(self, msg):
         name = msg['repository']['name']
         org = msg['repository']['owner']['name']

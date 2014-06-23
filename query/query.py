@@ -1,5 +1,4 @@
 import pyparsing as pp
-#import query_token
 import ast
 from werkzeug.datastructures import ImmutableMultiDict
 
@@ -61,10 +60,6 @@ class BasicQuery(object):
             self.args = args.to_dict()
         text = args['query']
         self.query = text
-        tokenizer = query_token.Tokenizer(text)
-        self.tokens = [t for t in tokenizer.tokenize()]
-        self.index = 0
-        self.curr = self.tokens[self.index]
 
         self.subsources = ss
         self.ast = self._query()[0]

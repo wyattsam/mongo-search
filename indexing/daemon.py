@@ -8,13 +8,8 @@ class IndexDaemon(object):
         self.hooks = hooks
 
     def handle(self, sourcename, message, headers):
-	print "stepped into handle"
-	print "sourcename", sourcename
-	print "allhooks", self.hooks
         hookcls = self.hooks[sourcename]
-	hook = hookcls()
-	print "hook is", hook
-	print "found a hook"
+        hook = hookcls()
         if not hook:
             return self.respond(403, status="Unrecognized hook source")
         if hook.needs_auth:
