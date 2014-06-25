@@ -16,6 +16,7 @@ class ScrapeRunner(object):
         self.scrapelog = self.db.scrapes
         self.cfg = cfg
         self.scrape_id = ""
+        self.opt = False
 
         cfgs = [k for k in self.cfg.keys() if k[0] != '_']
         self.scrapers = self.cfg_instantiate('scraper', snames or cfgs)
@@ -32,7 +33,7 @@ class ScrapeRunner(object):
             if s.needs_setup:
                 # _setup may take time; let scraping continue while we do setup
                 # FIXME: something is wrong with the thread safety here
-                if opt:
+                if self.opt:
                     thread.start_new_thread(s.setup, ())
                 else:
                     s.setup()

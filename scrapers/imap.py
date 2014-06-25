@@ -14,6 +14,7 @@ class IMAPScraper(BaseScraper):
        of the documents() method."""
     def __init__(self, name, **kwargs):
         BaseScraper.__init__(self, name, **kwargs)
+        self._setup_logger(__name__)
         self.labels = kwargs['labels']
         self.group_re = re.compile(r'^\[(.*)\]\s+(.*)')
         self.subject_re = re.compile(r'([\[\(] *)?(\bRE|FWD?) *([-:;)\]][ :;\])-]*|$)|\]+ *$',

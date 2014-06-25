@@ -5,6 +5,7 @@ import requests
 class GithubScraper(BaseScraper):
     def __init__(self, name, **kwargs):
         BaseScraper.__init__(self, name, **kwargs)
+        self._setup_logger(__name__)
         self.orgurl = 'https://api.github.com/orgs/'
         self.orgs = kwargs['orgs']
         self.org = self.orgs.pop(0)

@@ -5,6 +5,7 @@ import requests
 class JiraScraper(BaseScraper):
     def __init__(self, name, **kwargs):
         BaseScraper.__init__(self, name, **kwargs)
+        self._setup_logger(__name__)
         self.skip = kwargs['skip']
         self.apiurl = 'https://jira.mongodb.org/rest/api/2/search/'
         self.pkeys = []

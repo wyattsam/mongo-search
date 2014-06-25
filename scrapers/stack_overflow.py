@@ -4,6 +4,7 @@ from base_scraper import BaseScraper
 class StackOverflowScraper(BaseScraper):
     def __init__(self, name, **kwargs):
         BaseScraper.__init__(self, name, **kwargs)
+        self._setup_logger(__name__)
         self.apiurl = "https://api.stackexchange.com/2.1/search"
         self.tags = kwargs['tags']
         self.tag = 0

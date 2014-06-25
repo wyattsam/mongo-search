@@ -7,6 +7,7 @@ import ssl
 class GenericScraper(BaseScraper):
     def __init__(self, name, **kwargs):
         BaseScraper.__init__(self, name, **kwargs)
+        self._setup_logger(__name__)
         self.url_targets = kwargs['url_targets']
         self.base_url = kwargs['url']
         self.url_ext, self.target = self.url_targets.pop(0)

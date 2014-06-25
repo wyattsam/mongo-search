@@ -3,6 +3,7 @@ from base_scraper import BaseScraper
 class ProfilesScraper(BaseScraper):
     def __init__(self, name, **kwargs):
         BaseScraper.__init__(self, name, **kwargs)
+        self._setup_logger(__name__)
         self.apiurl = 'https://corp.mongodb.com/api/employee'
         self.params = {'expand': 'team'}
 

@@ -17,6 +17,7 @@ class MLStripper(HTMLParser):
 class ConfluenceScraper(BaseScraper):
     def __init__(self, name, **kwargs):
         BaseScraper.__init__(self, name, **kwargs)
+        self._setup_logger(__name__)
         self.spaces = kwargs['spaces']
         self.needs_setup = True
         self.base_url = "https://wiki.mongodb.com/rest/prototype/1/"

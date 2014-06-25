@@ -83,10 +83,3 @@ SEARCHES.ensure_index([
     ],
     name='query_text'
 )
-
-### User authentication
-USERS.ensure_index([
-    ('ip': 1)
-    ],
-    name='user_index'
-)

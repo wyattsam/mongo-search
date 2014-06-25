@@ -8,14 +8,9 @@ class BaseScraper(object):
     def __init__(self, name, **kwargs):
         self.name = name
         self.finished = False
-        self.log = logging.getLogger(__name__)
 
-        # set up the logger
-        so = logging.StreamHandler(sys.stdout)
-        so.setFormatter(
-            logging.Formatter('[%(levelname)s] %(asctime)s %(name)s: %(message)s'))
-        self.log.addHandler(so)
-        self.log.setLevel(kwargs['_loglevel'])
+        self._loglevel = kwargs['_loglevel']
+        self.logging_available = False
 
         self.params = {}
 
@@ -32,6 +27,18 @@ class BaseScraper(object):
                 self.auth = None
         else:
             self.auth = None
+
+    def _setup_logger(self, name):
+        self.log = logging.getLogger(name)
+
+        # set up the logger
+        so = logging.StreamHandler(sys.stdout)
+        so.setFormatter(
+            logging.Formatter('[%(levelname)s] %(asctime)s %(name)s: %(message)s'))
+        self.log.addHandler(so)
+        self.log.setLevel(self._loglevel)
+        self.logging_available = True
+
             
     def _auth(self, auth, un, pw, kwargs):
         user = auth[un]
@@ -49,6 +56,8 @@ class BaseScraper(object):
            API url. _scrape should change the
            value of self.finished at some point, or this method
            never terminates."""
+        if not self.logging_available:
+            self._setup_logger()
         while not self.finished:
             headers = {'accept': 'application/json'}
 
