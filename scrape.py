@@ -105,14 +105,14 @@ class ScrapeRunner(object):
     def run(self, s):
         self.logger.info("running scraper: %s" % s.name)
         self.log_scrape_start(s)
-        for d in s.documents():
-            for d1 in d:
-                try:
-                    self.save(d1, s.name)
-                except Exception as e:
-                    self.logger.error("documents exception: " + repr(e))
-                    self.log_scrape_error(e)
-                    return
+        try:
+            for d in s.documents():
+                for d1 in d:
+                        self.save(d1, s.name)
+        except Exception as e:
+            self.logger.error("documents exception: " + repr(e))
+            self.log_scrape_error(e)
+            return
         self.log_scrape_finish(s)
 
     def runall(self):

@@ -29,22 +29,26 @@ class GithubScraper(BaseScraper):
             self.repo = self.repos.pop(0)
         except KeyError:
             self.err(self.repos['message'])
-            return # TODO should throw a custom exception
+            raise StopIteration()
         self.apiurl = self.repo['url'] + "/commits"
         self.info("Starting repo %s" % self.repo['full_name'])
 
     def _scrape(self, doc, links=None):
         for commit in doc:
             if 'message' not in commit:
-                commit['_id'] = self.repo['full_name'] + '-' + commit['sha']
-                commit['repo'] = {
-                    'full_name': self.repo['full_name'],
-                    'name': self.repo['name'],
-                    'url': self.repo['url']
-                }
-                commit['subsource'] = self.repo['name']
-                commit['org'] = self.org
-                yield commit
+                try:
+                    commit['_id'] = self.repo['full_name'] + '-' + commit['sha']
+                    commit['repo'] = {
+                        'full_name': self.repo['full_name'],
+                        'name': self.repo['name'],
+                        'url': self.repo['url']
+                    }
+                    commit['subsource'] = self.repo['name']
+                    commit['org'] = self.org
+                    yield commit
+                except Exception: # we get a differently typed message when github shuts us off
+                    self.error("GitHub returned an error document: %s" % doc)
+                    raise StopIteration()
         if 'next' in links:
             self.info("Getting next page of repo %s" % self.repo['name'])
             self.apiurl = links['next']['url']
