@@ -8,8 +8,7 @@ app.config_from_object(celery_settings)
 
 cfg = search_settings.CONFIG
 
-#sources = [k for k in cfg.keys() if k[0] != '_']
-sources = ['docs']
+sources = [k for k in cfg.keys() if k[0] != '_']
 
 @app.task
 def scrape_source(source):
