@@ -2,7 +2,7 @@ MongoDB Search
 ==============
 A domain-specific search engine powered by MongoDB.
 
-## Deploying
+### Deploying
 Deploying the pre-packaged site requires only a few steps.
 
 1. Start a MongoDB instance configured to your liking on port 27017.
@@ -12,7 +12,15 @@ Deploying the pre-packaged site requires only a few steps.
 
 For instructions on the query language, see the cheat sheet on the home page of your deployment.
 
-## Building new data sources
+### Using Celery to scrape
+The file ```tasks.py``` is included to allow the scrapers to be run with [Celery](http://celeryproject.org). To start the celery workers, run:
+```
+$ celery -A tasks worker
+$ python tasks.py
+```
+Executing tasks.py will queue up an initial scrape for each data source. When a source is finished, its default behavior is to immediately start again. For this reason, it's advisable to run celery in the background by using celeryd (or your favorite solution).
+
+### Building new data sources
 Several common data sources, such as Stack Overflow, Github, and JIRA are available out of the box. However, defining other data sources is possible. There are a handful of steps required.
 
 1. Build a new scraper for your source in the ```scrapers``` directory. It should inherit from ```base_scraper.BaseScraper``` and implement the ```_scrape``` (and possibly ```_setup```) methods. If your scraper requires setup, make sure to set the ```self.needs_setup``` flag to True. The purpose of the scraper is to describe the logic behind any RESTful API you may be using. Once you are done and want to use your scraper, don't import it inside the ```scrapers/__init__.py``` file.
@@ -51,4 +59,4 @@ CONFIG = {
     ...
 }
 ```
-5. Now you can run your scraper by running ```python scrape.py my_new_source```. Once it's all done, you're ready to search!
+Now you can run your scraper by running ```python scrape.py my_new_source```. Once it's all done, you're ready to search!
