@@ -171,7 +171,6 @@ def submit():
     page_limit = page * PAGE_SIZE
     results = run_query(query_json, mq.args, page, page_limit)
     pagination = helpers.Pagination(page, PAGE_SIZE, counts['filter_total'])
-    print "args", mq.args
 
     return render_template(
         'results.html',
