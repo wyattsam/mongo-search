@@ -5,8 +5,7 @@ requirements = [
     'python-dev',
     'python-pip',
     'htop',
-    'nginx',
-    'mongodb'
+    'nginx'
     ]
 code_dir = '/home/ubuntu/search'
 hostname = 'ec2-54-85-5-163.compute-1.amazonaws.com'
@@ -31,6 +30,11 @@ def pull():
 
 def install_reqs():
     run('sudo apt-get install ' + ' '.join(requirements).strip()) 
+    # install mongodb 2.6
+    run('sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10')
+    run("echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list")
+    run('sudo apt-get update')
+    run('sudo apt-get install mongodb-org')
 
 def install_libs():
     with settings(warn_only=True):
@@ -43,7 +47,7 @@ def start_mongo():
     with settings(warn_only=True):
         run('mkdir /home/ubuntu/data')
         run('mkdir /home/ubuntu/logs')
-    run('sudo mongod --port 27017 --dbpath /home/ubuntu/data --logpath /home/ubuntu/logs/search.log --fork')
+    run('sudo mongod --port 27017 --dbpath /home/ubuntu/data --logpath /home/ubuntu/logs/search.log --fork --smallfiles')
 
 def start_nginx():
     run('sudo service nginx start')
