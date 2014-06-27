@@ -4,6 +4,7 @@ requirements = [
     'git',
     'python-dev',
     'python-pip',
+    'htop',
     'mongodb'
     ]
 code_dir = '/home/ubuntu/search'
@@ -33,6 +34,12 @@ def install_libs():
                 run('git pull')
                 run('sudo pip install -r requirements.txt')
 
+def start_mongo():
+    with settings(warn_only=True):
+        run('mkdir /home/ubuntu/data')
+        run('mkdir /home/ubuntu/logs')
+    run('mongod --port 27017 --dbpath /home/ubuntu/data --logpath /home/ubuntu/logs/search.log')
+
 def deploy():
     with settings(warn_only=True):
         if run('test -d %s' % code_dir).failed:
@@ -43,4 +50,6 @@ def deploy():
     with cd(code_dir):
         run("git pull")
         local('scp -i %s ~/dev/search/config/duckduckmongo.py ubuntu@%s:%s/config/' % (env.key_filename, hostname, code_dir))
-        run('sudo restart search')
+        #run('sudo restart search')
+        start_mongo()
+        run('gunicorn -w 3 -b %s:8000 search:app &' % hostname)
