@@ -43,4 +43,4 @@ def deploy():
     with cd(code_dir):
         run("git pull")
         local('scp -i %s ~/dev/search/config/duckduckmongo.py ubuntu@%s:%s/config/' % (env.key_filename, hostname, code_dir))
-        run("gunicorn app:app")
+        run('sudo restart search')
