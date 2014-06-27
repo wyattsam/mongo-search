@@ -5,6 +5,7 @@ requirements = [
     'python-dev',
     'python-pip',
     'htop',
+    'nginx',
     'mongodb'
     ]
 code_dir = '/home/ubuntu/search'
@@ -24,6 +25,10 @@ def prepare_deploy():
     commit()
     push()
 
+def pull():
+    with cd(code_dir):
+        run('git pull')
+
 def install_reqs():
     run('sudo apt-get install ' + ' '.join(requirements).strip()) 
 
@@ -40,6 +45,21 @@ def start_mongo():
         run('mkdir /home/ubuntu/logs')
     run('mongod --port 27017 --dbpath /home/ubuntu/data --logpath /home/ubuntu/logs/search.log')
 
+def start_nginx():
+    run('sudo service nginx start')
+
+def stop_nginx():
+    run('sudo service nginx stop')
+
+def install_config():
+    if run('test -d /etc/init').failed:
+        run('sudo mkdir /etc/init')
+    run('sudo cp %s/init/search.conf /etc/init/search.conf' % code_dir)
+    run('sudo cp %s/config/nginx.conf /etc/nginx/' % code_dir)
+    if run('test -d /etc/nginx/conf.d').failed:
+        run('sudo mkdir /etc/nginx/conf.d')
+    run('sudo cp %s/config/search.conf /etc/nginx/conf.d/' % code_dir)
+
 def deploy():
     with settings(warn_only=True):
         if run('test -d %s' % code_dir).failed:
@@ -50,6 +70,7 @@ def deploy():
     with cd(code_dir):
         run("git pull")
         local('scp -i %s ~/dev/search/config/duckduckmongo.py ubuntu@%s:%s/config/' % (env.key_filename, hostname, code_dir))
-        #run('sudo restart search')
-        start_mongo()
-        run('gunicorn -w 3 -b %s:8000 search:app &' % hostname)
+        with settings(warn_only=True):
+            start_mongo()
+            start_nginx()
+        run('sudo start search')
