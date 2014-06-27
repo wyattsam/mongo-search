@@ -43,7 +43,7 @@ def start_mongo():
     with settings(warn_only=True):
         run('mkdir /home/ubuntu/data')
         run('mkdir /home/ubuntu/logs')
-    run('mongod --port 27017 --dbpath /home/ubuntu/data --logpath /home/ubuntu/logs/search.log')
+    run('sudo mongod --port 27017 --dbpath /home/ubuntu/data --logpath /home/ubuntu/logs/search.log --fork')
 
 def start_nginx():
     run('sudo service nginx start')
@@ -69,7 +69,9 @@ def deploy():
             install_libs()
     with cd(code_dir):
         run("git pull")
+        #copy config
         local('scp -i %s ~/dev/search/config/duckduckmongo.py ubuntu@%s:%s/config/' % (env.key_filename, hostname, code_dir))
+        install_config()
         with settings(warn_only=True):
             start_mongo()
             start_nginx()
