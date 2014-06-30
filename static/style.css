@@ -237,3 +237,7 @@ a {
     -o-transition: height 0.001s;
     transition: height 0.001s;
 }
+
+.hidden-row{
+    padding: 0 !important;
+}
