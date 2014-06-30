@@ -16,8 +16,12 @@ class GithubScraper(BaseScraper):
 
         params = {'per_page': 100}
         if self.auth:
-            self.params = dict([self.auth])
+            self.params = {
+                'client_id': self.auth[0],
+                'client_secret': self.auth[1]
+            }
             self.params.update(**params)
+            print "params is", self.params
         else:
             self.params = params
         self.auth = None
@@ -59,7 +63,7 @@ class GithubScraper(BaseScraper):
                 if len(self.orgs) == 0:
                     self.finished = True
                 else:
-                    # TODO
+                    # TODO switch to new org
                     pass
             else:
                 self.repo = self.repos.pop(0)
