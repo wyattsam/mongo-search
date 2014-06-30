@@ -15,8 +15,11 @@ def scrape_source(source):
     scraper = ScrapeRunner(cfg, snames=[source])
     scraper.do_setup()
     scraper.runall()
-    scrape_source.delay(source)
 
-if __name__ == '__main__':
+@app.task
+def scrape_all():
     for source in sources:
         scrape_source.delay(source)
+
+if __name__ == '__main__':
+    scrape_all()
