@@ -1,4 +1,4 @@
-from fabric.api import local, cd, run, env, settings
+from fabric.api import local, run, cd, env, put
 import os
 import time
 
@@ -28,6 +28,10 @@ def prepare_deploy():
     commit()
     push()
 
+def install_celerybeat():
+    with cd('/etc/init.d'):
+        run('wget https://raw.githubusercontent.com/celery/celery/master/extra/centos/celerybeat')
+
 def deploy():
     deploydir = os.path.join(releases, time.strftime(datefmt))
     venvdir = os.path.join(appdir, 'venv')
@@ -42,10 +46,15 @@ def deploy():
     # set up virtual environment
     run('virtualenv {0}'.format(venvdir))
     run('source {0}/bin/activate'.format(venvdir))
+    run('scl enable python27 bash') # we need to use python27
     run('{0} install -r {1}'.format(venv_pip, req_file))
 
-    # start services
-    with cd(deploydir):
-        # copy over the config file
-        local('scp -i %s ~/dev/search/config/duckduckmongo.py %s@%s:%s/config/' % (env.key_filename, user, hostname, deploydir))
-        run('sudo restart search')
+    # copy over the config file
+    put('~/dev/search/config/duckduckmongo.py', '{0}/config/'.format(deploydir))
+
+    # copy over celery files
+    put('~/dev/search/config/celerybeat.sysconfig', '/etc/sysconfig/celerybeat')
+    run('echo CELERY_BIN="{0}/bin/celery" | sudo tee /etc/sysconfig/celerybeat')
+
+    # restart services
+    run('sudo restart search')
