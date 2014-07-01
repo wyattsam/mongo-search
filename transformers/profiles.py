@@ -2,7 +2,7 @@ from base_transformer import BaseTransformer
 from flask import request
 import md5
 
-CORP_URL = "https://corp.10gen.com"
+CORP_URL = "https://corp.10gen.com/"
 def corp_url():
     if request.referrer and 'mongodb' in request.referrer:
         return CORP_URL.replace('10gen', 'mongodb')
