@@ -1,21 +1,23 @@
 from fabric.api import local, cd, run, env, settings
+import os
+import time
 
 appname = 'search'
 environment = 'staging'
 user = appname+'-'+environment
 
 appdir = '/opt/10gen/'+user
-statedir = '/srv/10gen/'+user
-logdir = '/var/log/10gen/'+user
-lockdir = '/var/run/10gen/'+user
+current = os.path.join(appdir, 'current')
+releases = os.path.join(appdir, 'releases')
 
 hostname = 'ec2-54-88-195-164.compute-1.amazonaws.com'
 
-env.user = 'ec2-user'
 env.hosts = [hostname]
-env.key_filename = '~/.ssh/mongodb-search.pem'
+env.use_ssh_config = True
+env.forward_agent = True
 
-### Local prepare
+datefmt = '%Y%m%d%H%M%S'
+
 def commit():
     local("git add -p && git commit")
 
@@ -26,36 +28,24 @@ def prepare_deploy():
     commit()
     push()
 
-### Do the fresh deploy
-def pull():
-    with cd(appdir):
-        run('git pull')
-
-def install_libs():
-    with settings(warn_only=True):
-        with cd(appdir):
-            run('sudo pip install -r requirements.txt')
-
-def setup_dirs():
-    with settings(warn_only=True):
-        run('mkdir -p '+appdir)
-        run('chmod 2775 '+appdir)
-        run('mkdir -p '+statedir)
-        run('mkdir -p '+logdir)
-        run('mkdir -p '+lockdir)
-    with cd(appdir):
-        run('mkdir -p releases')
-
-def deploy_new():
-    with settings(warn_only=True):
-        setup_dirs()
-        run('git clone https://github.com/10gen/search '+appdir)
-    with cd(appdir):
-        # copy config
-        local('scp -i %s ~/dev/search/config/duckduckmongo.py ec2-user@%s:%s/config/' % (env.key_filename, hostname, appdir))
-        run('sudo start search')
-
 def deploy():
-    with cd(appdir):
-        run("git pull")
+    deploydir = os.path.join(releases, time.strftime(datefmt))
+    venvdir = os.path.join(appdir, 'venv')
+    venv_pip = os.path.join(venvdir, 'bin/pip')
+    req_file = os.path.join(deploydir, 'requirements.txt')
+
+    # set up directories
+    run('git clone {0} {1}'.format('https://github.com/10gen/search', deploydir))
+    run('chmod 2775 {0}'.format(deploydir))
+    run('ln -sfn {0} {1}'.format(deploydir, current))
+
+    # set up virtual environment
+    run('virtualenv {0}'.format(venvdir))
+    run('source {0}/bin/activate'.format(venvdir))
+    run('{0} install -r {1}'.format(venv_pip, req_file))
+
+    # start services
+    with cd(deploydir):
+        # copy over the config file
+        local('scp -i %s ~/dev/search/config/duckduckmongo.py %s@%s:%s/config/' % (env.key_filename, user, hostname, deploydir))
         run('sudo restart search')
