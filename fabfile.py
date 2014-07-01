@@ -1,20 +1,21 @@
 from fabric.api import local, cd, run, env, settings
 
-requirements = [
-    'git',
-    'gcc',
-    'python-devel',
-    'python-pip',
-    'htop',
-    'nginx'
-    ]
-code_dir = '/home/ec2-user/search'
+appname = 'search'
+environment = 'staging'
+user = appname+'-'+environment
+
+appdir = '/opt/10gen/'+user
+statedir = '/srv/10gen/'+user
+logdir = '/var/log/10gen/'+user
+lockdir = '/var/run/10gen/'+user
+
 hostname = 'ec2-54-88-195-164.compute-1.amazonaws.com'
 
 env.user = 'ec2-user'
 env.hosts = [hostname]
 env.key_filename = '~/.ssh/mongodb-search.pem'
 
+### Local prepare
 def commit():
     local("git add -p && git commit")
 
@@ -25,61 +26,36 @@ def prepare_deploy():
     commit()
     push()
 
+### Do the fresh deploy
 def pull():
-    with cd(code_dir):
+    with cd(appdir):
         run('git pull')
-
-def install_reqs():
-    run('sudo yum install ' + ' '.join(requirements).strip()) 
-    # install mongodb 2.6
-    run('echo -e "[mongodb]\nname=MongoDB Repository\nbaseurl=http://downloads-distro.mongodb.org/repo/redhat/os/x86_64\ngpgcheck=0\nenabled=1" | sudo tee /etc/yum.repos.d/mongodb.repo')
-    run('sudo yum install mongodb-org')
 
 def install_libs():
     with settings(warn_only=True):
-        if not run('test -d %s' % code_dir).failed:
-            with cd(code_dir):
-                run('git pull')
-                run('sudo pip install -r requirements.txt')
+        with cd(appdir):
+            run('sudo pip install -r requirements.txt')
 
-def start_mongo():
+def setup_dirs():
     with settings(warn_only=True):
-        run('mkdir /home/ec2-user/data')
-        run('mkdir /home/ec2-user/logs')
-    run('sudo mongod --port 27017 --dbpath /home/ec2-user/data --logpath /home/ec2-user/logs/search.log --fork --smallfiles &')
-
-def start_nginx():
-    run('sudo service nginx start')
-
-def stop_nginx():
-    run('sudo service nginx stop')
-
-def install_config():
-    if run('test -d /etc/init').failed:
-        run('sudo mkdir /etc/init')
-    run('sudo cp %s/init/search.conf /etc/init/search.conf' % code_dir)
-    run('sudo cp %s/config/nginx.conf /etc/nginx/' % code_dir)
-    if run('test -d /etc/nginx/conf.d').failed:
-        run('sudo mkdir /etc/nginx/conf.d')
-    run('sudo cp %s/config/search.conf /etc/nginx/conf.d/' % code_dir)
+        run('mkdir -p '+appdir)
+        run('chmod 2775 '+appdir)
+        run('mkdir -p '+statedir)
+        run('mkdir -p '+logdir)
+        run('mkdir -p '+lockdir)
+    with cd(appdir):
+        run('mkdir -p releases')
 
 def deploy_new():
     with settings(warn_only=True):
-        if run('test -d %s' % code_dir).failed:
-            run('mkdir %s' % code_dir)
-            install_reqs()
-            run('git clone https://github.com/10gen/search %s' % code_dir)
-            install_libs()
-    with cd(code_dir):
-        #copy config
-        local('scp -i %s ~/dev/search/config/duckduckmongo.py ec2-user@%s:%s/config/' % (env.key_filename, hostname, code_dir))
-        install_config()
-        with settings(warn_only=True):
-            start_mongo()
-            start_nginx()
+        setup_dirs()
+        run('git clone https://github.com/10gen/search '+appdir)
+    with cd(appdir):
+        # copy config
+        local('scp -i %s ~/dev/search/config/duckduckmongo.py ec2-user@%s:%s/config/' % (env.key_filename, hostname, appdir))
         run('sudo start search')
 
 def deploy():
-    with cd(code_dir):
+    with cd(appdir):
         run("git pull")
         run('sudo restart search')
