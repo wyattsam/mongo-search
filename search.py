@@ -253,7 +253,6 @@ def run_filtered_count_query(query_doc):
 
 @line_profile
 def run_query(query_doc, args, page, limit):
-    print "query_doc", query_doc
     # must use $orderby for sort until pymongo is updated
     sort_doc = {'text_score': {'$meta': 'textScore'}}
 

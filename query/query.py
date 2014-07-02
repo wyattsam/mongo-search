@@ -8,7 +8,6 @@ def make_IdentTerm(s, loc, toks):
     return ast.IdentTerm(toks[0])
 
 def make_QuotedTerm(s, loc, toks):
-    print toks
     return ast.QuotedTerm(toks[1:len(toks)-1])
 
 def make_Query(s, loc, toks):
