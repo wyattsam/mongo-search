@@ -69,7 +69,7 @@ class BasicQuery(object):
         ident = pp.Word(pp.srange("[a-zA-Z0-9_.+-]"))
 
         ## Terms
-        ident_term = pp.Word(pp.srange("[a-zA-Z0-9_.]")).setParseAction(
+        ident_term = pp.Word(pp.srange("[a-zA-Z0-9_.+-]")).setParseAction(
                 make_IdentTerm)
         quoted_term = ('"' + pp.OneOrMore(ident_term) + '"').setParseAction(
                 make_QuotedTerm)
