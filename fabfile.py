@@ -54,7 +54,7 @@ def deploy():
 
     # copy over celery files
     put('~/dev/search/config/celerybeat.sysconfig', '/etc/sysconfig/celerybeat')
-    run('echo CELERY_BIN="{0}/bin/celery" | sudo tee /etc/sysconfig/celerybeat')
+    run('echo CELERY_BIN="{0}/bin/celery" | sudo tee /etc/sysconfig/celerybeat'.format(venvdir))
 
     # restart services
     run('sudo restart search')
