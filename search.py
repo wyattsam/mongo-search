@@ -270,16 +270,16 @@ def run_query(query_doc, args, page, limit):
         if not (isinstance(args[k], str) or isinstance(args[k], unicode)):
             args[k] = ''
 
+    start = (page - 1) * PAGE_SIZE
+    end = page * PAGE_SIZE
     transformed = []
-    for result in results:
+    for result in results[start:end]:
         source = result['source']
         if settings.CONFIG[source]['transformer']:
             transformer = settings.CONFIG[source]['transformer']()
             transformed.append(transformer.transform(result))
 
-    start = (page - 1) * PAGE_SIZE
-    end = page * PAGE_SIZE
-    return transformed[start:end]
+    return transformed
 
 @line_profile
 def advanced_options(doc, args):
