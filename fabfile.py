@@ -10,11 +10,12 @@ appdir = '/opt/10gen/'+user
 current = os.path.join(appdir, 'current')
 releases = os.path.join(appdir, 'releases')
 
-hostname = 'ec2-54-88-195-164.compute-1.amazonaws.com'
+hostname = 'search-staging-1.vpc3.10gen.cc'
 
 env.hosts = [hostname]
 env.use_ssh_config = True
 env.forward_agent = True
+env.user = 'aestep'
 
 datefmt = '%Y%m%d%H%M%S'
 
