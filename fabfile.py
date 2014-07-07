@@ -12,22 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from fabric.api import local, cd, run, env, settings
+from fabric.api import local, run, cd, env, put
+import os
+import time
 
-requirements = [
-    'git',
-    'gcc',
-    'python-devel',
-    'python-pip',
-    'htop',
-    'nginx'
-    ]
-code_dir = '/home/ec2-user/search'
-hostname = 'ec2-54-88-195-164.compute-1.amazonaws.com'
+appname = 'search'
+environment = 'staging'
+user = appname+'-'+environment
 
-env.user = 'ec2-user'
+appdir = '/opt/10gen/'+user
+current = os.path.join(appdir, 'current')
+releases = os.path.join(appdir, 'releases')
+
+hostname = user+'-1.vpc3.10gen.cc'
+
 env.hosts = [hostname]
-env.key_filename = '~/.ssh/mongodb-search.pem'
+env.use_ssh_config = True
+env.forward_agent = True
+env.user = 'aestep'
+
+datefmt = '%Y%m%d%H%M%S'
 
 def commit():
     local("git add -p && git commit")
@@ -39,61 +43,31 @@ def prepare_deploy():
     commit()
     push()
 
-def pull():
-    with cd(code_dir):
-        run('git pull')
-
-def install_reqs():
-    run('sudo yum install ' + ' '.join(requirements).strip()) 
-    # install mongodb 2.6
-    run('echo -e "[mongodb]\nname=MongoDB Repository\nbaseurl=http://downloads-distro.mongodb.org/repo/redhat/os/x86_64\ngpgcheck=0\nenabled=1" | sudo tee /etc/yum.repos.d/mongodb.repo')
-    run('sudo yum install mongodb-org')
-
-def install_libs():
-    with settings(warn_only=True):
-        if not run('test -d %s' % code_dir).failed:
-            with cd(code_dir):
-                run('git pull')
-                run('sudo pip install -r requirements.txt')
-
-def start_mongo():
-    with settings(warn_only=True):
-        run('mkdir /home/ec2-user/data')
-        run('mkdir /home/ec2-user/logs')
-    run('sudo mongod --port 27017 --dbpath /home/ec2-user/data --logpath /home/ec2-user/logs/search.log --fork --smallfiles &')
-
-def start_nginx():
-    run('sudo service nginx start')
-
-def stop_nginx():
-    run('sudo service nginx stop')
-
-def install_config():
-    if run('test -d /etc/init').failed:
-        run('sudo mkdir /etc/init')
-    run('sudo cp %s/init/search.conf /etc/init/search.conf' % code_dir)
-    run('sudo cp %s/config/nginx.conf /etc/nginx/' % code_dir)
-    if run('test -d /etc/nginx/conf.d').failed:
-        run('sudo mkdir /etc/nginx/conf.d')
-    run('sudo cp %s/config/search.conf /etc/nginx/conf.d/' % code_dir)
-
-def deploy_new():
-    with settings(warn_only=True):
-        if run('test -d %s' % code_dir).failed:
-            run('mkdir %s' % code_dir)
-            install_reqs()
-            run('git clone https://github.com/10gen/search %s' % code_dir)
-            install_libs()
-    with cd(code_dir):
-        #copy config
-        local('scp -i %s ~/dev/search/config/duckduckmongo.py ec2-user@%s:%s/config/' % (env.key_filename, hostname, code_dir))
-        install_config()
-        with settings(warn_only=True):
-            start_mongo()
-            start_nginx()
-        run('sudo start search')
+def install_celerybeat():
+    with cd('/etc/init.d'):
+        run('wget https://raw.githubusercontent.com/celery/celery/master/extra/centos/celerybeat')
 
 def deploy():
-    with cd(code_dir):
-        run("git pull")
-        run('sudo restart search')
+    deploydir = os.path.join(releases, time.strftime(datefmt))
+    venvdir = os.path.join(appdir, 'venv')
+    venv_pip = os.path.join(venvdir, 'bin/pip')
+    req_file = os.path.join(deploydir, 'requirements.txt')
+
+    # set up directories
+    run('git clone {0} {1}'.format('git@github.com:10gen/search', deploydir))
+    run('chmod 2775 {0}'.format(deploydir))
+    run('ln -sfn {0} {1}'.format(deploydir, current))
+
+    # set up virtual environment
+    run("scl enable python27 'virtualenv {0}'".format(venvdir)) # we need to use python27
+    run("scl enable python27 '{0} install -r {1}'".format(venv_pip, req_file))
+
+    # copy over the config file
+    put('~/dev/search/config/duckduckmongo.py', '{0}/config/'.format(deploydir))
+
+    # copy over celery files
+    #put('~/dev/search/config/celerybeat.sysconfig', '/etc/sysconfig/celerybeat')
+    #run('echo CELERY_BIN="{0}/bin/celery" | sudo tee /etc/sysconfig/celerybeat'.format(venvdir))
+
+    # restart services
+    run('restart search')

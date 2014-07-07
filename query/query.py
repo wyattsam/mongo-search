@@ -22,7 +22,6 @@ def make_IdentTerm(s, loc, toks):
     return ast.IdentTerm(toks[0])
 
 def make_QuotedTerm(s, loc, toks):
-    print toks
     return ast.QuotedTerm(toks[1:len(toks)-1])
 
 def make_Query(s, loc, toks):
@@ -83,7 +82,7 @@ class BasicQuery(object):
         ident = pp.Word(pp.srange("[a-zA-Z0-9_.+-]"))
 
         ## Terms
-        ident_term = pp.Word(pp.srange("[a-zA-Z0-9_.]")).setParseAction(
+        ident_term = pp.Word(pp.srange("[a-zA-Z0-9_.+-]")).setParseAction(
                 make_IdentTerm)
         quoted_term = ('"' + pp.OneOrMore(ident_term) + '"').setParseAction(
                 make_QuotedTerm)

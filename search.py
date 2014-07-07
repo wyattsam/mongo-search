@@ -61,69 +61,6 @@ PAGE_SIZE = 10
 
 DAEMON = IndexDaemon(settings.HOOKS)
 
-"""
-RESULT_PROJECTION = {
-    # Common
-    'text_score': {'$meta': 'textScore'},
-    'source': 1,
-    'status': 1,
-    'url': 1,
-    'summary': 1,
-    'snippet': 1,
-
-    # GitHub
-    'committer': 1,
-    'html_url': 1,
-    'repo': 1,
-    'commit.committer': 1,
-    'commit.message': 1,
-    'commit.html_url': 1,
-    'commit.repo.full_name': 1,
-
-    # Jira
-    'project': 1,
-    'fields.summary': 1,
-    'fields.description': 1,
-    'fields.status': 1,
-    'fields.comment.total': 1,
-
-    # Stack Overflow
-    'link': 1,
-    'title': 1,
-    'body': 1,
-    'tags': 1,
-    'answer_count': 1,
-    'is_answered': 1,
-    'score': 1,
-
-    # Profiles
-    'crowd_id': 1,
-    'first_name': 1,
-    'last_name': 1,
-    'full_name': 1,
-    'github': 1,
-    'primary_phone': 1,
-    'title': 1,
-    'team.name': 1,
-    'office': 1,
-    'uri': 1,
-    'primary_email': 1,
-    'bio': 1,
-
-    # Google Groups
-    'subject': 1,
-    'from': 1,
-    'sender': 1,
-    'group': 1,
-
-    # Confluence
-    'space': 1,
-
-    # Docs
-    'section': 1,
-}
-"""
-
 RESULT_PROJECTION = {
     'text_score': {'$meta': 'textScore'},
     'source': 1,
@@ -347,16 +284,16 @@ def run_query(query_doc, args, page, limit):
         if not (isinstance(args[k], str) or isinstance(args[k], unicode)):
             args[k] = ''
 
+    start = (page - 1) * PAGE_SIZE
+    end = page * PAGE_SIZE
     transformed = []
-    for result in results:
+    for result in results[start:end]:
         source = result['source']
         if settings.CONFIG[source]['transformer']:
             transformer = settings.CONFIG[source]['transformer']()
             transformed.append(transformer.transform(result))
 
-    start = (page - 1) * PAGE_SIZE
-    end = page * PAGE_SIZE
-    return transformed[start:end]
+    return transformed
 
 @line_profile
 def advanced_options(doc, args):
