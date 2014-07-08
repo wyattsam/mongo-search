@@ -28,4 +28,9 @@ CELERYBEAT_SCHEDULE = {
     }
 }
 
+CELERYBEAT_CHDIR="/opt/10gen/search-staging/current"
+
+CELERYBEAT_LOG_FILE="/var/log/10gen/search-staging/celerybeat.log"
+CELERYBEAT_PID_FILE="/var/run/10gen/search-staging/celerybeat.pid"
+
 CELERY_TIMEZONE = 'UTC'
