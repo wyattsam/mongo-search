@@ -22,7 +22,7 @@ celery = Celery('github', broker="mongodb://localhost:27017")
 
 class GithubHook(BaseHook):
     def __init__(self):
-        BaseHook.__init__(self, 'http://github.com')
+        BaseHook.__init__(self)
         #self.needs_auth = True
         self.authtype = 'X-Hub-Signature'
 

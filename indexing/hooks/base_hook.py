@@ -16,7 +16,7 @@ from socket import gethostbyname
 from pymongo import MongoClient
 
 class BaseHook(object):
-    def __init__(self, hostname):
+    def __init__(self):
         self.needs_auth = False
         client = MongoClient('localhost:27017')
         db = client['duckduckmongo']
