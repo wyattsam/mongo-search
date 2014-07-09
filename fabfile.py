@@ -46,7 +46,7 @@ def prepare_deploy():
     push()
 
 def celerystart():
-    run('service search-celery restart')
+    run('sudo /etc/init.d/search-celery restart')
 
 def deploy():
     deploydir = os.path.join(releases, time.strftime(datefmt))
@@ -66,6 +66,7 @@ def deploy():
     run('sudo /etc/init.d/search-web stop')
 
     # set up virtual environment
+    # if it doesn't work, most likely the virtualenv was already in use by celery
     with settings(warn_only=True):
         run("scl enable python27 'virtualenv {0}'".format(venvdir)) # we need to use python27
         run("scl enable python27 '{0} install -r {1}'".format(venv_pip, req_file))
