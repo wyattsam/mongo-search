@@ -24,6 +24,10 @@ def make_IdentTerm(s, loc, toks):
 def make_QuotedTerm(s, loc, toks):
     return ast.QuotedTerm(toks[1:len(toks)-1])
 
+def make_DisjTerm(s, loc, toks):
+    return ast.DisjunctionTerm(
+            filter(lambda x: str(x) != 'or', toks))
+
 def make_Query(s, loc, toks):
     terms = []
     selectors = []
@@ -35,14 +39,8 @@ def make_Query(s, loc, toks):
     return ast.Query(terms, selectors)
 
 def make_NotSelector(s, loc, toks):
-    tokstrs = map(str, toks)
-    neg_idx = tokstrs.index('!')
-    toks.pop(neg_idx)
-    sel = toks[0]
-    maker = make_GenericSelector
-    if sel in SELECTORS:
-        maker = globals()['make_'+sel]
-    return ast.NegativeSelector(maker(s, loc, toks))
+    sel = toks[1]
+    return ast.NegativeSelector(sel)
 
 def make_ListSelector(s, loc, toks):
     sel = toks[0]
@@ -84,36 +82,36 @@ class BasicQuery(object):
         ## Terms
         ident_term = pp.Word(pp.srange("[a-zA-Z0-9_.+-]")).setParseAction(
                 make_IdentTerm)
-        quoted_term = ('"' + pp.OneOrMore(ident_term) + '"').setParseAction(
+        quoted_term = ('"' + pp.OneOrMore(ident) + '"').setParseAction(
                 make_QuotedTerm)
-        term = quoted_term | ident_term
+        disj_term = pp.Forward()
+        disj_term = (ident + pp.OneOrMore(pp.CaselessKeyword('or') + (disj_term | ident))).setParseAction(make_DisjTerm)
+        term = quoted_term | disj_term | ident_term
 
         ## Selector base
-        selector = pp.Forward()
+        basic_selector = pp.Forward()
         selector_start = ident + ':'
 
         ## Selector bodies only
         selector_body = pp.Forward()
-        not_selector_body = '!' + selector_body
         list_selector_body = '[' + pp.delimitedList(selector_body, ',') + ']'
         source_selector_body = ident + pp.Optional('/' + ident)
         generic_selector_body = ident
         selector_body << (
-                  not_selector_body
-                | list_selector_body
+                  list_selector_body
                 | source_selector_body
                 | generic_selector_body)
 
         ## Full selectors
-        not_selector = selector_start + not_selector_body
         list_selector =  selector_start + list_selector_body
         source_selector = pp.CaselessKeyword('source') + ':' + source_selector_body
         generic_selector = selector_start + generic_selector_body
-        selector << (
-                   not_selector.setParseAction(make_NotSelector) \
-                 | list_selector.setParseAction(make_ListSelector) \
+        basic_selector << (
+                   list_selector.setParseAction(make_ListSelector) \
                  | source_selector.setParseAction(make_source) \
                  | generic_selector.setParseAction(make_GenericSelector))
+        not_selector = ('!' + basic_selector).setParseAction(make_NotSelector)
+        selector = not_selector | basic_selector
         query = pp.ZeroOrMore(selector | term).setParseAction(
                 make_Query)
         return query.parseString(self.query)

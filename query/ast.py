@@ -15,6 +15,14 @@
 import re
 import json
 
+class InternalVisitor(object):
+    class DummyQuery(object):
+        def __init__(self):
+            self.args = {}
+    def __init__(self):
+        self.doc = {}
+        self.query = InternalVisitor.DummyQuery()
+
 def parse_advanced(k, arg):
     ineqs = {
         '+': '$gte',
@@ -147,12 +155,18 @@ class NegativeSelector(Selector):
         Selector.__init__(self, sel)
 
     def accept(self, vis):
-        attrs = dir(self.sel)
-        for attr in attrs:
-            field = getattr(self.sel, attr)
-            if not (attr[0] == '_' and attr[1] == '_') and (isinstance(field, str) or isinstance(field, unicode)) and not attr == 'sel': #TODO this should only ignore clownshoes
-                vis.query.args[attr] = { '$not': re.compile(field) }
-                vis.doc[attr] = { '$not': re.compile(field) }
+        if isinstance(self.sel, Selector):
+            # recurse! we got this.
+            vis2 = InternalVisitor()
+            self.sel.accept(vis2)
+            idoc = vis2.doc
+            key = idoc.keys()[0]
+            val = idoc[key]
+            # the $not directive requires a regex here
+            if isinstance(val, basestring):
+                val = re.compile(val)
+            vis.query.args[key] = {'$not': val}
+            vis.doc[key] = {'$not': val}
 
     def __str__(self):
         return 'not(' + str(self.sel) + ')'
@@ -191,7 +205,12 @@ class IdentTerm(Node):
         self.val = val
 
     def accept(self, vis):
-        vis.doc['$text']['$search'] += self.val + " "
+        # FIXME: we currently render multiple terms as individual phrases.
+        # This is a limitation of the server-side search engine
+        # in regards to conjuncting results together
+        # instead of disjuncting them. For now this will cause
+        # mediocre performance. Fix is on the way!
+        vis.doc['$text']['$search'] += '"' + self.val + '" '
 
     def __str__(self):
         return str(self.val)
@@ -207,13 +226,29 @@ class QuotedTerm(Node):
         self.vals = vals
 
     def accept(self, vis):
-        vis.doc['$text']['$search'] += '"' + ' '.join([q.val for q in self.vals]) + '" '
+        vis.doc['$text']['$search'] += '"' + ' '.join(self.vals) + '" '
 
     def __str__(self):
         return '"' + ' '.join(str(v) for v in self.vals) + '"'
 
     def __repr__(self):
         return '[QUOTED] ' +  " ".join(repr(v) for v in self.vals)
+
+    def __contains__(self, item):
+        return item in self.vals
+
+class DisjunctionTerm(Node):
+    def __init__(self, vals):
+        self.vals = vals
+
+    def accept(self, vis):
+        vis.doc['$text']['$search'] += ' '.join(self.vals) + ' '
+
+    def __str__(self):
+        return '"' + ' '.join(str(v) for v in self.vals) + '"'
+
+    def __repr__(self):
+        return '[DISJUNCT] ' +  " ".join(repr(v) for v in self.vals)
 
     def __contains__(self, item):
         return item in self.vals

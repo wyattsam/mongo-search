@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from fabric.api import local, run, cd, env, put, prefix
+from fabric.api import local, run, settings, cd, env, put, prefix
 import os
 import time
 
@@ -66,8 +66,9 @@ def deploy():
     run('sudo /etc/init.d/search-web stop')
 
     # set up virtual environment
-    run("scl enable python27 'virtualenv {0}'".format(venvdir)) # we need to use python27
-    run("scl enable python27 '{0} install -r {1}'".format(venv_pip, req_file))
+    with settings(warn_only=True):
+        run("scl enable python27 'virtualenv {0}'".format(venvdir)) # we need to use python27
+        run("scl enable python27 '{0} install -r {1}'".format(venv_pip, req_file))
 
     # copy over the config file
     put('~/dev/search/config/duckduckmongo.py', '{0}/config/'.format(deploydir))
