@@ -46,7 +46,7 @@ def prepare_deploy():
     push()
 
 def celerystart():
-    run('restart search-celery')
+    run('service search-celery restart')
 
 def deploy():
     deploydir = os.path.join(releases, time.strftime(datefmt))
@@ -62,6 +62,9 @@ def deploy():
     run('chmod 2775 {0}'.format(deploydir))
     run('ln -sfn {0} {1}'.format(deploydir, current))
 
+    # kill old services
+    run('sudo /etc/init.d/search-web stop')
+
     # set up virtual environment
     run("scl enable python27 'virtualenv {0}'".format(venvdir)) # we need to use python27
     run("scl enable python27 '{0} install -r {1}'".format(venv_pip, req_file))
@@ -71,7 +74,7 @@ def deploy():
 
     # copy over celery files
     run('echo CELERY_BIN="\'{0}/bin/celery\'" >> {1}/config/celery.py'.format(venvdir, deploydir))
-    run('echo CELERY_CHDIR="\'{0}\'" >> {0}/config/celery.py'.format(deploydir))
+    #run('echo CELERY_CHDIR="\'{0}\'" >> {0}/config/celery.py'.format(deploydir))
 
     # restart services
-    run('restart search-web')
+    run('sudo /etc/init.d/search-web start')
