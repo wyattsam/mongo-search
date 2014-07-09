@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from fabric.api import local, run, cd, env, put
+from fabric.api import local, run, cd, env, put, prefix
 import os
 import time
 
@@ -23,6 +23,8 @@ user = appname+'-'+environment
 appdir = '/opt/10gen/'+user
 current = os.path.join(appdir, 'current')
 releases = os.path.join(appdir, 'releases')
+
+statedir = '/srv/10gen/search-staging'
 
 hostname = user+'-1.vpc3.10gen.cc'
 
@@ -43,15 +45,17 @@ def prepare_deploy():
     commit()
     push()
 
-def install_celerybeat():
-    with cd('/etc/init.d'):
-        run('wget https://raw.githubusercontent.com/celery/celery/master/extra/centos/celerybeat')
+def celerystart():
+    run('restart search-celery')
 
 def deploy():
     deploydir = os.path.join(releases, time.strftime(datefmt))
+    req_file = os.path.join(deploydir, 'requirements.txt')
+
     venvdir = os.path.join(appdir, 'venv')
     venv_pip = os.path.join(venvdir, 'bin/pip')
-    req_file = os.path.join(deploydir, 'requirements.txt')
+    venv_gunicorn = os.path.join(venvdir, 'bin/gunicorn')
+    venv_celery = os.path.join(venvdir, 'bin/celery')
 
     # set up directories
     run('git clone {0} {1}'.format('git@github.com:10gen/search', deploydir))
@@ -66,8 +70,8 @@ def deploy():
     put('~/dev/search/config/duckduckmongo.py', '{0}/config/'.format(deploydir))
 
     # copy over celery files
-    #put('~/dev/search/config/celerybeat.sysconfig', '/etc/sysconfig/celerybeat')
-    #run('echo CELERY_BIN="{0}/bin/celery" | sudo tee /etc/sysconfig/celerybeat'.format(venvdir))
+    run('echo CELERY_BIN="\'{0}/bin/celery\'" >> {1}/config/celery.py'.format(venvdir, deploydir))
+    run('echo CELERY_CHDIR="\'{0}\'" >> {0}/config/celery.py'.format(deploydir))
 
     # restart services
-    run('restart search')
+    run('restart search-web')
