@@ -24,6 +24,11 @@ def make_IdentTerm(s, loc, toks):
 def make_QuotedTerm(s, loc, toks):
     return ast.QuotedTerm(toks[1:len(toks)-1])
 
+def make_NotTerm(s, loc, toks):
+    print 'making not'
+    print 'toks is', toks
+    return ast.NotTerm(toks[1])
+
 def make_DisjTerm(s, loc, toks):
     return ast.DisjunctionTerm(
             filter(lambda x: str(x) != 'or', toks))
@@ -84,9 +89,11 @@ class BasicQuery(object):
                 make_IdentTerm)
         quoted_term = ('"' + pp.OneOrMore(ident) + '"').setParseAction(
                 make_QuotedTerm)
+        not_term = ('-' + (ident_term | quoted_term)).setParseAction(
+                make_NotTerm)
         disj_term = pp.Forward()
         disj_term = (ident + pp.OneOrMore(pp.CaselessKeyword('or') + (disj_term | ident))).setParseAction(make_DisjTerm)
-        term = quoted_term | disj_term | ident_term
+        term = quoted_term | disj_term | not_term | ident_term
 
         ## Selector base
         basic_selector = pp.Forward()

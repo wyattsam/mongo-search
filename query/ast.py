@@ -19,9 +19,14 @@ class InternalVisitor(object):
     class DummyQuery(object):
         def __init__(self):
             self.args = {}
+
     def __init__(self):
-        self.doc = {}
+        self.doc = {"$text": {"$search": ""}}
         self.query = InternalVisitor.DummyQuery()
+
+    def keyval(self):
+        k = self.doc.keys()[0]
+        return (k, self.doc[k])
 
 def parse_advanced(k, arg):
     ineqs = {
@@ -60,6 +65,7 @@ class Query(Node):
         self.terms = terms
         self.selectors = selectors
     def accept(self, vis):
+        print 'terms', self.terms
         for t in self.terms:
             t.accept(vis)
 
@@ -159,9 +165,7 @@ class NegativeSelector(Selector):
             # recurse! we got this.
             vis2 = InternalVisitor()
             self.sel.accept(vis2)
-            idoc = vis2.doc
-            key = idoc.keys()[0]
-            val = idoc[key]
+            key,val = vis2.keyval()
             # the $not directive requires a regex here
             if isinstance(val, basestring):
                 val = re.compile(val)
@@ -236,6 +240,16 @@ class QuotedTerm(Node):
 
     def __contains__(self, item):
         return item in self.vals
+
+class NotTerm(Node):
+    def __init__(self, term):
+        self.term = term
+
+    def accept(self, vis):
+        vis2 = InternalVisitor()
+        self.term.accept(vis2)
+        k,v = vis2.keyval()
+        vis.doc['$text']['$search'] += '-'+v['$search']
 
 class DisjunctionTerm(Node):
     def __init__(self, vals):
