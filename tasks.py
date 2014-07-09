@@ -35,5 +35,9 @@ def scrape_all():
     for source in sources:
         scrape_source.delay(source)
 
+@app.task
+def heartbeat():
+    print 'I am alive!'
+
 if __name__ == '__main__':
     scrape_all()

@@ -26,10 +26,16 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(hours=12),
         'args': ()
     }
+    'ticktock': {
+        'task': 'tasks.heartbeat',
+        'schedule': timedelta(minutes=5),
+        'args': ()
+    }
 }
 
 #CELERYBEAT_CHDIR="/opt/10gen/search-staging/current"
 
 CELERYBEAT_LOG_FILE="/var/log/10gen/search-staging/celerybeat.log"
+CELERY_LOG_FILE="/var/log/10gen/search-staging/celery.log"
 
 CELERY_TIMEZONE = 'UTC'
