@@ -25,11 +25,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'tasks.scrape_all',
         'schedule': timedelta(hours=12),
         'args': ()
-    },
-    'ticktock': {
-        'task': 'tasks.heartbeat',
-        'schedule': timedelta(minutes=5),
-        'args': ()
     }
 }
 
