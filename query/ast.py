@@ -111,15 +111,15 @@ class Selector(Node):
 class SourceSelector(Selector):
     def __init__(self, sel, src, ssrc):
         Selector.__init__(self, sel)
-        self.source = src
+        self.source = src.lower()
         self.subsource = ssrc
 
     def accept(self, vis):
         vis.doc['source'] = self.source
         vis.query.args['source'] = self.source
         if self.subsource:
-            vis.doc['subsource'] = self.subsource
-            vis.query.args['subsource'] = self.subsource
+            vis.doc['subsource'] = self.subsource.lower()
+            vis.query.args['subsource'] = self.subsource.lower()
 
     def __str__(self):
         return 'source=' + self.source + ('/' + self.subsource if self.subsource else '')

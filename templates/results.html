@@ -20,8 +20,8 @@
             <span class="bounds">{{ct}}</span>
         {% endif %}
         for <strong>{{query.terms}}</strong>
-        {% if source %}
-            in <span class="source-search">{{ CONFIG[source]['fullname'] }}</span>
+        {% if source and source|lower in CONFIG %}
+            in <span class="source-search">{{ CONFIG[source|lower]['fullname'] }}</span>
             {% if sub_source %}
                 ({{ sub_source }})
             {% endif %}
@@ -54,8 +54,10 @@
                         <div id="advanced-search" class="panel-collapse collapse">
                             <div class="panel-body">
                                 {% from "_template_helpers.html" import advanced %}
-                                {% set sconfig = CONFIG[source] %}
-                                {{ advanced(source, sconfig, query) }}
+                                {% if source|lower in CONFIG %}
+                                    {% set sconfig = CONFIG[source|lower] %}
+                                    {{ advanced(source, sconfig, query) }}
+                                {% endif %}
                             </div>
                         </div>
                     </div>
