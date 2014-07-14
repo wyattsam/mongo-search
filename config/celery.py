@@ -15,9 +15,15 @@
 from datetime import timedelta
 
 BROKER_URL = 'mongodb://localhost:27017/celery_tasks'
+CELERY_RESULT_BACKEND = 'mongodb://localhost:27017'
+CELERY_MONGODB_BACKEND_SETTINGS = {
+    'database': 'celery_tasks',
+    'taskmeta_collection': 'taskmeta'
+}
 
 CELERY_ACCEPT_CONTENT = ['json', 'pickle']
 CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 CELERYBEAT_SCHEDULE = {
     'daily_scrapes': {
