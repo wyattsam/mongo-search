@@ -1,0 +1,3 @@
+MAILTO="austin.estep@10gen.com"
+# MIN   HOUR    DOM     MON     DOW     CMD
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py'
