@@ -17,14 +17,14 @@ import os
 import time
 
 appname = 'search'
-environment = 'staging'
+environment = 'prod'
 user = appname+'-'+environment
 
 appdir = '/opt/10gen/'+user
 current = os.path.join(appdir, 'current')
 releases = os.path.join(appdir, 'releases')
 
-statedir = '/srv/10gen/search-staging'
+statedir = '/srv/10gen/search-prod'
 
 hostname = user+'-1.vpc3.10gen.cc'
 
