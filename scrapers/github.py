@@ -35,7 +35,6 @@ class GithubScraper(BaseScraper):
                 'client_secret': self.auth[1]
             }
             self.params.update(**params)
-            print "params is", self.params
         else:
             self.params = params
         self.auth = None

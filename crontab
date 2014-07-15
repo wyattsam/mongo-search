@@ -1,3 +1,9 @@
 MAILTO="austin.estep@10gen.com"
 # MIN   HOUR    DOM     MON     DOW     CMD
-0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py'
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py jira'
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py confluence'
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py stackoverflow'
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py docs'
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py github'
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py googlegroups'
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py profiles'
