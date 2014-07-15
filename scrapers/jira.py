@@ -38,9 +38,20 @@ class JiraScraper(BaseScraper):
         projects = requests.get(url='https://jira.mongodb.org/rest/api/2/project/', auth=self.auth, verify=False).json(strict=False)
         self.pkeys = [p['key'] for p in projects if p['key'] not in self.skip]
         self.project = self.pkeys.pop(0)
-        self.params['jql'] = 'PROJECT={project} order by KEY asc'.format(project=self.project)
+        self.set_jql()
         self.debug("Searching projects %s" % self.pkeys)
         self.info("Beginning project %s" % self.project)
+
+    def set_jql(self):
+        if self.last_date:
+            last_date = self.last_date.strftime('%Y/%m/%d %H:%M')
+            print 'looking for things after', last_date
+            self.params['jql'] = 'PROJECT={project} and updated>"{date}" order by KEY asc'.format(
+                    project=self.project,
+                    date=last_date
+                    )
+        else:
+            self.params['jql'] = 'PROJECT={project} order by KEY asc'.format(project=self.project)
 
     def _scrape(self, doc, links=None):
         issues = None
@@ -56,7 +67,6 @@ class JiraScraper(BaseScraper):
                 self.processed += len(issues)
             else:
                 self.info("'issues' was None in result document on project %s" % self.project)
-                self.debug(str(doc))
         else:
             self.info("'issues' was not present in result document")
 
@@ -70,7 +80,7 @@ class JiraScraper(BaseScraper):
             else:
                 self.project = self.pkeys.pop(0)
                 self.info("Beginning project: %s" % self.project)
-                self.params['jql'] = 'PROJECT={project} order by KEY asc'.format(project=self.project)
+                self.set_jql()
                 self.params['startAt'] = 0
                 self.total = 0
                 self.processed = 0
