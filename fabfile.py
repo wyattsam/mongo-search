@@ -45,8 +45,15 @@ def prepare_deploy():
     commit()
     push()
 
-def celerystart():
-    run('sudo /etc/init.d/search-celery restart')
+def magic(command):
+    with cd(appdir):
+        run("scl enable python27 'source venv/bin/activate; {0}'".format(command))
+
+def build_index():
+    magic('python current/util/indexes.py')
+
+def scrape():
+    magic('python current/scrape.py')
 
 def deploy():
     deploydir = os.path.join(releases, time.strftime(datefmt))
