@@ -65,7 +65,6 @@ class Query(Node):
         self.terms = terms
         self.selectors = selectors
     def accept(self, vis):
-        print 'terms', self.terms
         for t in self.terms:
             t.accept(vis)
 

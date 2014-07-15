@@ -25,8 +25,6 @@ def make_QuotedTerm(s, loc, toks):
     return ast.QuotedTerm(toks[1:len(toks)-1])
 
 def make_NotTerm(s, loc, toks):
-    print 'making not'
-    print 'toks is', toks
     return ast.NotTerm(toks[1])
 
 def make_DisjTerm(s, loc, toks):
