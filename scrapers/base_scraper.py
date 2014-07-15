@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from pymongo import MongoClient
+
 import requests
 import logging
 import itertools
@@ -31,6 +33,8 @@ class BaseScraper(object):
         self.loading = False
         self.needs_setup = False
 
+        self.last_date = self._recent()
+
         if 'auth' in kwargs:
             auth = kwargs['auth']
             if 'user' in auth and 'password' in auth:
@@ -43,6 +47,8 @@ class BaseScraper(object):
             self.auth = None
 
     def _setup_logger(self, name):
+        """In order to get appropriate logging names,
+           scrapers should call this in their own constructors."""
         self.log = logging.getLogger(name)
 
         # set up the logger
@@ -53,7 +59,12 @@ class BaseScraper(object):
         self.log.setLevel(self._loglevel)
         self.logging_available = True
 
-            
+    def _recent(self):
+        last_scrapes = MongoClient('localhost:27017')['duckduckmongo']['scrapes']
+        last_scrape = last_scrapes.find({'state': 'complete', 'source': self.name}, {'end': 1, '_id': 0}).sort('end', -1)
+        if last_scrape.count() == 0:
+            return None
+        return last_scrape[0]['end']
     def _auth(self, auth, un, pw, kwargs):
         user = auth[un]
         password = auth[pw]

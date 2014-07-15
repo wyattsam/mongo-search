@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from time import sleep
+from time import sleep, mktime
 from base_scraper import BaseScraper
 
 class StackOverflowScraper(BaseScraper):
@@ -23,15 +23,23 @@ class StackOverflowScraper(BaseScraper):
         self.tags = kwargs['tags']
         self.tag = 0
         self.params = {
-                'site': 'stackoverflow',
-                'tagged': self.tags[self.tag],
-                'filter': '!*1Klotvkqr2dciMbX*Qdafx4aenCPiyZAdUE1x(1w',
-                'sort': 'creation',
-                'order': 'asc',
-                'page': 1,
-                'pagesize': 100
-            }
-        # TODO I think I messed up the credentials thing maybe
+            'site': 'stackoverflow',
+            'tagged': self.tags[self.tag],
+            'filter': '!*1Klotvkqr2dciMbX*Qdafx4aenCPiyZAdUE1x(1w',
+            'page': 1,
+            'order': 'asc',
+            'pagesize': 100
+        }
+        if self.last_date:
+            date = int(mktime(self.last_date.timetuple()))
+            self.params.update({
+                'sort': 'activity',
+                'min': date,
+            })
+        else:
+            self.params.update({
+                'sort': 'creation'
+            })
 
     def _scrape(self, doc, links=None):
         self.info('[%s] page %s' % (self.params['tagged'], self.params['page']))
@@ -45,7 +53,7 @@ class StackOverflowScraper(BaseScraper):
             # this tag is empty
             if not doc['has_more']:
                 # check for more tags
-                if len(self.tags) > self.tag:
+                if len(self.tags) > self.tag+1:
                     self.tag += 1
                     self.params['tagged'] = self.tags[self.tag]
                     self.params['page'] = 1
