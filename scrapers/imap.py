@@ -58,7 +58,12 @@ class IMAPScraper(BaseScraper):
             print "Status was not OK when running# %s" % command
 
     def get_message_ids(self):
-        data = self.uid('search', None, 'ALL')
+        if self.last_date:
+            last_date = self.last_date.strftime('%d-%b-%Y')
+            print 'getting things from after', last_date
+            data = self.uid('search', None, '(SINCE {0})'.format(last_date))
+        else:
+            data = self.uid('search', None, 'ALL')
         return data[0].split()
 
     def scrape_label(self, label):
