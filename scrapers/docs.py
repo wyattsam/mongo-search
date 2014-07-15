@@ -50,7 +50,6 @@ class DocsScraper(BaseScraper):
         yield ret
 
     def _setup(self):
-        # TODO: can the self.loading stuff be taken care of with a decorator?
         for k in self.kinds:
             urls = requests.get(self.apiurl + '/' + k + '/json/.file_list').text.split('\n')
             self.urlexts.extend([(k,u) for u in urls])
