@@ -29,6 +29,10 @@ class GithubScraper(BaseScraper):
         self.needs_setup = True
 
         params = {'per_page': 100}
+        if self.last_date:
+            params.update({
+                'since': self.last_date.isoformat()
+            })
         if self.auth:
             self.params = {
                 'client_id': self.auth[0],

@@ -60,7 +60,6 @@ class IMAPScraper(BaseScraper):
     def get_message_ids(self):
         if self.last_date:
             last_date = self.last_date.strftime('%d-%b-%Y')
-            print 'getting things from after', last_date
             data = self.uid('search', None, '(SINCE {0})'.format(last_date))
         else:
             data = self.uid('search', None, 'ALL')
