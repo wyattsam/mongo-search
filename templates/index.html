@@ -35,6 +35,14 @@
                     <td class="text-left">Contains "foo"</td>
                 </tr>
                 <tr>
+                    <td class="text-left"><code>foo bar</code></td>
+                    <td class="text-left">Contains "foo" and "bar"</td>
+                </tr>
+                <tr>
+                    <td class="text-left"><code>foo or bar</code></td>
+                    <td class="text-left">Contains "foo" or "bar" or both</td>
+                </tr>
+                <tr>
                     <td class="text-left"><code>foo source:jira</code></td>
                     <td class="text-left">JIRA results containing "foo"</td>
                 </tr>
@@ -46,7 +54,7 @@
                     <td class="text-left">Contains "foo", has a some_field attribute that is at least 5</td>
                 </tr>
                 <tr>
-                    <td class="text-left"><code>foo source:!jira</code></td>
+                    <td class="text-left"><code>foo !source:jira</code></td>
                     <td class="text-left">Contains "foo" and is not a JIRA result</td>
                 </tr>
                 <tr>
