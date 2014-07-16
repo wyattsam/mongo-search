@@ -1,4 +1,5 @@
 config/duckduckmongo.py
+bower_components/
 *.pyc
 *.swp
 *.o

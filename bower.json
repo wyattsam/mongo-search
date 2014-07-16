@@ -1,0 +1,6 @@
+{
+    "name": "mongo-search",
+    "dependencies": {
+        "mongostrap": "10gen/mongostrap"
+    }
+}
