@@ -21,14 +21,14 @@ from query.query import BasicQuery, BasicQueryVisitor
 from query.ast import parse_advanced
 from indexing import IndexDaemon
 import util.helpers as helpers
-import config.duckduckmongo as settings
+import config.search as settings
 import config.celery as celery_settings
 import json
 
 CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
 
 # Setup database
-DB = CONNECTION['duckduckmongo']
+DB = CONNECTION['mongosearch']
 
 CREDENTIALS = settings.SEARCH['credentials']
 USER = CREDENTIALS['user']

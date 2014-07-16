@@ -79,7 +79,7 @@ def deploy():
         run("scl enable python27 '{0} install -r {1}'".format(venv_pip, req_file))
 
     # copy over the config file
-    put('~/dev/search/config/duckduckmongo.py', '{0}/config/'.format(deploydir))
+    put('~/dev/search/config/search.py', '{0}/config/'.format(deploydir))
 
     # copy over celery files
     run('echo CELERY_BIN="\'{0}/bin/celery\'" >> {1}/config/celery.py'.format(venvdir, deploydir))

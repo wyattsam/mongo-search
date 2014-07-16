@@ -21,7 +21,7 @@ from pymongo import MongoClient
 CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
 
 # Setup database
-DB = CONNECTION['duckduckmongo']
+DB = CONNECTION['mongosearch']
 
 # Setup collections
 COMBINED = DB['combined']

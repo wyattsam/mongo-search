@@ -26,9 +26,9 @@ Several common data sources, such as Stack Overflow, Github, and JIRA are availa
 1. Build a new scraper for your source in the ```scrapers``` directory. It should inherit from ```base_scraper.BaseScraper``` and implement the ```_scrape``` (and possibly ```_setup```) methods. If your scraper requires setup, make sure to set the ```self.needs_setup``` flag to True. The purpose of the scraper is to describe the logic behind any RESTful API you may be using. Once you are done and want to use your scraper, don't import it inside the ```scrapers/__init__.py``` file.
 2. Build a transformer for your new data source. This simply packages the raw data your scraper saved into a small, more web-friendly format. As with the scraper, define it in the ```transformers``` directory and import it in ```transformers/__init__.py```. 
 3. Add a results template to ```templates/results```. If you want your template to have special styling, you should add style information to ```static/style.css```.
-4. Add a configuration field to ```config/duckduckmongo.py```. There is a lot of information to specify here. The following is an example configuration object:
+4. Add a configuration field to ```config/search.py```. There is a lot of information to specify here. The following is an example configuration object:
 ```python
- # in config/duckduckmongo.py
+ # in config/search.py
 CONFIG = {
     ...
     'my_new_source': {

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from celery import Celery
-import config.duckduckmongo as search_settings
+import config.search as search_settings
 from scrape import ScrapeRunner
 
 app = Celery('tasks')

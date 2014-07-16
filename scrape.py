@@ -25,7 +25,7 @@ from pymongo import MongoClient
 class ScrapeRunner(object):
     def __init__(self, cfg, snames=None,opt=False):
         self.client = MongoClient('localhost:27017')
-        self.db = self.client['duckduckmongo']
+        self.db = self.client['mongosearch']
         self.combined = self.db.combined
         self.scrapelog = self.db.scrapes
         self.cfg = cfg
@@ -140,7 +140,7 @@ class ScrapeRunner(object):
                 self.logger.debug("temporarily skipped %s because it was loading" % s.name)
 
 if __name__ == "__main__":
-    import config.duckduckmongo as settings
+    import config.search as settings
     if len(sys.argv) == 1:
         runner = ScrapeRunner(settings.CONFIG)
     else:
