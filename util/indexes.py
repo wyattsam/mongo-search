@@ -67,6 +67,9 @@ COMBINED.ensure_index([
 
     # Google Groups
     ('subject', 'text'),
+
+    # Docs
+    ('text', 'text'),
     ],
     name='search_index',
     weights= {
