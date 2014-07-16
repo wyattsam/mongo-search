@@ -258,7 +258,7 @@ class DisjunctionTerm(Node):
         vis.doc['$text']['$search'] += ' '.join(self.vals) + ' '
 
     def __str__(self):
-        return '"' + ' '.join(str(v) for v in self.vals) + '"'
+        return ' '.join(str(v) for v in self.vals)
 
     def __repr__(self):
         return '[DISJUNCT] ' +  " ".join(repr(v) for v in self.vals)

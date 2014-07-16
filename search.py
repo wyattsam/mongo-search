@@ -115,6 +115,7 @@ def submit():
     #run the counts separately using covered query
     visitor = BasicQueryVisitor(mq)
     query_json = visitor.visit_all()
+
     if 'advanced' in args and args['advanced']:
         query_json = advanced_options(query_json, mq.args)
     counts = covered_count(query_json, mq.args)

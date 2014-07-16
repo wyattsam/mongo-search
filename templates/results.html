@@ -19,7 +19,7 @@
             <span class="bounds">{{pagination.lower_bound}}-{{min(ct,pagination.upper_bound)}}</span> of
             <span class="bounds">{{ct}}</span>
         {% endif %}
-        for <strong>{{query.terms}}</strong>
+        for <strong>{{query.query}}</strong>
         {% if source and source|lower in CONFIG %}
             in <span class="source-search">{{ CONFIG[source|lower]['fullname'] }}</span>
             {% if sub_source %}
@@ -36,7 +36,7 @@
                 {% from "_template_helpers.html" import source_selector %}
                 <a class="list-group-item" href="/search?query={{query.query}}">Clear filters</a>
                 {% for src in SOURCES %}
-                    {{ source_selector(src, CONFIG[src]['fullname'], counts, source, query.terms , sub_source) }}
+                    {{ source_selector(src, CONFIG[src]['fullname'], counts, source, query.query , sub_source) }}
                 {% endfor %}
             </div>
         </div>
