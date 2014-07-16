@@ -4,7 +4,7 @@
     <div class="col-md-8 center">
         <form method="get" action="/search">
             <div class="input-group">
-                <input class="form-control" type="text" name="query" placeholder="Search" autofocus="autofocus">
+                <input class="form-control" type="text" name="query" placeholder="Search" autofocus="autofocus" id="searchbar">
                 <span class="input-group-btn">
                     <button class="btn btn-primary" type="submit">Submit</button>
                 </span>
@@ -18,13 +18,69 @@
 
 {% block footer %}
 <div class="center muted">
-    <p>
-        <small>
-            To search for documents that contain the term "node.js"
-            <strong>AND</strong>
-            the term "memory leak" use:
-        </small>
-    </p>
-    <code>"node.js" "memory leak"</code>
+    <a data-toggle="collapse" data-target="#cheat-sheet">
+        <h5 class="text-muted">Cheat sheet</h5>
+    </a>
+    <div id="cheat-sheet" class="collapse">
+        <table class="table table-bordered table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th>Query</th>
+                    <th>Matched documents</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-left"><code>foo</code></td>
+                    <td class="text-left">Contains "foo"</td>
+                </tr>
+                <tr>
+                    <td class="text-left"><code>foo bar</code></td>
+                    <td class="text-left">Contains "foo" and "bar"</td>
+                </tr>
+                <tr>
+                    <td class="text-left"><code>foo or bar</code></td>
+                    <td class="text-left">Contains "foo" or "bar" or both</td>
+                </tr>
+                <tr>
+                    <td class="text-left"><code>foo source:jira</code></td>
+                    <td class="text-left">JIRA results containing "foo"</td>
+                </tr>
+                <tr>
+                    <td class="text-left"><code>foo source:jira/BUILD</code></td>
+                    <td class="text-left">JIRA results from the BUILD project containing "foo"</td>
+                <tr>
+                    <td class="text-left"><code>foo some_field:5+</code></td>
+                    <td class="text-left">Contains "foo", has a some_field attribute that is at least 5</td>
+                </tr>
+                <tr>
+                    <td class="text-left"><code>foo !source:jira</code></td>
+                    <td class="text-left">Contains "foo" and is not a JIRA result</td>
+                </tr>
+                <tr>
+                    <td class="text-left"><code>foo source:[jira,github]</code></td>
+                    <td class="text-left">Contains "foo" and is either a JIRA or GitHub result</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
+<script type="text/javascript">
+    /*
+       TODO what on earth is the problem here????????????
+    $('#searchbar').bind('keyup', function() {
+        req = new XMLHttpRequest();
+        prefix = $("#searchbar").attr('value')
+        req.open("POST", "/", true);
+        req.send(prefix);
+        //alert("starting");
+        //alert("{{ ac|safe }}");
+        var tags = "{{ ac|safe }}";
+        //alert(tags);
+        $("#searchbar").autocomplete({
+            source: tags
+        });
+    });
+    */
+</script>
 {% endblock %}

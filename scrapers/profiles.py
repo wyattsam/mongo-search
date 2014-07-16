@@ -1,34 +1,31 @@
-from scrapers import JSONScraper
+# Copyright 2014 MongoDB Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-class ProfilesScraper(JSONScraper):
-    NAME = 'profiles'
-    API_BASE = 'https://corp.mongodb.com/api/'
-    EMPLOYEE_URL = API_BASE + 'employee'
+from base_scraper import BaseScraper
 
-    def __init__(self, credentials):
-        self.credentials = credentials
+class ProfilesScraper(BaseScraper):
+    def __init__(self, name, **kwargs):
+        BaseScraper.__init__(self, name, **kwargs)
+        self._setup_logger(__name__)
+        self.apiurl = 'https://corp.mongodb.com/api/employee'
+        self.params = {'expand': 'team'}
 
-    def scrape_employee(self, employee):
-        employee_id = employee['uri'].partition('/api/employee/')[2]
-        employee['crowd_id'] = employee_id
-        employee['_id'] = 'employee-' + employee_id
-        employee['full_name'] = ' '.join(
-            [employee['first_name'], employee['last_name']])
-        print u'[PROFILE] ' + employee['full_name'].encode('ascii', 'ignore')
-        return employee
-
-    def scrape(self):
-        params = {'expand': 'team'}
-        result = self.get_json(self.EMPLOYEE_URL, params=params,
-            auth=self.credentials, digest=True)
-
-        for employee in result['employees']:
-            yield self.scrape_employee(employee)
-
-
-if __name__ == '__main__':
-    import settings
-    from scrapers import ScrapeRunner
-    runner = ScrapeRunner(**settings.MONGO)
-    scraper = ProfilesScraper(**settings.PROFILES)
-    runner.run(scraper, remove=True)
+    def _scrape(self, doc, links=None):
+        for d in doc['employees']:
+            eid = d['uri'].partition("/api/employee/")[2]
+            d['crowd_id'] = eid
+            d['_id'] = 'employee-' + eid
+            d['full_name'] = " ".join([d['first_name'], d['last_name']])
+            yield d
+        self.finished = True # one query for everyone; wow!

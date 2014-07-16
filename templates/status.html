@@ -8,7 +8,7 @@
             <th>Last Successful Finish</th>
         </tr>
         {% for source, scrape in scrapes.items() %}
-            <tr>
+            <tr {{ 'data-toggle="collapse" data-target="#error-'|safe+source+'"'|safe if scrape.state == 'error' }}>
                 <td class="text-left">{{ source }}</td>
                 <td class="text-left">
                     {% if scrape.state == 'running' %}
@@ -26,6 +26,19 @@
                     {% endif %}
                 </td>
             </tr>
+            {% if scrape.state == 'error' %}
+            <tr>
+                <td class="hidden-row" style="width:300px;">
+                    <div class="collapse" id="error-{{source}}">
+                        <p class="text-left">
+                        {% for traceline in scrape.trace %}
+                        {{ traceline|escape }}<br>
+                        {% endfor %}
+                        </p>
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
         {% endfor %}
     </table>
 </div>

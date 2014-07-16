@@ -1,61 +1,59 @@
+# Copyright 2014 MongoDB Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from base_scraper import BaseScraper
 import requests
-from scrapers import JSONScraper
 
-
-class DocumentationScraper(JSONScraper):
-    NAME = 'docs'
-    API_BASE = 'http://docs.mongodb.org/'
-
-    def __init__(self, kinds):
+class DocsScraper(BaseScraper):
+    def __init__(self, name, **kwargs):
+        BaseScraper.__init__(self, name, **kwargs)
+        self._setup_logger(__name__)
+        kinds = kwargs['kinds']
+        self.apiurl = "http://docs.mongodb.org/"
         self.kinds = kinds
+        self.kind = ''
+        self.urlexts = []
 
-    def get_urls(self, kind):
-        file_urls_url = self.API_BASE + '/' + kind + '/json/.file_list'
-        file_urls = requests.get(file_urls_url).text.split('\n')
-        return file_urls
+        self.needs_setup = True
 
-    def scrape_file(self, kind, file_url):
-        file_json = self.get_json(file_url)
-        if 'text' in file_json:
-            page_name = file_json['current_page_name']
-            _id = "-".join([self.NAME, kind, page_name])
-            doc = {
-                '_id': _id,
-                'title': file_json['title'],
-                'body': file_json['text'],
-                'url':  file_json['url'],
-                'section': kind,
-                'subsource': kind
-            }
-            return doc
+    def _scrape(self, doc, links=None):
+        ret = None
+        if 'text' in doc:
+            pname = doc['current_page_name']
+            _id = '-'.join([self.name, self.kind, pname])
+            doc['_id'] = _id
+            doc['section'] = self.kind
+            doc['subsource'] = self.kind
+            ret = doc
         else:
-            return
+            self.err("Received unexpected message %s" % str(doc))
+            self.finished = True
 
-    def scrape_kind(self, kind):
-        file_urls = self.get_urls(kind)
-        for file_url in file_urls:
-            if not file_url:
-                return
-            try:
-                yield self.scrape_file(kind, file_url)
-            except ValueError:
-                print "Failed to parse json in %s" % file_url
-                continue
+        # ensure we advance
+        if len(self.urlexts) > 0:
+            url = self.urlexts.pop(0)
+            self.kind = url[0]
+            self.apiurl = url[1]
+        else:
+            self.finished = True
+        yield ret
 
-    def scrape(self):
-        for kind in self.kinds:
-            print '[DOC] ' + kind
-            for doc in self.scrape_kind(kind):
-                yield doc
-
-class MmsDocumentationScraper(DocumentationScraper):
-    NAME = 'mms'
-    API_BASE = 'http://mms.mongodb.com/'
-
-
-if __name__ == '__main__':
-    import settings
-    from scrapers import ScrapeRunner
-    runner = ScrapeRunner(**settings.MONGO)
-    scraper = DocumentationScraper(**settings.DOCS)
-    runner.run(scraper)
+    def _setup(self):
+        for k in self.kinds:
+            urls = requests.get(self.apiurl + '/' + k + '/json/.file_list').text.split('\n')
+            self.urlexts.extend([(k,u) for u in urls])
+        # make sure apiurl is updated
+        url = self.urlexts.pop(0)
+        self.kind = url[0]
+        self.apiurl = url[1]

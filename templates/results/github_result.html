@@ -6,9 +6,9 @@
             {{ result.commit_msg|truncate(125) }}
         </div>
     </a>
-    {% if result.commit_msg_body %}
+    {% if result.commit_body %}
         <div class="result-snippet">
-            {{ result.commit_msg_body|truncate(350) }}
+            {{ result.commit_body|truncate(350) }}
         </div>
     {% endif %}
     <p class="result-url">

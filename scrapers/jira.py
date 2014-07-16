@@ -1,74 +1,86 @@
+# Copyright 2014 MongoDB Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from base_scraper import BaseScraper
 from time import sleep
-from scrapers import JSONScraper
+import requests
 
-
-class JiraScraper(JSONScraper):
-    NAME = 'jira'
-    API_BASE = 'https://jira.mongodb.org/rest/api/2/'
-    SEARCH_URL = API_BASE + 'search/'
-    PROJECT_URL = API_BASE + 'project/'
-    PAGE_SIZE = 100
-
-    def __init__(self, credentials=None, skip=[]):
-        self.skip = skip
-        self.credentials = credentials
-
-    def get_projects(self):
-        projects = self.get_json(url=self.PROJECT_URL, auth=self.credentials)
-        project_keys = [project['key'] for project in projects]
-        return project_keys
-
-    def search_issues(self, jql):
-        return self.get_json(self.SEARCH_URL, jql, auth=self.credentials)
-
-    def scrape_issue(self, issue, project):
-        issue['_id'] = issue['key']
-        issue['project'] = project
-        issue['subsource'] = project
-        issue['fields']['status'] = issue['fields']['status']['name']
-        return issue
-
-    def scrape_issues(self, project):
-        jql = 'PROJECT={project} order by KEY asc'.format(project=project)
-        params = {
-            'jql': jql,
+class JiraScraper(BaseScraper):
+    def __init__(self, name, **kwargs):
+        BaseScraper.__init__(self, name, **kwargs)
+        self._setup_logger(__name__)
+        self.skip = kwargs['skip']
+        self.apiurl = 'https://jira.mongodb.org/rest/api/2/search/'
+        self.pkeys = []
+        self.needs_setup = True
+        self.limit = 100
+        self.total = 0
+        self.processed = 0
+        self.params = {
             'startAt': 0,
-            'maxResults': self.PAGE_SIZE,
+            'maxResults': self.limit,
             'fields': 'key,summary,description,comment,status'
         }
+        self.project = ""
 
-        while True:
-            result = self.search_issues(params)
-            if 'issues' in result:
-                issues = result['issues']
-                if issues:
-                    for issue in issues:
-                        yield self.scrape_issue(issue, project)
-                else:
-                    break
+    def _setup(self):
+        projects = requests.get(url='https://jira.mongodb.org/rest/api/2/project/', auth=self.auth, verify=False).json(strict=False)
+        self.pkeys = [p['key'] for p in projects if p['key'] not in self.skip]
+        self.project = self.pkeys.pop(0)
+        self.set_jql()
+        self.debug("Searching projects %s" % self.pkeys)
+        self.info("Beginning project %s" % self.project)
+
+    def set_jql(self):
+        if self.last_date:
+            last_date = self.last_date.strftime('%Y/%m/%d %H:%M')
+            print 'looking for things after', last_date
+            self.params['jql'] = 'PROJECT={project} and updated>"{date}" order by KEY asc'.format(
+                    project=self.project,
+                    date=last_date
+                    )
+        else:
+            self.params['jql'] = 'PROJECT={project} order by KEY asc'.format(project=self.project)
+
+    def _scrape(self, doc, links=None):
+        issues = None
+        if 'issues' in doc and 'total' in doc:
+            issues = doc['issues']
+            self.total = doc['total']
+            if issues:
+                for issue in issues:
+                    issue['_id'] = issue['key']
+                    issue['subsource'] = self.project
+                    issue['fields']['status'] = issue['fields']['status']['name']
+                    yield issue
+                self.processed += len(issues)
             else:
-                break
+                self.info("'issues' was None in result document on project %s" % self.project)
+        else:
+            self.info("'issues' was not present in result document")
 
-            params['startAt'] += len(issues)
-            sleep(1)
-
-    def scrape_project(self, project):
-        if project not in self.skip:
-            print "[PROJECT] " + project
-            for issue in self.scrape_issues(project):
-                yield issue
-
-    def scrape(self):
-        projects = self.get_projects()
-        print '[JIRA] %s' % projects
-        for project in projects:
-            for issue in self.scrape_project(project):
-                yield issue
-
-
-if __name__ == '__main__':
-    import settings
-    from scrapers import ScrapeRunner
-    runner = ScrapeRunner(**settings.MONGO)
-    scraper = JiraScraper(**settings.JIRA)
-    runner.run(scraper)
+        if self.processed < self.total: # there are more issues
+            self.params['startAt'] += len(issues)
+            sleep(1) # don't dos jira
+        else: # we exhausted this project, time to move on
+            if len(self.pkeys) == 0:
+                self.info("no more projects to scrape")
+                self.finished = True
+            else:
+                self.project = self.pkeys.pop(0)
+                self.info("Beginning project: %s" % self.project)
+                self.set_jql()
+                self.params['startAt'] = 0
+                self.total = 0
+                self.processed = 0

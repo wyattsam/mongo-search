@@ -1,6 +1,5 @@
+config/duckduckmongo.py
 *.pyc
-.DS_Store
-settings.py
-scrapers/settings.py
-env
-log
+*.swp
+*.o
+*.bak

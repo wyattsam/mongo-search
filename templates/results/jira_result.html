@@ -3,17 +3,25 @@
 {% block result %}
     <div class="result-summary">
         <a target="_blank" href="{{ result.url }}">
+            {% if result.status == 'Open' %}
+                <strong>({{ result.status }})</strong>
+            {% else %}
+                ({{ result.status }})
+            {% endif %}
             <strong>{{ result.id }}</strong>
-            {{ result.summary|truncate(125) }}
+            {{ result.title|truncate(125) }}
         </a>
     </div>
     {%- if result.snippet %}
         <p class="result-snippet">{{ result.snippet|truncate(350) }}</p>
     {% endif %}
+    {% if result.last_comment %}
     <p class="structured">
-    <p class="result-url">
-        <span class="text-muted">status:</span>&nbsp;<span class="gh-username">{{result.status}}</span>&nbsp;<span class="text-muted">comments:</span>&nbsp;<span>{{result.comments}}</span>
-        <br/>
+    <span class="text-muted">Last comment of {{ result.comments }} total:</span>&nbsp;<span class="gh-username">
+        <a href={{ "https://jira.mongodb.org/secure/ViewProfile.jspa?name="+result.last_comment.user }}>
+            <img src={{ result.last_comment.avatar }} /> {{ result.last_comment.name }}
+        </a> says...</span>
+        <p class="result-snippet">{{ result.last_comment.body|truncate(100) }}</p>
     </p>
-    </p>
+    {% endif %}
 {% endblock %}

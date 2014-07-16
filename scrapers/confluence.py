@@ -1,12 +1,23 @@
+# Copyright 2014 MongoDB Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from base_scraper import BaseScraper
+from HTMLParser import HTMLParser
 import re
 import requests
 
-from HTMLParser import HTMLParser
-from scrapers import JSONScraper
-
-
 class MLStripper(HTMLParser):
-    '''Markup language stripper to convert HTML into plain text'''
     def __init__(self):
         self.reset()
         self.fed = []
@@ -17,111 +28,78 @@ class MLStripper(HTMLParser):
     def get_data(self):
         return ''.join(self.fed)
 
-
-class ConfluenceScraper(JSONScraper):
-    NAME = 'confluence'
-    SPACES = [
-        '10GEN',
-        'cs',
-        'sales',
-        'Devops',
-        'KB',
-        'mcs',
-        'mrkt',
-        'HGTC',
-        'MMS',
-        'KERNEL'
-    ]
-    API_BASE = 'https://wiki.mongodb.com/rest/prototype/1/'
-
-    def __init__(self, credentials=None, skip=[]):
-        self.skip = skip
-        self.credentials = credentials
+class ConfluenceScraper(BaseScraper):
+    def __init__(self, name, **kwargs):
+        BaseScraper.__init__(self, name, **kwargs)
+        self._setup_logger(__name__)
+        self.spaces = kwargs['spaces']
+        self.needs_setup = True
+        self.base_url = "https://wiki.mongodb.com/rest/prototype/1/"
+        self.page = 0
+        self.page_ids = []
 
     def strip_tags(self, html):
         s = MLStripper()
         s.feed(html)
         return s.get_data()
 
-    def scrape_page(self, page_id, space):
-        user = self.credentials['user']
-        password = self.credentials['password']
+    def update_params(self):
+        self.params = {
+            'type': 'page',
+            'space': self.space,
+            'startIndex': self.page
+        }
 
-        page_url = ''.join([self.API_BASE, 'content/', page_id, '.json'])
-        page_json = requests.get(
-            page_url,
-            auth=(user, password),
-            verify=False
-        ).json()
+    def advance_space(self):
+        req_url = ''.join([self.base_url, 'search.json'])
+        self.space = self.spaces.pop(0)
+        self.update_params()
+        results = requests.get(req_url, params=self.params, auth=self.auth).json(strict=False)
+        self.size = results['totalSize']
+        while True:
+            res = results['result']
+            if res:
+                self.page_ids.extend([elem['id'] for elem in res])
 
-        html_body = page_json['body']['value']
-        # Some older documents returned from Confluence contain useful text,
-        # but wrapped in tags that our parser does not properly handle.  To
-        # deal with this here we look for such documents and extract the
-        # useful text before passing it along to strip_tags()
-        if "{wiki}" in html_body:
+            self.page += 50
+            if self.page > self.size:
+                break
+            self.update_params()
+            self.debug("getting page starting at %s for space %s" % (self.page, self.space))
+            results = requests.get(req_url, params=self.params, auth=self.auth).json(strict=False)
+        self.advance_page()
+        self.page = 0
+
+    def advance_page(self):
+        self.page_id = self.page_ids.pop(0)
+        self.apiurl = ''.join([self.base_url, 'content/', str(self.page_id), '.json'])
+
+    def _setup(self):
+        self.advance_space()
+
+    def _scrape(self, doc, links=None):
+        html_body = doc['body']['value']
+        if '{wiki}' in html_body:
             r = re.compile(r'\{wiki\}(.*)\{wiki\}', re.MULTILINE | re.DOTALL)
             result = r.search(html_body)
             if result:
                 html_body = result.group(1)
 
         text_body = self.strip_tags(html_body)
-        doc = {
-            '_id': page_json['id'],
-            'title': page_json['title'],
+        yield {
+            '_id': doc['id'],
+            'title': doc['title'],
             'body': text_body,
-            'url':  page_json['link'][0]['href'],
-            'space': space,
-            'subsource': space
+            'url': doc['link'][0]['href'],
+            'space': self.space,
+            'subsource': self.space
         }
-        return doc
 
-    def search_pages(self, space, index):
-        space_url = ''.join([self.API_BASE, 'search.json'])
-        space_params = {
-            'type': 'page',
-            'startIndex': str(index),
-            'spaceKey': space
-        }
-        space_json = self.get_json(
-            space_url,
-            space_params,
-            auth=self.credentials
-        )
-
-        result = space_json['result']
-        if result:
-            return [elem['id'] for elem in result]
-
-    def scrape_pages(self, space):
-        index = 0
-
-        while True:
-            result = self.search_pages(space, index)
-            if result:
-                for page_id in result:
-                    yield self.scrape_page(page_id, space)
+        if len(self.page_ids) > 0:
+            self.advance_page()
+        else: # we are out of pages
+            if len(self.spaces) == 0: # we are also out of spaces
+                self.finished = True
             else:
-                break
-
-            index += 50
-
-    def scrape_space(self, space):
-        if space not in self.skip:
-            print "[SPACE] " + space
-            for page in self.scrape_pages(space):
-                yield page
-
-    def scrape(self):
-        spaces = self.SPACES
-        print '[WIKI] %s' % spaces
-        for space in spaces:
-            for page in self.scrape_space(space):
-                yield page
-
-if __name__ == '__main__':
-    import settings
-    from scrapers import ScrapeRunner
-    runner = ScrapeRunner(**settings.MONGO)
-    scraper = ConfluenceScraper(**settings.CONFLUENCE)
-    runner.run(scraper)
+                self.advance_space()
+                self.page = 0

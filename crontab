@@ -1,9 +1,9 @@
-MAILTO="tyler@10gen.com"
+MAILTO="austin.estep@10gen.com"
 # MIN   HOUR    DOM     MON     DOW     CMD
-0       7       *       *       *       cd ~/playground/duckduckmongo; source env/bin/activate; python scrapers/jira.py
-0       7       *       *       *       cd ~/playground/duckduckmongo; source env/bin/activate; python scrapers/stack_overflow.py
-0       7       *       *       *       cd ~/playground/duckduckmongo; source env/bin/activate; python scrapers/github.py
-0       7       *       *       *       cd ~/playground/duckduckmongo; source env/bin/activate; python scrapers/docs.py
-0       7       *       *       *       cd ~/playground/duckduckmongo; source env/bin/activate; python scrapers/profiles.py
-0       7       *       *       *       cd ~/playground/duckduckmongo; source env/bin/activate; python scrapers/google_groups.py
-0       7       *       *       *       cd ~/playground/duckduckmongo; source env/bin/activate; python scrapers/confluence.py
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py jira'
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py confluence'
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py stackoverflow'
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py docs'
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py github'
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py googlegroups'
+0       1,13    *       *       *       cd /opt/10gen/search-staging; scl enable python27 'source venv/bin/activate; cd current; python scrape.py profiles'

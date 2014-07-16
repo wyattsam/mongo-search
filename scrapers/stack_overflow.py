@@ -1,72 +1,72 @@
-from scrapers import JSONScraper
-from time import sleep
+# Copyright 2014 MongoDB Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
+from time import sleep, mktime
+from base_scraper import BaseScraper
 
-class StackOverflowScraper(JSONScraper):
-    NAME = 'stack_overflow'
-    API_BASE = 'https://api.stackexchange.com/2.1/'
-    SEARCH_URL = API_BASE + 'search'
-    PAGE_SIZE = 100
-
-    def __init__(self, tags, credentials=None):
-        self.tags = tags
-        self.credentials = credentials
-
-    def scrape_question(self, question):
-        key = 'SO-' + str(question['question_id'])
-        question['_id'] = key
-        return question
-
-    def scrape_tag(self, tag):
-        print "[TAG] " + tag
-        params = {
+class StackOverflowScraper(BaseScraper):
+    def __init__(self, name, **kwargs):
+        BaseScraper.__init__(self, name, **kwargs)
+        self._setup_logger(__name__)
+        self.apiurl = "https://api.stackexchange.com/2.1/search"
+        self.tags = kwargs['tags']
+        self.tag = 0
+        self.params = {
             'site': 'stackoverflow',
-            'tagged': tag,
+            'tagged': self.tags[self.tag],
             'filter': '!*1Klotvkqr2dciMbX*Qdafx4aenCPiyZAdUE1x(1w',
-            'sort': 'creation',
-            'order': 'asc',
             'page': 1,
-            'pagesize': self.PAGE_SIZE,
+            'order': 'asc',
+            'pagesize': 100
         }
+        if self.last_date:
+            date = int(mktime(self.last_date.timetuple()))
+            self.params.update({
+                'sort': 'activity',
+                'min': date,
+            })
+        else:
+            self.params.update({
+                'sort': 'creation'
+            })
 
-        if self.credentials:
-            params['access_token'] = self.credentials['access_token']
-            params['key'] = self.credentials['key']
+    def _scrape(self, doc, links=None):
+        self.info('[%s] page %s' % (self.params['tagged'], self.params['page']))
+        items = doc.get('items', [])
+        if items:
+            for item in items:
+                key = self.name + "-" + str(item['question_id'])
+                item['_id'] = key
+                yield item
 
-        while True:
-            print '[%s] page %s' % (tag, params['page'])
-            result = self.get_json(self.SEARCH_URL, params=params)
-            items = result.get('items', [])
-
-            if items:
-                for item in items:
-                    yield self.scrape_question(item)
-
-                if not result['has_more']:
-                    break
-
-                params['page'] += 1
-
+            # this tag is empty
+            if not doc['has_more']:
+                # check for more tags
+                if len(self.tags) > self.tag+1:
+                    self.tag += 1
+                    self.params['tagged'] = self.tags[self.tag]
+                    self.params['page'] = 1
+                # no more tags, bow out
+                else:
+                    self.finished = True
+            # keep going on this tag
             else:
-                print '[ERROR] %s' % result
-                break
+                self.params['page'] += 1
+        else:
+            self.finished = True
 
-            # don't remove this -- back off if you're told to backoff
-            if 'backoff' in result:
-                backoff = result['backoff']
-                print '[BACKOFF] backing off for %s seconds' % backoff
-                sleep(backoff)
-
-
-    def scrape(self):
-        for tag in self.tags:
-            for question in self.scrape_tag(tag):
-                yield question
-
-
-if __name__ == '__main__':
-    import settings
-    from scrapers import ScrapeRunner
-    runner = ScrapeRunner(**settings.MONGO)
-    scraper = StackOverflowScraper(**settings.STACK_OVERFLOW)
-    runner.run(scraper)
+        if 'backoff' in doc:
+            backoff = doc['backoff']
+            self.warn('backing off from stackoverflow for %s seconds' % backoff)
+            sleep(backoff)
