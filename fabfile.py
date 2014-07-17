@@ -86,4 +86,6 @@ def deploy():
     #run('echo CELERY_CHDIR="\'{0}\'" >> {0}/config/celery.py'.format(deploydir))
 
     # restart services
+    with cd(appdir):
+        run('crontab -e')
     run('sudo /etc/init.d/search-web start')
