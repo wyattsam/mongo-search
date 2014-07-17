@@ -65,7 +65,10 @@ class Query(Node):
         self.terms = terms
         self.selectors = selectors
     def accept(self, vis):
+        identct = len([x for x in self.terms if isinstance(x, IdentTerm)])
         for t in self.terms:
+            if identct == 1 and isinstance(t, IdentTerm):
+                t.lonesome = True
             t.accept(vis)
 
         #if we have a source/subsource option from the U:, use that
@@ -206,6 +209,10 @@ class ListSelector(Selector):
 class IdentTerm(Node):
     def __init__(self, val):
         self.val = val
+        # Optimization hack. Don't decrease performance with
+        # quotes if the term is singled out, either as the only
+        # term in the query or if it is negated.
+        self.lonesome = False
 
     def accept(self, vis):
         # FIXME: we currently render multiple terms as individual phrases.
@@ -213,7 +220,10 @@ class IdentTerm(Node):
         # in regards to conjuncting results together
         # instead of disjuncting them. For now this will cause
         # mediocre performance. Fix is on the way!
-        vis.doc['$text']['$search'] += '"' + self.val + '" '
+        if not self.lonesome:
+            vis.doc['$text']['$search'] += '"' + self.val + '" '
+        else:
+            vis.doc['$text']['$search'] += self.val + " "
 
     def __str__(self):
         return str(self.val)
@@ -243,6 +253,8 @@ class QuotedTerm(Node):
 class NotTerm(Node):
     def __init__(self, term):
         self.term = term
+        if isinstance(term, IdentTerm):
+            self.term.lonesome = True
 
     def accept(self, vis):
         vis2 = InternalVisitor()
