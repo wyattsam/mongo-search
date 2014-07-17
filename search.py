@@ -28,7 +28,7 @@ import json
 CONNECTION = MongoClient('/tmp/mongodb-27017.sock')
 
 # Setup database
-DB = CONNECTION['mongosearch']
+DB = CONNECTION['duckduckmongo']
 
 CREDENTIALS = settings.SEARCH['credentials']
 USER = CREDENTIALS['user']

@@ -60,7 +60,7 @@ class BaseScraper(object):
         self.logging_available = True
 
     def _recent(self):
-        last_scrapes = MongoClient('localhost:27017')['mongosearch']['scrapes']
+        last_scrapes = MongoClient('localhost:27017')['duckduckmongo']['scrapes']
         last_scrape = last_scrapes.find({'state': 'complete', 'source': self.name}, {'end': 1, '_id': 0}).sort('end', -1)
         if last_scrape.count() == 0:
             return None

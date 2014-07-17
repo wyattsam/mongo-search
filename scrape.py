@@ -25,7 +25,7 @@ from pymongo import MongoClient
 class ScrapeRunner(object):
     def __init__(self, cfg, snames=None,opt=False):
         self.client = MongoClient('localhost:27017')
-        self.db = self.client['mongosearch']
+        self.db = self.client['duckduckmongo']
         self.combined = self.db.combined
         self.scrapelog = self.db.scrapes
         self.cfg = cfg
