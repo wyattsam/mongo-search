@@ -87,5 +87,6 @@ def deploy():
 
     # restart services
     with cd(appdir):
+        run('crontab -r')
         run('crontab -e')
     run('sudo /etc/init.d/search-web start')
