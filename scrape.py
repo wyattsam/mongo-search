@@ -140,7 +140,7 @@ class ScrapeRunner(object):
                 self.logger.debug("temporarily skipped %s because it was loading" % s.name)
 
 if __name__ == "__main__":
-    import config.search as settings
+    import config.duckduckmongo as settings
     if len(sys.argv) == 1:
         runner = ScrapeRunner(settings.CONFIG)
     else:

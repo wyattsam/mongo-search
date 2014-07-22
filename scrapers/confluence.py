@@ -46,7 +46,7 @@ class ConfluenceScraper(BaseScraper):
     def update_params(self):
         self.params = {
             'type': 'page',
-            'space': self.space,
+            'spaceKey': self.space,
             'startIndex': self.page
         }
 
@@ -58,8 +58,12 @@ class ConfluenceScraper(BaseScraper):
         self.size = results['totalSize']
         while True:
             res = results['result']
+            extended = None
             if res:
-                self.page_ids.extend([elem['id'] for elem in res])
+                extended = [elem['id'] for elem in res]
+                self.page_ids.extend(extended)
+            if not extended:
+                break
 
             self.page += 50
             if self.page > self.size:
