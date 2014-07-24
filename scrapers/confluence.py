@@ -37,6 +37,7 @@ class ConfluenceScraper(BaseScraper):
         self.base_url = "https://wiki.mongodb.com/rest/prototype/1/"
         self.page = 0
         self.page_ids = []
+        self.page_id = -1
 
     def strip_tags(self, html):
         s = MLStripper()
