@@ -2,12 +2,12 @@
 {% block title %} - Results{% endblock %}
 {% block navbar_right %}
     <form class="navbar-form navbar-right" method="get" action="/search" id="search">
-        <div class="form-group">
-            <input class="form-control" type="text" name="query" placeholder="Search" value="{{ query.query }}" id="searchbar">
-            <button type="submit" class="btn btn-default">Submit</button>
+        <div class="form-group" style="display:inline;">
+            <input class="form-control" type="text" name="query" placeholder="Search" value="{{ query.query }}" id="searchbar" style="width:600px;">
         </div>
+        <button type="submit" class="btn btn-default">Submit</button>
     </form>
-    <p class="navbar-text navbar-right">Results
+    <span class="navbar-text">Results
         {% if pagination.total_count == 0 %}
             0
         {% else %}
@@ -19,14 +19,14 @@
             <span class="bounds">{{pagination.lower_bound}}-{{min(ct,pagination.upper_bound)}}</span> of
             <span class="bounds">{{ct}}</span>
         {% endif %}
-        for <strong>{{query.query}}</strong>
+        <!--for <strong>{{query.query}}</strong>-->
         {% if source and source|lower in CONFIG %}
             in <span class="source-search">{{ CONFIG[source|lower]['fullname'] }}</span>
             {% if sub_source %}
                 ({{ sub_source }})
             {% endif %}
         {% endif %}
-    </p>
+    </span>
 {% endblock %}
 {% block content %}
 <div class="container-fluid">
