@@ -71,10 +71,14 @@ class Query(Node):
                 t.lonesome = True
             t.accept(vis)
 
-        #if we have a source/subsource option from the U:, use that
+        # if we have a source/subsource option from the U:, use that
         if 'source' in vis.query.args and vis.query.args['source']:
             vis.doc['source'] = vis.query.args['source']
+            # first try to capture subsource from a subsource field
+            if 'subsource' in vis.query.args and vis.query.args['subsource']:
+                vis.doc['subsource'] = vis.query.args['subsource']
             ss = vis.query.subsources
+            # now capture it from special name
             for k in vis.query.subsources.keys():
                 if ss[k] and ss[k]['name'] in vis.query.args and vis.query.args[ss[k]['name']]:
                     vis.doc['subsource'] = vis.query.args[ss[k]['field']]
@@ -134,8 +138,8 @@ class SourceSelector(Selector):
         vis.doc['source'] = self.source
         vis.query.args['source'] = self.source
         if self.subsource:
-            vis.doc['subsource'] = self.subsource.lower()
-            vis.query.args['subsource'] = self.subsource.lower()
+            vis.doc['subsource'] = self.subsource
+            vis.query.args['subsource'] = self.subsource
 
     def __str__(self):
         return 'source=' + self.source + ('/' + self.subsource if self.subsource else '')
