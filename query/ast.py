@@ -134,8 +134,8 @@ class SourceSelector(Selector):
         vis.doc['source'] = self.source
         vis.query.args['source'] = self.source
         if self.subsource:
-            vis.doc['subsource'] = self.subsource.lower()
-            vis.query.args['subsource'] = self.subsource.lower()
+            vis.doc['subsource'] = self.subsource
+            vis.query.args['subsource'] = self.subsource
 
     def __str__(self):
         return 'source=' + self.source + ('/' + self.subsource if self.subsource else '')
