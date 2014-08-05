@@ -18,9 +18,50 @@ import sys
 import thread
 import types
 import traceback
+
+import time
 from datetime import datetime
+from datetime import timedelta
 
 from pymongo import MongoClient
+
+import config.search as settings
+import strategy
+
+fire = None
+USE_ADAPTIVE = False
+
+def main(args):
+    if len(args) == 0:
+        runner = ScrapeRunner(settings.CONFIG)
+    else:
+        runner = ScrapeRunner(settings.CONFIG, snames=args)
+    runner.do_setup()
+    runner.runall()
+
+if '_launcher' in settings.CONFIG:
+    if settings.CONFIG['_launcher'] == 'skunkqueue':
+        from skunkqueue import SkunkQueue
+        queue = SkunkQueue('search_scrapers')
+
+        main = queue.event()(main)
+        USE_ADAPTIVE = True
+
+        def _fire(job, t, *args, **kwargs):
+            job.fire_at(t, *args, **kwargs)
+        fire = _fire
+
+    elif settings.CONFIG['_launcher'] == 'celery':
+        from celery import Celery
+        queue = Celery('scrape', broker='mongodb://localhost:27017/celery_tasks')
+
+        main = queue.task(main)
+        USE_ADAPTIVE = True
+
+        def _fire(job, t, *args, **kwargs):
+            res = job.apply_async(args, countdown=t.total_seconds(), **kwargs)
+            print 'res is', res
+        fire = _fire
 
 class ScrapeRunner(object):
     def __init__(self, cfg, snames=None,opt=False):
@@ -28,12 +69,16 @@ class ScrapeRunner(object):
         self.db = self.client['mongosearch']
         self.combined = self.db.combined
         self.scrapelog = self.db.scrapes
+        self.scrapemeta = self.db.scrapemeta
         self.cfg = cfg
         self.scrape_id = ""
         self.opt = False
 
+        self._launcher = cfg['_launcher']
+
         cfgs = [k for k in self.cfg.keys() if k[0] != '_']
-        self.scrapers = self.cfg_instantiate('scraper', snames or cfgs)
+        snames = snames or cfgs
+        self.scrapers = self.cfg_instantiate('scraper', snames)
 
         self.logger = logging.getLogger("ScrapeRunner")
         so = logging.StreamHandler(sys.stdout)
@@ -116,18 +161,32 @@ class ScrapeRunner(object):
             return ret
         return doc
 
+    def launch(self, s, last_t):
+        strategy = s.strategy(self.scrapemeta, self.scrapelog)
+        if USE_ADAPTIVE and strategy:
+            td = strategy.launch(s.name, last_t, main)
+            self.logger.info(("launching a scrape for %s after timedelta " % s.name)+ str(td))
+            if self._launcher == 'skunq':
+                main.routes = [s.name]
+            print 'arg is', [s.name]
+            fire(main, td, [s.name])
+        else:
+            return
+
     def run(self, s):
         self.logger.info("running scraper: %s" % s.name)
         self.log_scrape_start(s)
+        start = datetime.utcnow()
         try:
             for d in s.documents():
                 for d1 in d:
-                        self.save(d1, s.name)
+                    self.save(d1, s.name)
         except Exception as e:
             self.logger.error("documents exception: " + repr(e))
             self.log_scrape_error(e)
             return
         self.log_scrape_finish(s)
+        self.launch(s, datetime.utcnow() - start)
 
     def runall(self):
         self.logger.info("running all scrapers: %s" % str([s.name for s in self.scrapers]))
@@ -140,11 +199,4 @@ class ScrapeRunner(object):
                 self.logger.debug("temporarily skipped %s because it was loading" % s.name)
 
 if __name__ == "__main__":
-    import config.search as settings
-    if len(sys.argv) == 1:
-        runner = ScrapeRunner(settings.CONFIG)
-    else:
-        names = sys.argv[1:]
-        runner = ScrapeRunner(settings.CONFIG, snames=names)
-    runner.do_setup()
-    runner.runall()
+    main(sys.argv[1:])
