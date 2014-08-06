@@ -166,7 +166,7 @@ class ScrapeRunner(object):
         if USE_ADAPTIVE and strategy:
             td = strategy.launch(s.name, last_t, main)
             self.logger.info(("launching a scrape for %s after timedelta " % s.name)+ str(td))
-            if self._launcher == 'skunq':
+            if self._launcher == 'skunkqueue':
                 main.routes = [s.name]
             print 'arg is', [s.name]
             fire(main, td, [s.name])
