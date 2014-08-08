@@ -44,7 +44,7 @@ if '_launcher' in settings.CONFIG:
         from skunkqueue import SkunkQueue
         queue = SkunkQueue('search_scrapers')
 
-        main = queue.event()(main)
+        main = queue.job()(main)
         USE_ADAPTIVE = True
 
         def _fire(job, t, *args, **kwargs):
