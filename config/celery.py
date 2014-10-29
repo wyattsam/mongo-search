@@ -34,3 +34,4 @@ CELERYBEAT_SCHEDULE = {
 }
 
 CELERY_TIMEZONE = 'UTC'
+CELERY_BIN='/opt/10gen/search-prod/venv/bin/celery'

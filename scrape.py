@@ -103,7 +103,7 @@ class ScrapeRunner(object):
         }
         self.scrapelog.update(scrape, upd)
         self.scrape_id = None
-        
+
     def join(self, doc, proj):
         ret = {}
         # if no projector is available, just return everything
@@ -140,7 +140,7 @@ class ScrapeRunner(object):
                 self.logger.debug("temporarily skipped %s because it was loading" % s.name)
 
 if __name__ == "__main__":
-    import config.duckduckmongo as settings
+    import config.search as settings
     if len(sys.argv) == 1:
         runner = ScrapeRunner(settings.CONFIG)
     else:

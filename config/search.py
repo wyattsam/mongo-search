@@ -36,8 +36,8 @@ CONFIG = {
         'view': 'results/stackoverflow_result.html',
         'advanced': [
             {
-                'name': 'Total views',
-                'field': 'view_count',
+                'name': 'Score',
+                'field': 'score',
                 'type': 'text'
             },
             {
@@ -47,7 +47,36 @@ CONFIG = {
                 'options': [('Yes', 'true'), ('No', 'false')]
             }
         ],
-        'tags': []
+        'tags': ['mongodb', 'replication', 'sharding', 'nosql']
+    },
+    'docs': {
+        'fullname': 'Documentation',
+        'scraper': scrapers.DocsScraper,
+        'transformer': transformers.DocsTransformer,
+        'subsources': {
+            'name': 'section',
+            'field': 'section'
+        },
+        'projector': {
+            '_id': 1,
+            'title': 1,
+            'text': 1,
+            'subsource': 1,
+            'section': 1,
+            'current_page_name': 1,
+            'meta': 1,
+            'url': 1,
+            'metatags': 1
+        },
+        'view': 'results/docs_result.html',
+        'advanced': [
+            {
+                'name': 'Section',
+                'field': 'section',
+                'type': 'text'
+            }
+        ],
+        'kinds': ['manual', 'ecosystem']
     },
     'jira': {
         'fullname': 'JIRA',
@@ -78,8 +107,8 @@ CONFIG = {
             }
         ],
         'auth': {
-            'user': '',
-            'password': ''
+            'user': 'xgen-internal-search',
+            'password': 'xxx'
         },
         'skip': ['FREE'],
     },
@@ -89,7 +118,7 @@ CONFIG = {
         'transformer': transformers.GithubTransformer,
         'subsources': {
             'name': 'repo',
-            'field': 'repo.name'
+            'field': 'repo'
         },
         'projector': {
             'html_url': 1,
@@ -113,8 +142,8 @@ CONFIG = {
             }
         ],
         'auth': {
-            'client_id': '',
-            'client_secret': ''
+            'client_id': 'xxx',
+            'client_secret': 'xxx'
         },
         'orgs': ['mongodb']
     },
@@ -133,10 +162,48 @@ CONFIG = {
         },
         'view': 'results/imap_result.html',
         'auth': {
-            'user': '',
-            'password': ''
+            'user': 'info@10gen.com',
+            'password': 'xxx'
         },
         'labels': ['freesupport']
+    },
+    'profiles': {
+        'fullname': 'Profiles',
+        'scraper': scrapers.ProfilesScraper,
+        'transformer': transformers.ProfilesTransformer,
+        'subsources': None,
+        'projector': {
+            '_id': 1,
+            'crowd_id': 1,
+            'first_name': 1,
+            'last_name': 1,
+            'full_name': 1,
+            'team': 1,
+            'office': 1,
+            'primary_email': 1,
+            'primary_phone': 1,
+            'github': 1,
+            'title': 1,
+            'bio': 1
+        },
+        'view': 'results/profiles_result.html',
+        'advanced': [
+            {
+                'name': 'Office',
+                'field': 'office',
+                'type': 'text'
+            },
+            {
+                'name': 'Team',
+                'field': 'team.name',
+                'type': 'text'
+            }
+        ],
+        'auth': {
+            'user': 'employee_api',
+            'password': 'xxx'
+        },
+        'digest': True
     },
     'confluence': {
         'fullname': 'Confluence',
@@ -146,7 +213,7 @@ CONFIG = {
             'name': 'space',
             'field': 'space'
         },
-        'projector': { 
+        'projector': {
             '_id': 1,
             'body': 1,
             'space': 1,
@@ -156,10 +223,21 @@ CONFIG = {
         },
         'view': 'results/confluence_result.html',
         'auth': {
-            'user': '',
-            'password': ''
+            'user': 'xgen-internal-search',
+            'password': 'xxx'
         },
-        'spaces': []
+        'spaces': [
+            '10GEN',
+            'cs',
+            'sales',
+            'Devops',
+            'KB',
+            'mcs',
+            'mrkt',
+            'HGTC',
+            'MMS',
+            'KERNEL'
+        ]
     },
     '_loglevel': logging.DEBUG
 }
