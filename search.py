@@ -45,10 +45,10 @@ COMBINED = DB['combined']
 SEARCHES = DB['searches']
 SCRAPES = DB['scrapes']
 
-SOURCES = [k for k in settings.CONFIG.keys() if k[0] != '_']
+SOURCES = [k for k in sorted(settings.CONFIG.keys()) if k[0] != '_']
 SUBSOURCES = dict([(n, settings.CONFIG[n]['subsources']) for n in SOURCES])
 
-BASIC_OPTS = [  'query' 
+BASIC_OPTS = [  'query'
               , 'source'
               , 'subsource'
               , 'page'
@@ -101,13 +101,13 @@ def submit():
     ac = ""
     if request.method == 'POST':
         ac = autocomplete_list(str(request.data))
-    args = request.args
-    log_search(args)
+    request_args = request.args
+    log_search(request_args)
     if len(ac) > 0:
         ac = map(str, ac)
         ac = map(json.dumps, ac)
 
-    mq, page = parse_args(args)
+    mq, page = parse_args(request_args)
 
     if not mq.query:
         return redirect('/')
@@ -116,7 +116,7 @@ def submit():
     visitor = BasicQueryVisitor(mq)
     query_json = visitor.visit_all()
 
-    if 'advanced' in args and args['advanced']:
+    if 'advanced' in request_args and request_args['advanced']:
         query_json = advanced_options(query_json, mq.args)
     counts = covered_count(query_json, mq.args)
 
@@ -374,9 +374,8 @@ if __name__ == "__main__":
     toolbar = DebugToolbarExtension(app)
 
     if not app.debug:
-        ADMINS = ['tyler@10gen.com', 'austin.estep@10gen.com']
+        ADMINS = ['internal-tools@10gen.com']
 
-        """
         import logging
         from logging.handlers import SMTPHandler
         from logging.handlers import RotatingFileHandler
@@ -388,5 +387,4 @@ if __name__ == "__main__":
         file_handler.setLevel(logging.WARNING)
         app.logger.addHandler(file_handler)
         app.logger.addHandler(mail_handler)
-        """
     app.run()

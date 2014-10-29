@@ -30,9 +30,7 @@ class GenericScraper(BaseScraper):
     def documents(self):
         while True:
             try:
-               response = requests.get(self.apiurl, params=self.params,
-                                       auth=self.auth, verify=False,
-                                       timeout=60)
+               response = requests.get(self.apiurl, params=self.params, auth=self.auth)
             except requests.exceptions.SSLError:
                 self.warn("Experienced requests.exceptions.SSLError timeout; continuing")
                 continue

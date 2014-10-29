@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import inspect
+import traceback
 import logging
 import sys
 import thread
@@ -122,9 +123,9 @@ class ScrapeRunner(object):
         try:
             for d in s.documents():
                 for d1 in d:
-                        self.save(d1, s.name)
+                    self.save(d1, s.name)
         except Exception as e:
-            self.logger.error("documents exception: " + repr(e))
+            self.logger.error("documents exception:\n" + traceback.format_exc())
             self.log_scrape_error(e)
             return
         self.log_scrape_finish(s)
