@@ -12,10 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 import scrapers as scrapers
 import transformers as transformers
 import indexing.hooks as hooks
-import logging
+from config.private import CONFIG as PRIVATE_CONFIG
+
+## Deep dict merge.
+def merge(a, b):
+    if not isinstance(a, dict) or not isinstance(b, dict):
+        raise Exception("`merge` must pass a dict for both parameters")
+
+    out = dict(a)
+
+    for key in b.keys():
+        if key in a.keys() and isinstance(a[key], dict) and isinstance(b[key], dict):
+            out[key] = merge(a[key], b[key])
+        else:
+            out[key] = b[key]
+
+    return out
 
 CONFIG = {
     'stackoverflow': {
@@ -49,8 +66,8 @@ CONFIG = {
         ],
         'tags': ['mongodb', 'replication', 'sharding', 'nosql']
     },
-    'docs': {
-        'fullname': 'Documentation',
+    'docs-core': {
+        'fullname': 'MongoDB Documentation',
         'scraper': scrapers.DocsScraper,
         'transformer': transformers.DocsTransformer,
         'subsources': {
@@ -76,7 +93,65 @@ CONFIG = {
                 'type': 'text'
             }
         ],
-        'kinds': ['manual', 'ecosystem']
+        'siteurl': 'http://docs.mongodb.org/',
+        'kinds': ['manual', 'ecosystem'] ## Defines the feeds to fetch from for the scraper
+    },
+    'docs-mms-classic': {
+        'fullname': 'MMS Classic Documentation',
+        'scraper': scrapers.DocsScraper,
+        'transformer': transformers.DocsTransformer,
+        'subsources': {
+            'name': 'classic-section',
+            'field': 'classic-section'
+        },
+        'projector': {
+            '_id': 1,
+            'title': 1,
+            'text': 1,
+            'subsource': 1,
+            'section': 1,
+            'current_page_name': 1,
+            'meta': 1,
+            'url': 1,
+            'metatags': 1
+        },
+        'view': 'results/docs_result.html',
+        'advanced': [
+            {
+                'name': 'Section',
+                'field': 'section',
+                'type': 'text'
+            }
+        ],
+        'siteurl': 'https://mms.mongodb.org/',
+        'kinds': ['help-classic']
+    },
+    'docs-mms-cloud': {
+        'fullname': 'MMS Cloud Documentation',
+        'scraper': scrapers.DocsScraper,
+        'transformer': transformers.DocsTransformer,
+        'subsources': None,
+        'projector': {
+            '_id': 1,
+            'title': 1,
+            'text': 1,
+            'subsource': 1,
+            'section': 1,
+            'current_page_name': 1,
+            'meta': 1,
+            'url': 1,
+            'metatags': 1
+        },
+        'view': 'results/docs_result.html',
+        'advanced': [
+            {
+                'name': 'Section',
+                'field': 'section',
+                'type': 'text'
+            }
+        ],
+        'siteurl': 'https://docs.mms.mongodb.com/',
+        'kinds': ['']
     },
     'jira': {
         'fullname': 'JIRA',
@@ -230,7 +305,7 @@ CONFIG = {
             '10GEN',
             'cs',
             'sales',
-            'Devops',
+            'OPSIT',
             'KB',
             'mcs',
             'mrkt',
@@ -242,9 +317,12 @@ CONFIG = {
     '_loglevel': logging.DEBUG
 }
 
+CONFIG = merge(CONFIG, PRIVATE_CONFIG)
+
 SEARCH = {'credentials': {'user': None, 'password': None}}
 
 HOOKS = {
     'github': hooks.GithubHook,
     'jira': hooks.JiraHook
 }
+

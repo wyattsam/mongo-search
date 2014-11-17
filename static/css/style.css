@@ -240,3 +240,7 @@ a {
 .hidden-row{
     padding: 0 !important;
 }
+
+.navbar-results {
+    max-width: 280px;
+}

@@ -20,7 +20,7 @@ class DocsScraper(BaseScraper):
         BaseScraper.__init__(self, name, **kwargs)
         self._setup_logger(__name__)
         kinds = kwargs['kinds']
-        self.apiurl = "http://docs.mongodb.org/"
+        self.apiurl = kwargs['siteurl']
         self.kinds = kinds
         self.kind = ''
         self.urlexts = []
@@ -51,7 +51,7 @@ class DocsScraper(BaseScraper):
 
     def _setup(self):
         for k in self.kinds:
-            urls = requests.get(self.apiurl + '/' + k + '/json/.file_list').text.split('\n')
+            urls = requests.get(self.apiurl + k + '/json/.file_list', verify=False).text.split('\n')
             self.urlexts.extend([(k,u) for u in urls])
         # make sure apiurl is updated
         url = self.urlexts.pop(0)

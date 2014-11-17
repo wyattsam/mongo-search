@@ -87,10 +87,9 @@ class BaseScraper(object):
             headers = {'accept': 'application/json'}
 
             try:
-                response = requests.get(self.apiurl, params=self.params, 
-                                        auth=self.auth, verify=False,
-                                        headers=headers,
-                                        timeout=60)
+                response = requests.get(self.apiurl, params=self.params,
+                                        auth=self.auth,
+                                        headers=headers, verify=False)
             except requests.exceptions.MissingSchema:
                 # TODO is this a reliable terminator?
                 return

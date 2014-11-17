@@ -35,7 +35,7 @@ class JiraScraper(BaseScraper):
         self.project = ""
 
     def _setup(self):
-        projects = requests.get(url='https://jira.mongodb.org/rest/api/2/project/', auth=self.auth, verify=False).json(strict=False)
+        projects = requests.get(url='https://jira.mongodb.org/rest/api/2/project/', auth=self.auth).json(strict=False)
         self.pkeys = [p['key'] for p in projects if p['key'] not in self.skip]
         self.project = self.pkeys.pop(0)
         self.set_jql()
