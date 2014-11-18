@@ -53,7 +53,9 @@ class DocsScraper(BaseScraper):
         for k in self.kinds:
             urls = requests.get(self.apiurl + k + '/json/.file_list', verify=False).text.split('\n')
             self.urlexts.extend([(k,u) for u in urls])
+
         # make sure apiurl is updated
         url = self.urlexts.pop(0)
         self.kind = url[0]
         self.apiurl = url[1]
+

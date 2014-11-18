@@ -124,7 +124,7 @@ CONFIG = {
             }
         ],
         'siteurl': 'https://mms.mongodb.org/',
-        'kinds': ['help-classic']
+        'kinds': ['help-classic', 'help-hosted/current']
     },
     'docs-mms-cloud': {
         'fullname': 'MMS Cloud Documentation',
