@@ -123,8 +123,38 @@ CONFIG = {
                 'type': 'text'
             }
         ],
-        'siteurl': 'https://mms.mongodb.org/',
+        'siteurl': 'https://mms.mongodb.com/',
         'kinds': ['help-classic', 'help-hosted/current']
+    },
+    'docs-mms-onprem': {
+        'fullname': 'MMS On-Prem Documentation',
+        'scraper': scrapers.DocsScraper,
+        'transformer': transformers.DocsTransformer,
+        'subsources': {
+            'name': 'onprem-section',
+            'field': 'onprem-section'
+        },
+        'projector': {
+            '_id': 1,
+            'title': 1,
+            'text': 1,
+            'subsource': 1,
+            'section': 1,
+            'current_page_name': 1,
+            'meta': 1,
+            'url': 1,
+            'metatags': 1
+        },
+        'view': 'results/docs_result.html',
+        'advanced': [
+            {
+                'name': 'Section',
+                'field': 'section',
+                'type': 'text'
+            }
+        ],
+        'siteurl': 'https://mms.mongodb.com/',
+        'kinds': ['help-hosted/current']
     },
     'docs-mms-cloud': {
         'fullname': 'MMS Cloud Documentation',
