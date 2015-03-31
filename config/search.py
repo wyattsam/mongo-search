@@ -344,7 +344,7 @@ CONFIG = {
             'KERNEL'
         ]
     },
-    '_loglevel': logging.DEBUG
+    '_loglevel': logging.WARN
 }
 
 CONFIG = merge(CONFIG, PRIVATE_CONFIG)

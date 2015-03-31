@@ -68,7 +68,7 @@ class GithubScraper(BaseScraper):
                     commit['org'] = self.org
                     yield commit
                 except Exception: # we get a differently typed message when github shuts us off
-                    self.error("GitHub returned an error document: %s" % doc)
+                    self.err("GitHub returned an error document: %s" % doc)
                     raise StopIteration()
         if 'next' in links:
             self.info("Getting next page of repo %s" % self.repo['name'])
