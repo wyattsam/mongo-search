@@ -1,6 +1,9 @@
 config/duckduckmongo.py
 config/private.py
+
 *.pyc
 *.swp
 *.o
 *.bak
+
+.idea/
