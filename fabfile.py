@@ -67,7 +67,7 @@ def deploy(refspec):
     deploydir = os.path.join(releases, time.strftime(datefmt))
 
     # set up directories
-    run('git clone {0} {1}'.format('git@github.com:10gen/search', deploydir))
+    run('git clone {0} {1}'.format('git@github.com:10gen-labs/mongo-search', deploydir))
     with cd(deploydir):
         run('git checkout {0}'.format(refspec))
 
