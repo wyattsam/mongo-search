@@ -6,4 +6,8 @@ config/private.py
 *.o
 *.bak
 
+# IDE directories
 .idea/
+
+# Python virtualenv stuff
+venv
