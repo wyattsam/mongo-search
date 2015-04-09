@@ -89,7 +89,7 @@ class BaseScraper(object):
             try:
                 response = requests.get(self.apiurl, params=self.params,
                                         auth=self.auth,
-                                        headers=headers, verify=False)
+                                        headers=headers)
             except requests.exceptions.MissingSchema:
                 # TODO is this a reliable terminator?
                 return

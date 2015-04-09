@@ -45,7 +45,7 @@ class JiraScraper(BaseScraper):
     def set_jql(self):
         if self.last_date:
             last_date = self.last_date.strftime('%Y/%m/%d %H:%M')
-            print 'looking for things after', last_date
+            self.info('looking for things after {date}'.format(date=last_date))
             self.params['jql'] = 'PROJECT={project} and updated>"{date}" order by KEY asc'.format(
                     project=self.project,
                     date=last_date

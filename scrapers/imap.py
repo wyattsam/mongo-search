@@ -117,7 +117,7 @@ class IMAPScraper(BaseScraper):
 
     def scrape_messages(self, message_ids):
         asking_range = str(message_ids[0]) + ':' + str(message_ids[-1])
-        print "Fetching messages in range [%s]" % asking_range
+        self.info("Fetching messages in range [%s]" % asking_range)
         data = self.uid('fetch', asking_range, self.message_parts)
         for headers, message in data[::2]:
             yield self.scrape_message(headers, message)
