@@ -217,41 +217,41 @@ CONFIG = {
         },
         'skip': ['FREE'],
     },
-#    'github': {
-#        'fullname': 'GitHub',
-#        'scraper': scrapers.GithubScraper,
-#        'transformer': transformers.GithubTransformer,
-#        'subsources': {
-#            'name': 'repo',
-#            'field': 'repo'
-#        },
-#        'projector': {
-#            'html_url': 1,
-#            'repo': 1,
-#            'commit': 1,
-#            '_id': 1,
-#            'org': 1,
-#            'subsource': 1
-#        },
-#        'view': 'results/github_result.html',
-#        'advanced': [
-#            {
-#                'name': 'Repository',
-#                'field': 'repo.name',
-#                'type': 'text'
-#            },
-#            {
-#                'name': 'Organization',
-#                'field': 'org',
-#                'type': 'text'
-#            }
-#        ],
-#        'auth': {
-#            'client_id': 'xxx',
-#            'client_secret': 'xxx'
-#        },
-#        'orgs': ['mongodb']
-#    },
+   'github': {
+       'fullname': 'GitHub',
+       'scraper': scrapers.GithubScraper,
+       'transformer': transformers.GithubTransformer,
+       'subsources': {
+           'name': 'repo',
+           'field': 'repo'
+       },
+       'projector': {
+           'html_url': 1,
+           'repo': 1,
+           'commit': 1,
+           '_id': 1,
+           'org': 1,
+           'subsource': 1
+       },
+       'view': 'results/github_result.html',
+       'advanced': [
+           {
+               'name': 'Repository',
+               'field': 'repo.name',
+               'type': 'text'
+           },
+           {
+               'name': 'Organization',
+               'field': 'org',
+               'type': 'text'
+           }
+       ],
+       'auth': {
+           'client_id': 'xxx',
+           'client_secret': 'xxx'
+       },
+       'orgs': ['']
+   },
     'googlegroups': {
         'fullname': 'Google Groups',
         'scraper': scrapers.IMAPScraper,
