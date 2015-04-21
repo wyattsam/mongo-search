@@ -45,13 +45,18 @@ class ScrapeRunner(object):
 
     def do_setup(self):
         for s in self.scrapers:
+            self.log_scrape_start(s)
             if s.needs_setup:
                 # _setup may take time; let scraping continue while we do setup
                 # FIXME: something is wrong with the thread safety here
-                if self.opt:
-                    thread.start_new_thread(s.setup, ())
-                else:
-                    s.setup()
+                try:
+                    if self.opt:
+                        thread.start_new_thread(s.setup, ())
+                    else:
+                        s.setup()
+                except Exception as e:
+                    self.log_scrape_error(e)
+                    raise e
 
     def cfg_instantiate(self, typ, cfgs):
         clss = [self.cfg[c][typ] for c in cfgs]
@@ -119,7 +124,6 @@ class ScrapeRunner(object):
 
     def run(self, s):
         self.logger.info("running scraper: %s" % s.name)
-        self.log_scrape_start(s)
         try:
             for d in s.documents():
                 for d1 in d:
