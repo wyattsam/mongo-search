@@ -87,9 +87,7 @@ class BaseScraper(object):
             headers = {'accept': 'application/json'}
 
             try:
-                response = requests.get(self.apiurl, params=self.params,
-                                        auth=self.auth,
-                                        headers=headers)
+                response = self.make_request(headers)
             except requests.exceptions.MissingSchema:
                 # TODO is this a reliable terminator?
                 return
@@ -102,6 +100,15 @@ class BaseScraper(object):
                 continue
             json = response.json(strict=False)
             yield self._scrape(json, response.links)
+
+    def make_request(self, headers):
+        """
+        This is a default implementation of the request that is sent to get documents.
+        Subclasses can override if a different behavior is needed
+        """
+        return requests.get(self.apiurl, params=self.params,
+            auth=self.auth,
+            headers=headers)
 
     def _scrape(self, doc, links=None):
         """Transform a response document into the desired form.

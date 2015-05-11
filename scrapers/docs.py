@@ -15,6 +15,8 @@
 from base_scraper import BaseScraper
 import requests
 
+requests.packages.urllib3.disable_warnings()
+
 class DocsScraper(BaseScraper):
     def __init__(self, name, **kwargs):
         BaseScraper.__init__(self, name, **kwargs)
@@ -51,11 +53,21 @@ class DocsScraper(BaseScraper):
 
     def _setup(self):
         for k in self.kinds:
-            urls = requests.get(self.apiurl + k + '/json/.file_list').text.split('\n')
+            urls = requests.get(self.apiurl + k + '/json/.file_list', verify=False).text.split('\n')
             self.urlexts.extend([(k,u) for u in urls])
 
         # make sure apiurl is updated
         url = self.urlexts.pop(0)
         self.kind = url[0]
         self.apiurl = url[1]
+
+    def make_request(self, headers):
+        """
+        The request method is overridden so that it doesn't verify the https,
+        because of currently-inconsistent behavior between the docs cert and
+        python 2.7
+        """
+        return requests.get(self.apiurl, params=self.params,
+            auth=self.auth,
+            headers=headers, verify=False)
 
