@@ -250,7 +250,7 @@ CONFIG = {
            'client_id': 'xxx',
            'client_secret': 'xxx'
        },
-       'orgs': ['']
+       'orgs': ['mongodb']
    },
     'googlegroups': {
         'fullname': 'Google Groups',

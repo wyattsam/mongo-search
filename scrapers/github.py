@@ -16,6 +16,8 @@ from base_scraper import BaseScraper
 from time import sleep
 import requests
 
+github_rate_header = 'X-RateLimit-Remaining'
+
 class GithubScraper(BaseScraper):
     def __init__(self, name, **kwargs):
         BaseScraper.__init__(self, name, **kwargs)
@@ -38,20 +40,28 @@ class GithubScraper(BaseScraper):
                 'client_id': self.auth[0],
                 'client_secret': self.auth[1]
             }
+            self.oauth_params = '?client_id={id}&client_secret={secret}'.format(id=self.auth[0], secret=self.auth[1])
+            self.ratelimit_url = 'https://api.github.com/rate_limit' + self.oauth_params
             self.params.update(**params)
         else:
             self.params = params
         self.auth = None
 
+        self.remaining_requests = self.get_remaining_requests()
+
     def _setup(self):
-        url = self.orgurl + self.org + "/repos"
-        self.repos = requests.get(url, params=self.params).json(strict=False)
+        url = self.orgurl + self.org + "/repos" + self.oauth_params
+        response, at_limit = self.make_ratelimited_github_request(url)
+        if at_limit:
+            self.err('Hit github api limit while setting up - exiting')
+        self.repos = response.json(strict=False)
         try:
             self.repo = self.repos.pop(0)
         except KeyError:
             self.err(self.repos['message'])
             raise StopIteration()
-        self.apiurl = self.repo['url'] + "/commits"
+
+        self.apiurl = self.repo['url'] + "/commits" + self.oauth_params
         self.info("Starting repo %s" % self.repo['full_name'])
 
     def _scrape(self, doc, links=None):
@@ -84,5 +94,36 @@ class GithubScraper(BaseScraper):
                     pass
             else:
                 self.repo = self.repos.pop(0)
-                self.apiurl = self.repo['url'] + "/commits"
+                self.apiurl = self.repo['url'] + "/commits" + self.oauth_params
                 self.info("Starting repo %s" % self.repo['full_name'])
+
+    def make_request(self, headers):
+        """
+        This is a default implementation of the request that is sent to get documents.
+        Subclasses can override if a different behavior is needed
+        """
+        response, past_limit = self.make_ratelimited_github_request(self.apiurl, params=self.params, auth=self.auth, headers=headers)
+        if past_limit:
+            raise StopIteration()
+        return response
+
+    def make_ratelimited_github_request(self, url, **kwargs):
+        """
+            Github limits the requests that can be made to it to 5000/hour
+            This wrapper makes sure that we don't crack that
+            :return:
+        """
+        if not self.remaining_requests:
+            self.remaining_requests = self.get_remaining_requests()
+
+        if self.remaining_requests < 0:
+            self.error('Hit github rate limit - stopping')
+            return None, True
+
+        response = requests.get(url, **kwargs)
+        self.remaining_requests = int(response.headers[github_rate_header])
+        return response, False
+
+    def get_remaining_requests(self):
+        ratelimit_info = requests.get(self.ratelimit_url).json()
+        return int(ratelimit_info.get('resources', {}).get('core', {}).get('remaining', 0))
