@@ -334,7 +334,6 @@ CONFIG = {
         'spaces': [
             '10GEN',
             'cs',
-            'sales',
             'OPSIT',
             'KB',
             'mcs',
