@@ -72,7 +72,8 @@ class ConfluenceScraper(BaseScraper):
             self.update_params()
             self.debug("getting page starting at %s for space %s" % (self.page, self.space))
             results = requests.get(req_url, params=self.params, auth=self.auth).json(strict=False)
-        self.advance_page()
+        if len(self.page_ids) > 0:
+            self.advance_page()
         self.page = 0
 
     def advance_page(self):
