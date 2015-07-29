@@ -22,10 +22,17 @@ class ProfilesScraper(BaseScraper):
         self.params = {'expand': 'team'}
 
     def _scrape(self, doc, links=None):
-        for d in doc['employees']:
-            eid = d['uri'].partition("/api/employee/")[2]
-            d['crowd_id'] = eid
-            d['_id'] = 'employee-' + eid
-            d['full_name'] = " ".join([d['first_name'], d['last_name']])
-            yield d
+        try:
+            for d in doc['employees']:
+                eid = d['uri'].partition("/api/employee/")[2]
+                d['crowd_id'] = eid
+                d['_id'] = 'employee-' + eid
+                d['full_name'] = " ".join([d['first_name'], d['last_name']])
+                yield d
+        except TypeError:
+            # Temporary code that will catch an intermittent type error that
+            # happens every once in a while.  This should be removed in a
+            # later commit
+            print "Caught the elusive profiles TypeError!  Here is what doc is:"
+            print doc
         self.finished = True # one query for everyone; wow!
