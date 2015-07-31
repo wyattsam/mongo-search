@@ -97,7 +97,7 @@ CONFIG = {
         'kinds': ['manual', 'ecosystem'] ## Defines the feeds to fetch from for the scraper
     },
     'docs-mms-classic': {
-        'fullname': 'MMS Classic Documentation',
+        'fullname': 'Cloud Classic Documentation',
         'scraper': scrapers.DocsScraper,
         'transformer': transformers.DocsTransformer,
         'subsources': {
@@ -123,11 +123,11 @@ CONFIG = {
                 'type': 'text'
             }
         ],
-        'siteurl': 'https://mms.mongodb.com/',
+        'siteurl': 'https://cloud.mongodb.com/',
         'kinds': ['help-classic', 'help-hosted/current']
     },
     'docs-mms-onprem': {
-        'fullname': 'MMS On-Prem Documentation',
+        'fullname': 'Cloud On-Prem Documentation',
         'scraper': scrapers.DocsScraper,
         'transformer': transformers.DocsTransformer,
         'subsources': {
@@ -153,11 +153,11 @@ CONFIG = {
                 'type': 'text'
             }
         ],
-        'siteurl': 'https://mms.mongodb.com/',
+        'siteurl': 'https://cloud.mongodb.com/',
         'kinds': ['help-hosted/current']
     },
     'docs-mms-cloud': {
-        'fullname': 'MMS Cloud Documentation',
+        'fullname': 'Cloud Manager Documentation',
         'scraper': scrapers.DocsScraper,
         'transformer': transformers.DocsTransformer,
         'subsources': None,
@@ -180,7 +180,7 @@ CONFIG = {
                 'type': 'text'
             }
         ],
-        'siteurl': 'https://docs.mms.mongodb.com/',
+        'siteurl': 'https://docs.cloud.mongodb.com/',
         'kinds': ['']
     },
     'jira': {
